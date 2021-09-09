@@ -4,7 +4,7 @@ import { AuthCredentialsDto } from './dto/auth-credential.dto';
 import { UserRepository } from './repository/user.repository';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { ResponseGetUserByDto } from './dto/response/responseGetUserById.dto';
+import { ResponseGetUserByIdDto } from './dto/response/responseGetUserById.dto';
 import { User } from './entities/user.entity';
 import { CreatePersonalUserDto } from './dto/create-personal-user.dto';
 import { UserPersonal } from './entities/user-personal.entity';
@@ -12,6 +12,7 @@ import { UserPersonalDetailRepository } from './repository/user-personal-detail.
 import { CreateEnterpriseUserDto } from './dto/create-enterprise-user.dto';
 import { UserEnterprise } from './entities/user-enterprise.entity';
 import { UserEnterpriseDetailRepository } from './repository/user-enterprise-detail.repository';
+import { responseGetUserByEmailDto } from './dto/response/responseGetUserByEmail.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,35 +24,41 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async getUserById(userId: string): Promise<ResponseGetUserByDto> {
-    const found = await this.userRepository.findOne({ userId });
+  async getUserById(param: {
+    userId: string;
+  }): Promise<ResponseGetUserByIdDto> {
+    const found = await this.userRepository.findOne({
+      where: {
+        id: param.userId,
+      },
+    });
 
     return found
       ? Object.assign({
-          statusCode: 200,
-          message: 'userID existence',
-          data: { isDuplicate: true },
+          statusCode: 201,
+          message: '유저 아이디가 존재합니다.',
+          isDuplicate: true,
         })
       : Object.assign({
           statusCode: 200,
-          message: 'userID null',
-          data: { isDuplicate: false },
+          message: '유저 아이디가 없습니다.',
+          isDuplicate: false,
         });
   }
 
-  async getUserByEmail(useremail: string): Promise<ResponseGetUserByDto> {
+  async getUserByEmail(useremail: string): Promise<responseGetUserByEmailDto> {
     const found = await this.userRepository.findOne({ useremail });
 
     return found
       ? Object.assign({
           statusCode: 200,
-          message: 'userEmail existence',
-          data: { isDuplicate: true },
+          message: '유저 이메일이 존재합니다',
+          isDuplicate: true,
         })
       : Object.assign({
           statusCode: 200,
-          message: 'userEmail null',
-          data: { isDuplicate: false },
+          message: '유저 이메일이 없습니다.',
+          isDuplicate: false,
         });
   }
 

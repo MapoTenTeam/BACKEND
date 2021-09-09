@@ -12,27 +12,57 @@ import {
 import { AuthService } from './auth.service';
 
 import { AuthCredentialsDto } from './dto/auth-credential.dto';
-import { ApiOperation, ApiTags, ApiBody } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiBody,
+  ApiOkResponse,
+  ApiParam,
+  ApiResponse,
+  getSchemaPath,
+  refs,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
 import { GetUser } from './get-user.decorator';
 import { Request } from 'express';
-import { ResponseGetUserByDto } from './dto/response/responseGetUserById.dto';
+import {
+  ResponseGetUserByIdDto,
+  ResponseGetUserByIdNotDto,
+} from './dto/response/responseGetUserById.dto';
 import { CreatePersonalUserDto } from './dto/create-personal-user.dto';
 import { UserPersonal } from './entities/user-personal.entity';
 import { CreateEnterpriseUserDto } from './dto/create-enterprise-user.dto';
 import { UserEnterprise } from './entities/user-enterprise.entity';
+import { responseGetUserByEmailDto } from './dto/response/responseGetUserByEmail.dto';
 
 @ApiTags('유저 API')
-@Controller('auth')
+@Controller('user')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   //유저ID 중복체크 API
-  @Get('userId/:userId')
+
   @ApiOperation({ summary: '유저 아이디 중복체크 API' })
-  getUserById(@Param('userId') userId: string): Promise<ResponseGetUserByDto> {
-    return this.authService.getUserById(userId);
+  @ApiParam({
+    name: 'userId',
+    example: 'hee1234',
+    description: '중복체크할 유저 아이디',
+  })
+  @ApiOkResponse({
+    description: '유저 아이디가 없는경우',
+    type: ResponseGetUserByIdDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '유저 아이디가 있는경우',
+    type: ResponseGetUserByIdNotDto,
+  })
+  @Get('userId/:userId')
+  getUserById(
+    @Param() param: { userId: string },
+  ): Promise<ResponseGetUserByIdDto> {
+    return this.authService.getUserById(param);
   }
 
   //유저 이메일 중복체크 API
@@ -40,7 +70,7 @@ export class AuthController {
   @ApiOperation({ summary: '유저 이메일 중복체크 API' })
   getUserByEmail(
     @Param('userEmail') useremail: string,
-  ): Promise<ResponseGetUserByDto> {
+  ): Promise<responseGetUserByEmailDto> {
     return this.authService.getUserByEmail(useremail);
   }
 
@@ -75,6 +105,7 @@ export class AuthController {
 
   //개인 프로필 정보 보내기 API
   @Post('/personal/profile')
+  @ApiOperation({ summary: '개인 프로필 정보 보내기 API' })
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   async personalUser(
@@ -86,6 +117,7 @@ export class AuthController {
 
   //기업 프로필 정보 보내기 API
   @Post('/enterprise/profile')
+  @ApiOperation({ summary: '기업 프로필 정보 보내기 API' })
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
   async enterpriseUser(
