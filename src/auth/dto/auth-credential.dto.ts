@@ -18,11 +18,15 @@ export class AuthCredentialsDto {
   })
   password: string;
 
+  @ApiProperty()
   usernickname: string;
 
+  @ApiProperty()
   useremail: string;
 
+  @ApiProperty()
   usertype: number;
 
+  @ApiProperty()
   bizrno: string;
 }

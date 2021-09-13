@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -21,6 +22,7 @@ import {
   ApiResponse,
   getSchemaPath,
   refs,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
@@ -28,13 +30,17 @@ import { GetUser } from './get-user.decorator';
 import { Request } from 'express';
 import {
   ResponseGetUserByIdDto,
+  ResponseGetUserByIdFindInputDto,
+  ResponseGetUserByIdFindOutputDto,
   ResponseGetUserByIdNotDto,
 } from './dto/response/responseGetUserById.dto';
 import { CreatePersonalUserDto } from './dto/create-personal-user.dto';
 import { UserPersonal } from './entities/user-personal.entity';
 import { CreateEnterpriseUserDto } from './dto/create-enterprise-user.dto';
 import { UserEnterprise } from './entities/user-enterprise.entity';
-import { responseGetUserByEmailDto } from './dto/response/responseGetUserByEmail.dto';
+import { responseGetUserByEmailDto, responseGetUserByEmailNotDto } from './dto/response/responseGetUserByEmail.dto';
+import { ResponseGetUserByPasswordFindInputDto, ResponseGetUserByPasswordFindOutputDto } from './dto/response/responseGetUserByPassword.dto';
+import { ResponseGetUserByDeleteOutputDto } from './dto/response/responseGetUserByDelete.dto';
 
 @ApiTags('유저 API')
 @Controller('user')
@@ -42,7 +48,6 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   //유저ID 중복체크 API
-
   @ApiOperation({ summary: '유저 아이디 중복체크 API' })
   @ApiParam({
     name: 'userId',
@@ -50,29 +55,87 @@ export class AuthController {
     description: '중복체크할 유저 아이디',
   })
   @ApiOkResponse({
-    description: '유저 아이디가 없는경우',
-    type: ResponseGetUserByIdDto,
+    description: '중복된 아이디가 없는경우',
+    type: ResponseGetUserByIdNotDto,
   })
   @ApiResponse({
     status: 201,
-    description: '유저 아이디가 있는경우',
-    type: ResponseGetUserByIdNotDto,
+    description: '중복된 아이디가 있는경우',
+    type: ResponseGetUserByIdDto,
   })
   @Get('userId/:userId')
-  getUserById(
+  async getUserById(
     @Param() param: { userId: string },
-  ): Promise<ResponseGetUserByIdDto> {
-    return this.authService.getUserById(param);
+  ): Promise<ResponseGetUserByIdNotDto> {
+    return await this.authService.getUserById(param);
   }
 
   //유저 이메일 중복체크 API
-  @Get('userEmail/:userEmail')
   @ApiOperation({ summary: '유저 이메일 중복체크 API' })
-  getUserByEmail(
+  @ApiParam({
+    name: 'userEmail',
+    example: 'hee1234@gmail.com',
+    description: '중복체크할 유저 이메일',
+  })
+  @ApiOkResponse({
+    description: '중복된 이메일이 없는경우',
+    type: responseGetUserByEmailNotDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '중복된 이메일이 있는경우',
+    type: responseGetUserByEmailDto,
+  })
+  @Get('userEmail/:userEmail')
+  async getUserByEmail(
     @Param('userEmail') useremail: string,
-  ): Promise<responseGetUserByEmailDto> {
-    return this.authService.getUserByEmail(useremail);
+  ): Promise<responseGetUserByEmailNotDto> {
+    return await this.authService.getUserByEmail(useremail);
   }
+
+  //유저 아이디 찾기
+  @ApiOperation({ summary: '유저 아이디 찾기 API' })
+  @ApiBody({
+    type:ResponseGetUserByIdFindInputDto
+  })
+  @ApiOkResponse({
+    description: '유저 아이디 찾기 성공',
+    type: ResponseGetUserByIdFindOutputDto,
+  })
+  @Get('userIdFind')
+  async getUserByIdFind(){}
+
+  //유저 패스워드 찾기
+  @ApiOperation({ summary: '유저 패스워드 찾기 API' })
+  @ApiBody({
+    type:ResponseGetUserByPasswordFindInputDto
+  })
+  @ApiOkResponse({
+    description: '유저 패스워드 찾기 성공',
+    type: ResponseGetUserByPasswordFindOutputDto,
+  })
+  @Get('userPasswordFind')
+  async getUserByPasswordFind(){}
+
+  //회원 탈퇴하기
+  @ApiOperation({ summary: '회원 탈퇴 API' })
+  @ApiParam({
+    name: 'userId',
+    example: 'hee1234',
+    description: '유저Id',
+  })
+  @ApiOkResponse({
+    description: '회원 탈퇴 성공 성공',
+    type: ResponseGetUserByDeleteOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증되지 않은 사용자 입니다.',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  @Delete(':userId')
+  async deleteUser(){}
 
   //개인 회원가입 API
   @Post('/personal/signup')
@@ -104,10 +167,11 @@ export class AuthController {
   }
 
   //개인 프로필 정보 보내기 API
-  @Post('/personal/profile')
   @ApiOperation({ summary: '개인 프로필 정보 보내기 API' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
+  @Post('/personal/profile')
   async personalUser(
     @Body() createPersonalUserDto: CreatePersonalUserDto,
     @GetUser() user: User,
@@ -116,10 +180,11 @@ export class AuthController {
   }
 
   //기업 프로필 정보 보내기 API
-  @Post('/enterprise/profile')
   @ApiOperation({ summary: '기업 프로필 정보 보내기 API' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
+  @Post('/enterprise/profile')
   async enterpriseUser(
     @Body() createEnterpriseUserDto: CreateEnterpriseUserDto,
     @GetUser() user: User,

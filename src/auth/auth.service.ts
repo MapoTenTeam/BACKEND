@@ -13,6 +13,7 @@ import { CreateEnterpriseUserDto } from './dto/create-enterprise-user.dto';
 import { UserEnterprise } from './entities/user-enterprise.entity';
 import { UserEnterpriseDetailRepository } from './repository/user-enterprise-detail.repository';
 import { responseGetUserByEmailDto } from './dto/response/responseGetUserByEmail.dto';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -29,13 +30,13 @@ export class AuthService {
   }): Promise<ResponseGetUserByIdDto> {
     const found = await this.userRepository.findOne({
       where: {
-        id: param.userId,
+        userId: param.userId,
       },
     });
 
     return found
       ? Object.assign({
-          statusCode: 201,
+          statusCode: 200,
           message: '유저 아이디가 존재합니다.',
           isDuplicate: true,
         })
