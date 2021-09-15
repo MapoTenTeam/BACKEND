@@ -7,8 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
-import { UserEnterpriseDetailRepository } from './repository/user-enterprise-detail.repository';
-import { UserPersonalDetailRepository } from './repository/user-personal-detail.repository';
 import { UserRepository } from './repository/user.repository';
 
 @Module({
@@ -20,11 +18,7 @@ import { UserRepository } from './repository/user.repository';
         secret: configService.get<string>('JWT_SECRET'),
       }),
     }),
-    TypeOrmModule.forFeature([
-      UserRepository,
-      UserPersonalDetailRepository,
-      UserEnterpriseDetailRepository,
-    ]),
+    TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

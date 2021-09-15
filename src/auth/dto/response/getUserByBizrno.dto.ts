@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class responseGetUserByEmailNotDto {
+export class GetUserByBizrnoNotDto {
   @ApiProperty({
     example: '200',
     description: '상태코드',
@@ -8,19 +8,19 @@ export class responseGetUserByEmailNotDto {
   statusCode: number;
 
   @ApiProperty({
-    example: '유저 이메일이 없습니다.',
+    example: '사업자등록번호가 없습니다.',
     description: '설명',
   })
   message: string;
 
   @ApiProperty({
     example: 'false',
-    description: '중복된 이메일이 없는경우',
+    description: '중복된 사업자등록번호가 없는경우',
   })
   isDuplicate: boolean;
 }
 
-export class responseGetUserByEmailDto {
+export class GetUserByBizrnoDto {
   @ApiProperty({
     example: '200',
     description: '상태코드',
@@ -28,14 +28,14 @@ export class responseGetUserByEmailDto {
   statusCode: number;
 
   @ApiProperty({
-    example: '유저 이메일이 있습니다.',
+    example: '사업자등록번호가 있습니다.',
     description: '설명',
   })
   message: string;
 
   @ApiProperty({
     example: 'true',
-    description: '중복된 이메일이 있는경우',
+    description: '중복된 사업자등록번호가 있는경우',
   })
   isDuplicate: boolean;
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ResponseGetUserByIdNotDto {
+export class GetUserByIdNotDto {
   @ApiProperty({
     example: '200',
     description: '상태코드',
@@ -20,7 +20,7 @@ export class ResponseGetUserByIdNotDto {
   isDuplicate: boolean;
 }
 
-export class ResponseGetUserByIdDto {
+export class GetUserByIdDto {
   @ApiProperty({
     example: '200',
     description: '상태코드',
@@ -40,14 +40,14 @@ export class ResponseGetUserByIdDto {
   isDuplicate: boolean;
 }
 
-export class ResponseGetUserByIdFindInputDto {
-  @ApiProperty()
-  userName: string;
-  @ApiProperty()
-  email: string;
+export class GetUserByIdFindInputDto {
+  @ApiProperty({ example: '이름' })
+  USER_NM: string;
+  @ApiProperty({ example: '이메일' })
+  USER_EMAIL: string;
 }
 
-export class ResponseGetUserByIdFindOutputDto {
+export class GetUserByIdFindOutputDto {
   @ApiProperty({
     example: '200',
     description: '상태코드',

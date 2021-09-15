@@ -6,9 +6,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('MapoTen')
     .setDescription('MapoTen API document')
-    .setVersion('3.0')
+    .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

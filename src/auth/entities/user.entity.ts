@@ -1,6 +1,5 @@
-import { Board } from 'src/boards/board.entity';
+import { Board } from 'src/jobs/jobs.entity';
 import {
-  BaseEntity,
   Column,
   Entity,
   JoinColumn,
@@ -14,7 +13,7 @@ import { UserPersonal } from './user-personal.entity';
 
 @Entity()
 @Unique(['userId'])
-export class User extends BaseEntity {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -36,17 +35,17 @@ export class User extends BaseEntity {
   @Column({ default: null })
   bizrno: string;
 
-  @OneToOne((type) => UserPersonal, (userPersonal) => userPersonal.user, {
-    nullable: true,
-  })
-  @JoinColumn()
-  userPersonal: UserPersonal;
+  // @OneToOne((type) => UserPersonal, (userPersonal) => userPersonal.user, {
+  //   nullable: true,
+  // })
+  // @JoinColumn()
+  // userPersonal: UserPersonal;
 
-  @OneToOne((type) => UserEnterprise, (userEnterprise) => userEnterprise.user, {
-    nullable: true,
-  })
-  @JoinColumn()
-  userEnterprise: UserEnterprise;
+  // @OneToOne((type) => UserEnterprise, (userEnterprise) => userEnterprise.user, {
+  //   nullable: true,
+  // })
+  // @JoinColumn()
+  // userEnterprise: UserEnterprise;
 
   @OneToMany((type) => Board, (board) => board.user, { eager: true })
   boards: Board[];

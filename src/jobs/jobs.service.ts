@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { BoardStatus } from './board-status.enum';
-import { CreateBoardDto } from './dto/create-board.dto';
+import { BoardStatus } from './jobs-status.enum';
+import { CreateBoardDto } from './dto/create-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BoardRepository } from './board.repository';
-import { Board } from './board.entity';
+import { BoardRepository } from './jobs.repository';
+import { Board } from './jobs.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class BoardsService {
@@ -22,7 +23,22 @@ export class BoardsService {
       .where('board.userId = :userId', { userId: user.id })
       .select(['board.title', 'board.description', 'board.status'])
       .getMany();
+
     return boards;
+    // const conn = getConnection();
+    // try {
+    //   const rows = await conn.query(
+    //     `SELECT USER_ID FROM COMVNUSERMASTER WHERE ESNTL_ID='USRCNFRM_00000000000'`,
+    //   );
+
+    //   return Object.assign({
+    //     statusCode: 201,
+    //     message: '유저 아이디 찾기 성공',
+    //     USER_ID: rows[0].USER_ID,
+    //   });
+    // } catch (error) {
+    //   throw new Error(error);
+    // }
   }
 
   createBoard(createBoardDto: CreateBoardDto, user: User): Promise<Board> {

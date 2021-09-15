@@ -7,22 +7,23 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
-import { BoardStatus } from './board-status.enum';
-import { Board } from './board.entity';
-import { BoardsService } from './boards.service';
-import { CreateBoardDto } from './dto/create-board.dto';
-import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe';
+import { BoardStatus } from './jobs-status.enum';
+import { Board } from './jobs.entity';
+import { BoardsService } from './jobs.service';
+import { CreateBoardDto } from './dto/create-job.dto';
+import { BoardStatusValidationPipe } from './pipes/jobs-status-validation.pipe';
 
 @ApiTags('일자리 API')
-@Controller('boards')
+@Controller('job')
 export class BoardsController {
   constructor(private boardsService: BoardsService) {}
 
@@ -54,7 +55,7 @@ export class BoardsController {
     return this.boardsService.deleteBoard(id);
   }
 
-  @Patch('/:id/status')
+  @Put('/:id/status')
   updateBoardStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status', BoardStatusValidationPipe) status: BoardStatus,

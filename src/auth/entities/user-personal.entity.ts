@@ -15,6 +15,6 @@ export class UserPersonal extends BaseEntity {
   @Column()
   description: string;
 
-  @OneToOne((type) => User, (user) => user.userPersonal, { eager: false })
-  user: User;
+  // @OneToOne((type) => User, (user) => user.userPersonal, { eager: false })
+  // user: User;
 }
