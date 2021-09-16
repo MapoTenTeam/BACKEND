@@ -9,6 +9,7 @@ import {
   Put,
   Req,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -50,24 +51,33 @@ import {
   GetUserByPasswordFindInputDto,
   GetUserByPasswordFindOutputDto,
 } from './dto/response/getUserByPassword.dto';
-import { GetUserByDeleteOutputDto } from './dto/response/GetUserByDelete.dto';
+import { GetUserByDeleteOutputDto } from './dto/response/getUserByDelete.dto';
 import {
+  EditProfilePersonalInputDto,
+  EditProfilePersonalOutputDto,
   PasswordPersonalOutputDto,
   ProfilePersonalInputDto,
   ProfilePersonalOutputDto,
+  SelectProfilePersonalOutputDto,
   SignupPersonalOutputDto,
 } from './dto/personalUser.dto';
 import {
+  EditProfileEnterpriseInputDto,
+  EditProfileEnterpriseOutputDto,
   PasswordEnterpriseOutputDto,
+  ProfileEnterpriseInputDto,
   ProfileEnterpriseOutputDto,
+  ProfileImageEnterpriseOutputDto,
+  SelectProfileEnterpriseOutputDto,
   SignupEnterpriseOutputDto,
 } from './dto/enterpriseUser.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,
   LoginInputDto,
   LoginOutputDto,
+  TermsOutputDto,
 } from './dto/auth-credential.dto';
 import {
   GetUserByBizrnoDto,
@@ -151,6 +161,7 @@ export class AuthController {
   //유저 아이디 찾기
   @ApiOperation({ summary: '유저 아이디 찾기 API' })
   @ApiBody({
+    description: '유저 정보',
     type: GetUserByIdFindInputDto,
   })
   @ApiOkResponse({
@@ -163,10 +174,11 @@ export class AuthController {
   //유저 패스워드 찾기
   @ApiOperation({ summary: '유저 패스워드 찾기 API' })
   @ApiBody({
+    description: '유저 정보',
     type: GetUserByPasswordFindInputDto,
   })
   @ApiOkResponse({
-    description: '유저 패스워드 찾기 성공',
+    description: '임시 비밀번호 생성 성공',
     type: GetUserByPasswordFindOutputDto,
   })
   @Get('/find/password')
@@ -174,6 +186,10 @@ export class AuthController {
 
   //이용 약관
   @ApiOperation({ summary: '이용 약관 API' })
+  @ApiOkResponse({
+    description: '이용약관 가져오기',
+    type: TermsOutputDto,
+  })
   @Get('/terms')
   async getTerms() {}
 
@@ -244,7 +260,10 @@ export class AuthController {
   //개인 회원가입 API
   @Post('/personal/signup')
   @ApiOperation({ summary: '개인 회원 가입 API' })
-  @ApiBody({ type: AuthCredentialsPersonalDto })
+  @ApiBody({
+    description: '유저 정보',
+    type: AuthCredentialsPersonalDto,
+  })
   @ApiOkResponse({
     description: '개인 회원가입 성공',
     type: SignupPersonalOutputDto,
@@ -264,7 +283,7 @@ export class AuthController {
   // 기업 회원가입 API
   @Post('/enterprise/signup')
   @ApiOperation({ summary: '기업 회원 가입 API' })
-  @ApiBody({ type: AuthCredentialsEnterpriseDto })
+  @ApiBody({ description: '유저 정보', type: AuthCredentialsEnterpriseDto })
   @ApiOkResponse({
     description: '기업 회원가입 성공',
     type: SignupEnterpriseOutputDto,
@@ -274,7 +293,7 @@ export class AuthController {
   // 로그인 API
   @Post('/signin')
   @ApiOperation({ summary: '로그인 API' })
-  @ApiBody({ type: LoginInputDto })
+  @ApiBody({ description: '유저 정보', type: LoginInputDto })
   @ApiOkResponse({
     description: '로그인 성공',
     type: LoginOutputDto,
@@ -288,42 +307,102 @@ export class AuthController {
   //개인 회원 프로필 조회
   @Get('/personal/profile')
   @ApiOperation({ summary: '개인 회원 프로필 조회 API' })
-  @ApiOkResponse({ type: ProfilePersonalOutputDto })
+  @ApiOkResponse({
+    description: '개인 회원 프로필 조회 성공',
+    type: SelectProfilePersonalOutputDto,
+  })
   @ApiBearerAuth()
   async getpersonalProfile() {}
 
   //기업 회원 프로필 조회
   @Get('/enterprise/profile')
   @ApiOperation({ summary: '기업 회원 프로필 조회 API' })
-  @ApiOkResponse({ type: ProfileEnterpriseOutputDto })
+  @ApiOkResponse({
+    description: '기업 회원 프로필 조회 성공',
+    type: SelectProfileEnterpriseOutputDto,
+  })
   @ApiBearerAuth()
   async getenterpriseProfile() {}
 
-  //개인 회원 프로필 넣기
+  //개인 회원 프로필 등록
   @Put('/personal/upload/profile')
-  @ApiOperation({ summary: '개인 회원 프로필 넣기 API' })
+  @ApiOperation({ summary: '개인 회원 프로필 등록 API' })
   @ApiBody({
+    description: '등록 할 프로필 정보',
     type: ProfilePersonalInputDto,
   })
-  // @ApiBody({
-  //   type: LoginEnterpriseInputDto,
-  // })
+  @ApiOkResponse({
+    description: '개인 회원 프로필 등록 성공',
+    type: ProfilePersonalOutputDto,
+  })
   @ApiBearerAuth()
   async personalProfile() {}
 
-  //기업 회원 프로필 넣기
+  //기업 회원 프로필 등록
   @Put('/enterprise/upload/profile')
-  @ApiOperation({ summary: '기업 회원 프로필 넣기 API' })
+  @ApiOperation({ summary: '기업 회원 프로필 등록 API' })
+  @ApiBody({
+    description: '등록 할 프로필 정보',
+    type: ProfileEnterpriseInputDto,
+  })
+  @ApiOkResponse({
+    description: '기업 회원 프로필 등록 성공',
+    type: ProfileEnterpriseOutputDto,
+  })
   @ApiBearerAuth()
   async enterpriseProfile() {}
 
-  //기업 회원 프로필 이미지
-  @Put('/enterprise/upload/profile/image')
-  @ApiOperation({ summary: '기업 회원 프로필 이미지 API' })
+  //개인 회원 프로필 수정
+  @Put('/personal/edit/profile')
+  @ApiOperation({ summary: '개인 회원 프로필 수정 API' })
+  @ApiBody({
+    description: '수정 할 프로필 정보',
+    type: EditProfilePersonalInputDto,
+  })
+  @ApiOkResponse({
+    description: '개인 회원 프로필 수정 성공',
+    type: EditProfilePersonalOutputDto,
+  })
+  @ApiBearerAuth()
+  async personalEditProfile() {}
+
+  //기업 회원 프로필 수정
+  @Put('/enterprise/edit/profile')
+  @ApiOperation({ summary: '기업 회원 프로필 수정 API' })
+  @ApiBody({
+    description: '수정 할 프로필 정보',
+    type: EditProfileEnterpriseInputDto,
+  })
+  @ApiOkResponse({
+    description: '기업 회원 프로필 수정 성공',
+    type: EditProfileEnterpriseOutputDto,
+  })
+  @ApiBearerAuth()
+  async enterpriseEditProfile() {}
+
+  //기업 회원 프로필 이미지 등록
+  @Patch('/enterprise/upload/profile/image')
+  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 API' })
+  @ApiOkResponse({
+    description: '기업 회원 프로필 이미지 등록 성공',
+    type: ProfileImageEnterpriseOutputDto,
+  })
   @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: '등록 할 이미지 파일',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file'))
   @ApiBearerAuth()
-  async enterpriseProfileImage(@UploadedFile() file) {}
+  async enterpriseProfileImage(@UploadedFile('file') file) {}
 
   //개인 회원 비밀번호 변경
   @Patch('/personal/password/:password')

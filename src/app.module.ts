@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { BoardsModule } from './jobs/jobs.module';
 import { User } from './auth/entities/user.entity';
 import { Board } from './jobs/jobs.entity';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Board } from './jobs/jobs.entity';
     }),
     AuthModule,
     BoardsModule,
+    BookmarksModule,
   ],
 })
 export class AppModule {}

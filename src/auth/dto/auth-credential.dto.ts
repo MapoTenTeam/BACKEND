@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
+export class AuthCredentialsDto {}
 export class AuthCredentialsPersonalDto {
   @ApiProperty({ example: '이름' })
   MBER_NM: string;
@@ -88,4 +89,30 @@ export class LoginOutputDto {
     description: '토큰',
   })
   token: string;
+}
+
+export class TermsOutputDto {
+  @ApiProperty({
+    example: '200',
+    description: '상태코드',
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '이용약관 조회 성공',
+    description: '설명',
+  })
+  message: string;
+
+  @ApiProperty({
+    example: '서비스 이용약관',
+    description: '서비스 이용약관',
+  })
+  terms: string;
+
+  @ApiProperty({
+    example: '개인정보 수집 및 이용',
+    description: '개인정보 수집 및 이용',
+  })
+  agree: string;
 }
