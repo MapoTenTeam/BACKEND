@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { BoardStatus } from './jobs-status.enum';
-import { CreateBoardDto } from './dto/create-job.dto';
+import { CreateBoardDto } from './dtos/create-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardRepository } from './jobs.repository';
 import { Board } from './jobs.entity';

@@ -6,9 +6,9 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from './entities/user.entity';
 import { UserPersonal } from './entities/user-personal.entity';
 import { UserEnterprise } from './entities/user-enterprise.entity';
-import { GetUserByIdDto } from './dto/response/getUserById.dto';
-import { GetUserByEmailDto } from './dto/response/getUserByEmail.dto';
-import { AuthCredentialsPersonalDto } from './dto/auth-credential.dto';
+import { GetUserByIdDto } from './dtos/response/getUserById.dto';
+import { GetUserByEmailDto } from './dtos/response/getUserByEmail.dto';
+import { AuthCredentialsPersonalDto } from './dtos/auth-credential.dto';
 
 @Injectable()
 export class AuthService {

@@ -39,19 +39,19 @@ import {
   GetUserByIdFindInputDto,
   GetUserByIdFindOutputDto,
   GetUserByIdNotDto,
-} from './dto/response/getUserById.dto';
+} from './dtos/response/getUserById.dto';
 import { UserPersonal } from './entities/user-personal.entity';
 import { UserEnterprise } from './entities/user-enterprise.entity';
 import {
   GetUserByEmailAuthDto,
   GetUserByEmailDto,
   GetUserByEmailNotDto,
-} from './dto/response/getUserByEmail.dto';
+} from './dtos/response/getUserByEmail.dto';
 import {
   GetUserByPasswordFindInputDto,
   GetUserByPasswordFindOutputDto,
-} from './dto/response/getUserByPassword.dto';
-import { GetUserByDeleteOutputDto } from './dto/response/getUserByDelete.dto';
+} from './dtos/response/getUserByPassword.dto';
+import { GetUserByDeleteOutputDto } from './dtos/response/getUserByDelete.dto';
 import {
   EditProfilePersonalInputDto,
   EditProfilePersonalOutputDto,
@@ -60,7 +60,7 @@ import {
   ProfilePersonalOutputDto,
   SelectProfilePersonalOutputDto,
   SignupPersonalOutputDto,
-} from './dto/personalUser.dto';
+} from './dtos/personalUser.dto';
 import {
   EditProfileEnterpriseInputDto,
   EditProfileEnterpriseOutputDto,
@@ -70,7 +70,7 @@ import {
   ProfileImageEnterpriseOutputDto,
   SelectProfileEnterpriseOutputDto,
   SignupEnterpriseOutputDto,
-} from './dto/enterpriseUser.dto';
+} from './dtos/enterpriseUser.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   AuthCredentialsEnterpriseDto,
@@ -78,11 +78,11 @@ import {
   LoginInputDto,
   LoginOutputDto,
   TermsOutputDto,
-} from './dto/auth-credential.dto';
+} from './dtos/auth-credential.dto';
 import {
   GetUserByBizrnoDto,
   GetUserByBizrnoNotDto,
-} from './dto/response/getUserByBizrno.dto';
+} from './dtos/response/getUserBybizrno.dto';
 
 @ApiTags('유저 API')
 @Controller('user')

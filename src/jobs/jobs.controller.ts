@@ -13,14 +13,22 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
 import { BoardStatus } from './jobs-status.enum';
 import { Board } from './jobs.entity';
 import { BoardsService } from './jobs.service';
-import { CreateBoardDto } from './dto/create-job.dto';
+import { CreateBoardDto } from './dtos/create-job.dto';
 import { BoardStatusValidationPipe } from './pipes/jobs-status-validation.pipe';
+import { EnterpriseRegisterMenuDto } from './dtos/enterpriseRegisterMenu.dto';
 
 @ApiTags('일자리 API')
 @Controller('job')
@@ -29,23 +37,64 @@ export class BoardsController {
 
   //공공 일자리 목록 조회
   @Get('/public')
-  @ApiOperation({ summary: '공공 일자리 목록 조회 API' })
+  @ApiOperation({ summary: '공공 일자리 목록 조회 API (페이지당 12개씩)' })
+  @ApiQuery({
+    name: 'page',
+    example: 'http://localhost:3000/job/public?page=1',
+    description: '공공 일자리 목록',
+  })
+  @ApiOkResponse({
+    description: '페이지별 12개씩 공공일자리 목록',
+  })
   async getPublicJob() {}
 
   //공공 일자리 상세 조회
   @Get('/public/detail/:id')
   @ApiOperation({ summary: '공공 일자리 상세 조회 API' })
+  @ApiParam({
+    name: 'jobId',
+    example: '1',
+    description: '일자리Id',
+  })
+  @ApiOkResponse({
+    description: '일자리 상세 페이지',
+  })
   async getPublicDetailJob() {}
 
   //일반 일자리 목록 조회
   @Get('/general')
-  @ApiOperation({ summary: '일반 일자리 목록 조회 API' })
+  @ApiOperation({ summary: '일반 일자리 목록 조회 API (페이지당 12개씩)' })
+  @ApiQuery({
+    name: 'page',
+    example: 'http://localhost:3000/job/general?page=1',
+    description: '일반 일자리 목록',
+  })
+  @ApiOkResponse({
+    description: '페이지별 12개씩 일반일자리 목록',
+  })
   async getGeneralJob() {}
 
   //일반 일자리 상세 조회
   @Get('/general/detail/:id')
   @ApiOperation({ summary: '일반 일자리 상세 조회 API' })
+  @ApiParam({
+    name: 'jobId',
+    example: '1',
+    description: '일자리Id',
+  })
+  @ApiOkResponse({
+    description: '일자리 상세 페이지',
+  })
   async getGeneralDetailJob() {}
+
+  //기업 채용공고 등록 메뉴 조회
+  @Get('/enterprise/register/all')
+  @ApiOperation({ summary: '기업 채용공고 등록 메뉴 조회 API (ex 학력,경력)' })
+  @ApiOkResponse({
+    type: EnterpriseRegisterMenuDto,
+    description: '채용공고 등록 메뉴',
+  })
+  async getEnterpriseRegisterJob() {}
 
   //기업 채용공고 등록
   @Post('/enterprise/register')

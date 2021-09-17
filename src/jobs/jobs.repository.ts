@@ -2,7 +2,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { BoardStatus } from './jobs-status.enum';
 import { Board } from './jobs.entity';
-import { CreateBoardDto } from './dto/create-job.dto';
+import { CreateBoardDto } from './dtos/create-job.dto';
 
 @EntityRepository(Board)
 export class BoardRepository extends Repository<Board> {
