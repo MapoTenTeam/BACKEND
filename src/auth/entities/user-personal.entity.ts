@@ -1,20 +1,88 @@
+import { IsEmpty, IsNotEmpty } from 'class-validator';
 import {
-  BaseEntity,
   Column,
+  Double,
   Entity,
-  OneToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity()
-export class UserPersonal extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Unique(['MBER_ID'])
+export class COMTNGNRLMBER {
+  @PrimaryColumn()
+  MBER_ID: string;
 
   @Column()
-  description: string;
+  PASSWORD: string;
 
-  // @OneToOne((type) => User, (user) => user.userPersonal, { eager: false })
-  // user: User;
+  @Column({ nullable: true })
+  PASSWORD_HINT: string;
+
+  @Column({ nullable: true })
+  PASSWORD_CNSR: string;
+
+  @Column({ nullable: true })
+  IHIDNUM: string;
+
+  @Column({ nullable: true })
+  MBER_NM: string;
+
+  @Column({ nullable: true })
+  ZIP: string;
+
+  @Column({ nullable: true })
+  ADRES: string;
+
+  @Column({ nullable: true })
+  AREA_NO: string;
+
+  @Column({ nullable: true })
+  MBER_STTUS: string;
+
+  @Column({ nullable: true })
+  DETAIL_ADRES: string;
+
+  @Column({ nullable: true })
+  END_TELNO: string;
+
+  @Column({ nullable: true })
+  MOBLPHON_NO: string;
+
+  @Column({ nullable: true })
+  GROUP_ID: string;
+
+  @Column({ nullable: true })
+  MBER_FXNUM: string;
+
+  @Column()
+  MBER_EMAIL_ADRES: string;
+
+  @Column({ nullable: true })
+  MIDDLE_TELNO: string;
+
+  @Column()
+  SBSCRB_DE: Date;
+
+  @Column({ nullable: true })
+  SEXDSTN_CODE: string;
+
+  @Column({ nullable: true })
+  ESNTL_ID: string;
+
+  @Column({ nullable: true })
+  LOCK_AT: string;
+
+  @Column({ nullable: true })
+  LOCK_CNT: string;
+
+  @Column({ nullable: true })
+  LOCK_LAST_PNTTM: Date;
+
+  @Column({ nullable: true })
+  CHG_PWD_LAST_PNTTM: Date;
+
+  @Column({ nullable: true })
+  TERMS: boolean;
 }

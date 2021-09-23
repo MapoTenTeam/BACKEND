@@ -40,7 +40,6 @@ import {
   GetUserByIdFindOutputDto,
   GetUserByIdNotDto,
 } from './dtos/response/getUserById.dto';
-import { UserPersonal } from './entities/user-personal.entity';
 import { UserEnterprise } from './entities/user-enterprise.entity';
 import {
   GetUserByEmailAuthDto,
@@ -82,7 +81,7 @@ import {
 import {
   GetUserByBizrnoDto,
   GetUserByBizrnoNotDto,
-} from './dtos/response/getUserBybizrno.dto';
+} from './dtos/response/getUserByBizrno.dto';
 
 @ApiTags('유저 API')
 @Controller('user')
@@ -106,11 +105,11 @@ export class AuthController {
     type: GetUserByIdDto,
   })
   @Get('/duplicate/id/:id')
-  async getUserById(
-    @Param() param: { userid: string },
-  ): Promise<GetUserByIdNotDto> {
-    return await this.authService.getUserById(param);
-  }
+  async getUserById() {}
+  //   @Param() param: { userid: string },
+  // ): Promise<GetUserByIdNotDto> {
+  //   return await this.authService.getUserById(param);
+  // }
 
   //유저 이메일 중복체크 API
   @ApiOperation({ summary: '유저 이메일 중복체크 API' })
@@ -248,18 +247,8 @@ export class AuthController {
   async emailAuth() {}
 
   //개인 회원가입 API
-  // @Post('/personal/signup')
-  // @ApiOperation({ summary: '개인 회원 가입 API' })
-  // @ApiBody({ type: AuthCredentialsDto })
-  // async personalSignUp(
-  //   @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
-  // ): Promise<void> {
-  //   return await this.authService.personalSignUp(authCredentialsDto);
-  // }
-
-  //개인 회원가입 API
   @Post('/personal/signup')
-  @ApiOperation({ summary: '개인 회원 가입 API' })
+  @ApiOperation({ summary: '개인 회원 가입 API(완료)' })
   @ApiBody({
     description: '유저 정보',
     type: AuthCredentialsPersonalDto,
@@ -268,7 +257,16 @@ export class AuthController {
     description: '개인 회원가입 성공',
     type: SignupPersonalOutputDto,
   })
-  async personalSignUp() {}
+  @ApiResponse({
+    status: 409,
+    description: '중복된 ID가 있습니다.',
+  })
+  async personalSignUp(
+    @Body(ValidationPipe)
+    authCredentialsPersonalDto: AuthCredentialsPersonalDto,
+  ): Promise<void> {
+    return await this.authService.personalSignUp(authCredentialsPersonalDto);
+  }
 
   // 기업 회원가입 API
   // @Post('/enterprise/signup')

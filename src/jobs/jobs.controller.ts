@@ -15,6 +15,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -29,6 +30,18 @@ import { BoardsService } from './jobs.service';
 import { CreateBoardDto } from './dtos/create-job.dto';
 import { BoardStatusValidationPipe } from './pipes/jobs-status-validation.pipe';
 import { EnterpriseRegisterMenuDto } from './dtos/enterpriseRegisterMenu.dto';
+import { SelectJobPublicOutputDto } from './dtos/job-public.dto';
+import { SelectJobGeneralOutputDto } from './dtos/job-general.dto';
+import {
+  DeleteJobEnterpriseOutputDto,
+  JobEnterpriseJudgeOutputDto,
+  JobEnterpriseRegisterInputDto,
+  JobEnterpriseRegisterOutputDto,
+  SelectJobDetailOutputDto,
+  SelectJobEnterpriseDetailOutputDto,
+  SelectJobEnterpriseOutputDto,
+  UpdateJobEnterpriseOutputDto,
+} from './dtos/job-enterprise.dto';
 
 @ApiTags('일자리 API')
 @Controller('job')
@@ -45,6 +58,7 @@ export class BoardsController {
   })
   @ApiOkResponse({
     description: '페이지별 12개씩 공공일자리 목록',
+    type: SelectJobPublicOutputDto,
   })
   async getPublicJob() {}
 
@@ -58,6 +72,7 @@ export class BoardsController {
   })
   @ApiOkResponse({
     description: '일자리 상세 페이지',
+    type: SelectJobDetailOutputDto,
   })
   async getPublicDetailJob() {}
 
@@ -71,6 +86,7 @@ export class BoardsController {
   })
   @ApiOkResponse({
     description: '페이지별 12개씩 일반일자리 목록',
+    type: SelectJobGeneralOutputDto,
   })
   async getGeneralJob() {}
 
@@ -84,6 +100,7 @@ export class BoardsController {
   })
   @ApiOkResponse({
     description: '일자리 상세 페이지',
+    type: SelectJobDetailOutputDto,
   })
   async getGeneralDetailJob() {}
 
@@ -100,30 +117,78 @@ export class BoardsController {
   @Post('/enterprise/register')
   @ApiBearerAuth()
   @ApiOperation({ summary: '기업 채용공고 등록 API' })
+  @ApiBody({
+    description: '채용공고 등록',
+    type: JobEnterpriseRegisterInputDto,
+  })
+  @ApiOkResponse({
+    description: '채용공고 등록 성공',
+    type: JobEnterpriseRegisterOutputDto,
+  })
   async enterpriseRegisterJob() {}
+
+  //기업 채용공고 심사요청
+  @Patch('/enterprise/judge')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '기업 채용공고 심사요청 API' })
+  @ApiOkResponse({
+    description: '채용공고 심사요청 성공',
+    type: JobEnterpriseJudgeOutputDto,
+  })
+  async enterpriseJudgeJob() {}
 
   //기업 채용공고 목록 조회
   @Get('/enterprise/list')
   @ApiBearerAuth()
   @ApiOperation({ summary: '기업 채용공고 목록 조회 API' })
+  @ApiOkResponse({
+    description: '채용공고 목록 조회',
+    type: SelectJobEnterpriseOutputDto,
+  })
   async enterpriseListJob() {}
 
   //기업 채용공고 상세 조회
   @Get('/enterprise/list/detail/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: '기업 채용공고 상세 조회 API' })
+  @ApiOkResponse({
+    description: '채용공고 상세 조회',
+    type: SelectJobEnterpriseDetailOutputDto,
+  })
   async enterpriseListDetailJob() {}
 
   //기업 채용공고 수정
   @Put('/enterprise/edit/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: '기업 채용공고 수정 API' })
+  @ApiParam({
+    name: 'jobId',
+    example: '1',
+    description: '일자리Id',
+  })
+  @ApiBody({
+    description: '채용공고 수정',
+    type: JobEnterpriseRegisterInputDto,
+  })
+  @ApiOkResponse({
+    description: '채용공고 수정',
+    type: UpdateJobEnterpriseOutputDto,
+  })
   async enterpriseEditJob() {}
 
   //기업 채용공고 삭제
   @Delete('/enterprise/delete/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: '기업 채용공고 삭제 API' })
+  @ApiParam({
+    name: 'jobId',
+    example: '1',
+    description: '일자리Id',
+  })
+  @ApiOkResponse({
+    description: '채용공고 삭제',
+    type: DeleteJobEnterpriseOutputDto,
+  })
   async enterpriseDeleteJob() {}
 
   // @Get()

@@ -4,7 +4,7 @@ import { IsNotEmpty } from 'class-validator';
 //개인 회원 회원가입 성공했을때
 export class SignupPersonalOutputDto {
   @ApiProperty({
-    example: '200',
+    example: '201',
     description: '상태코드',
   })
   statusCode: number;

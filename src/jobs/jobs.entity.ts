@@ -2,7 +2,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BoardStatus } from './jobs-status.enum';
 
-@Entity()
+// @Entity()
 export class Board {
   @PrimaryGeneratedColumn()
   id: number;

@@ -1,31 +1,44 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class AuthCredentialsDto {}
 export class AuthCredentialsPersonalDto {
   @ApiProperty({ example: '이름' })
+  @IsString()
+  @IsNotEmpty()
   MBER_NM: string;
 
   @ApiProperty({ example: '아이디' })
   @IsString()
+  @IsNotEmpty()
   @MinLength(4)
   @MaxLength(20)
   MBER_ID: string;
 
   @ApiProperty({ example: '이메일' })
+  @IsString()
+  @IsNotEmpty()
   MBER_EMAIL_ADRES: string;
 
   @ApiProperty({ example: '패스워드' })
   @IsString()
-  @MinLength(4)
-  @MaxLength(20)
-  //영어랑 숫자만 가능한 유효성 검사
-  @Matches(/^[a-zA-Z0-9]*$/, {
-    message: 'password only accepts english and number',
-  })
+  @IsNotEmpty()
+  // @MinLength(4)
+  // @MaxLength(20)
+  // //영어랑 숫자만 가능한 유효성 검사
+  // @Matches(/^[a-zA-Z0-9]*$/, {
+  //   message: 'password only accepts english and number',
+  // })
   PASSWORD: string;
 
   @ApiProperty({ description: '이용약관 체크여부' })
+  @IsNotEmpty()
   TERMS: boolean;
 }
 

@@ -9,9 +9,8 @@ import {
   Unique,
 } from 'typeorm';
 import { UserEnterprise } from './user-enterprise.entity';
-import { UserPersonal } from './user-personal.entity';
 
-@Entity()
+// @Entity()
 @Unique(['userId'])
 export class User {
   @PrimaryGeneratedColumn()

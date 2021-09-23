@@ -52,7 +52,7 @@ export class ProfileEnterpriseInputDto {
   WEB_ADRES: string;
 
   @ApiProperty({ example: '회사대표 이메일' })
-  APPLCNT_EMAIL_ADRES: string;
+  CEO_EMAIL_ADRES: string;
 }
 
 //기업 회원 프로필 등록
