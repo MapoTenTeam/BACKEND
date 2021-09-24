@@ -3,15 +3,13 @@ import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Strategy } from 'passport-jwt';
 import { ExtractJwt } from 'passport-jwt';
+import { getConnection } from 'typeorm';
 import { COMTNGNRLMBER } from './entities/user-personal.entity';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 
 @Injectable()
 export class PersonalJwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @InjectRepository(UserPersonalRepository)
-    private UserPersonalRepository: UserPersonalRepository,
-  ) {
+  constructor() {
     super({
       secretOrKey: `${process.env.JWT_SECRET}`,
 
@@ -21,9 +19,11 @@ export class PersonalJwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload) {
     const { MBER_ID } = payload;
-    const user: COMTNGNRLMBER = await this.UserPersonalRepository.findOne({
-      MBER_ID,
-    });
+
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${MBER_ID}'`,
+    );
 
     if (!user) {
       throw new UnauthorizedException();

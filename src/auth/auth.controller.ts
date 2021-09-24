@@ -302,14 +302,15 @@ export class AuthController {
   @Post('/signin')
   @ApiOperation({ summary: '로그인 API' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: '로그인 성공',
     type: LoginOutputDto,
   })
-  async siginIn() {
-    //   @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
-    // ): Promise<{ accessToken: string }> {
-    //   return await this.authService.signIn(authCredentialsDto);
+  async siginIn(
+    @Body(ValidationPipe) loginInputDto: LoginInputDto,
+  ): Promise<{ accessToken: string }> {
+    return await this.authService.signIn(loginInputDto);
   }
 
   //개인 회원 프로필 조회

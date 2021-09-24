@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsHash,
   IsNotEmpty,
   IsString,
   Matches,
@@ -30,6 +31,9 @@ export class AuthCredentialsPersonalDto {
   @ApiProperty({ example: '패스워드' })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
+    message: 'password hash error',
+  })
   PASSWORD: string;
 
   @ApiProperty({ description: '이메일 인증 여부' })
@@ -63,6 +67,9 @@ export class AuthCredentialsEnterpriseDto {
   @ApiProperty({ example: '패스워드' })
   @IsString()
   @IsNotEmpty()
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
+    message: 'password hash error',
+  })
   ENTRPRS_MBER_PASSWORD: string;
 
   @ApiProperty({ example: '신청인명' })
@@ -83,17 +90,27 @@ export class AuthCredentialsEnterpriseDto {
   TERMS: boolean;
 }
 
+//로그인 InputDto
 export class LoginInputDto {
   @ApiProperty({ example: '아이디' })
+  @IsString()
+  @IsNotEmpty()
   USER_ID: string;
 
   @ApiProperty({ example: '비밀번호' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(20)
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
+    message: 'password hash error',
+  })
   PASSWORD: string;
 }
 
+//로그인 OutputDto
 export class LoginOutputDto {
   @ApiProperty({
-    example: '200',
+    example: '201',
     description: '상태코드',
   })
   statusCode: number;
@@ -109,7 +126,7 @@ export class LoginOutputDto {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZWZlZnNlMTEyNSIsImlhdCI6MTYzMTA4OTQyNn0.m4gl3atBiQZWnWCJlvxjvVeyPO-JN6_cR2pcgcovyKo',
     description: '토큰',
   })
-  token: string;
+  accessToken: string;
 }
 
 export class TermsOutputDto {

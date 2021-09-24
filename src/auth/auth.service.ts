@@ -8,9 +8,11 @@ import { GetUserByEmailDto } from './dtos/response/getUserByEmail.dto';
 import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,
+  LoginInputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -76,28 +78,31 @@ export class AuthService {
     );
   }
 
-  // async signIn(authCredentialsDto: AuthCredentialsPersonalDto): Promise<{
-  //   statusCode: number;
-  //   message: string;
-  //   accessToken: string;
-  // }> {
-  //   const { userId, password } = authCredentialsDto;
-  //   const user = await this.userRepository.findOne({ userId });
+  async signIn(loginInputDto: LoginInputDto): Promise<{
+    statusCode: number;
+    message: string;
+    accessToken: string;
+  }> {
+    const { USER_ID, PASSWORD } = loginInputDto;
 
-  //   if (user && (await bcrypt.compare(password, user.password))) {
-  //     //유저 토큰 생성(Secret + Payload)
-  //     const payload = { userId };
-  //     const accessToken = await this.jwtService.sign(payload);
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}'`,
+    );
 
-  //     return Object.assign({
-  //       statusCode: 200,
-  //       message: 'login success',
-  //       data: { accessToken: accessToken },
-  //     });
-  //   } else {
-  //     throw new UnauthorizedException('login failed');
-  //   }
-  // }
+    if (user && user.PASSWORD == PASSWORD) {
+      //유저 토큰 생성(Secret + Payload)
+      const payload = { USER_ID };
+      const accessToken = await this.jwtService.sign(payload);
+      return Object.assign({
+        statusCode: 201,
+        message: '로그인 성공',
+        accessToken: accessToken,
+      });
+    } else {
+      throw new UnauthorizedException('로그인 실패');
+    }
+  }
 
   // async personalUser(
   //   createPersonalUserDto: CreatePersonalUserDto,
