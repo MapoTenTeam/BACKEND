@@ -88,9 +88,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   //유저ID 중복체크 API
-  @ApiOperation({ summary: '유저 아이디 중복체크 API' })
+  @ApiOperation({ summary: '유저 아이디 중복체크 API(완료)' })
   @ApiParam({
-    name: 'userId',
+    name: 'userid',
     example: 'hee1234',
     description: '중복체크할 유저 아이디',
   })
@@ -103,12 +103,12 @@ export class AuthController {
     description: '아이디가 있는경우',
     type: GetUserByIdDto,
   })
-  @Get('/duplicate/id/:id')
-  async getUserById() {}
-  //   @Param() param: { userid: string },
-  // ): Promise<GetUserByIdNotDto> {
-  //   return await this.authService.getUserById(param);
-  // }
+  @Get('/duplicate/id/:userid')
+  async getUserById(
+    @Param() param: { userid: string },
+  ): Promise<GetUserByIdNotDto> {
+    return await this.authService.getUserById(param);
+  }
 
   //유저 이메일 중복체크 API
   @ApiOperation({ summary: '유저 이메일 중복체크 API' })

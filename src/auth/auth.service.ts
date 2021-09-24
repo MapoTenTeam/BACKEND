@@ -26,25 +26,24 @@ export class AuthService {
     private userEnterpriseRepository: UserEnterpriseRepository,
   ) {}
 
-  // async getUserById(param: { userid: string }): Promise<GetUserByIdDto> {
-  //   const found = await this.userRepository.findOne({
-  //     where: {
-  //       userId: param.userid,
-  //     },
-  //   });
+  async getUserById(param: { userid: string }): Promise<GetUserByIdDto> {
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${param.userid}'`,
+    );
 
-  //   return found
-  //     ? Object.assign({
-  //         statusCode: 200,
-  //         message: '유저 아이디가 존재합니다.',
-  //         isDuplicate: true,
-  //       })
-  //     : Object.assign({
-  //         statusCode: 200,
-  //         message: '유저 아이디가 없습니다.',
-  //         isDuplicate: false,
-  //       });
-  // }
+    return found
+      ? Object.assign({
+          statusCode: 200,
+          message: '유저 아이디가 존재합니다.',
+          isDuplicate: true,
+        })
+      : Object.assign({
+          statusCode: 200,
+          message: '유저 아이디가 없습니다.',
+          isDuplicate: false,
+        });
+  }
 
   // async getUserByEmail(useremail: string): Promise<GetUserByEmailDto> {
   //   const found = await this.userRepository.findOne({ useremail });
