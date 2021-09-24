@@ -132,6 +132,17 @@ export class LoginOutputDto {
   accessToken: string;
 }
 
+//이메일 중복확인
+export class UserByEmailInputDto {
+  @ApiProperty({
+    description: '중복체크할 유저 이메일',
+    example: 'hee1234@gmail.com',
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
+
 export class TermsOutputDto {
   @ApiProperty({
     example: '200',

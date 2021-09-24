@@ -9,10 +9,12 @@ import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,
   LoginInputDto,
+  UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
 import { getConnection } from 'typeorm';
+import { GetUserByBizrnoDto } from './dtos/response/getUserByBizrno.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,21 +47,48 @@ export class AuthService {
         });
   }
 
-  // async getUserByEmail(useremail: string): Promise<GetUserByEmailDto> {
-  //   const found = await this.userRepository.findOne({ useremail });
+  async getUserByEmail(
+    userByEmailInputDto: UserByEmailInputDto,
+  ): Promise<GetUserByEmailDto> {
+    const { email } = userByEmailInputDto;
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT EMAIL_ADRES FROM COMVNUSERMASTER WHERE EMAIL_ADRES='${email}'`,
+    );
 
-  //   return found
-  //     ? Object.assign({
-  //         statusCode: 200,
-  //         message: '유저 이메일이 존재합니다',
-  //         isDuplicate: true,
-  //       })
-  //     : Object.assign({
-  //         statusCode: 200,
-  //         message: '유저 이메일이 없습니다.',
-  //         isDuplicate: false,
-  //       });
-  // }
+    return found
+      ? Object.assign({
+          statusCode: 200,
+          message: '유저 이메일이 존재합니다',
+          isDuplicate: true,
+        })
+      : Object.assign({
+          statusCode: 200,
+          message: '유저 이메일이 없습니다.',
+          isDuplicate: false,
+        });
+  }
+
+  async getUserBybizrno(param: {
+    bizrno: string;
+  }): Promise<GetUserByBizrnoDto> {
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}'`,
+    );
+
+    return found
+      ? Object.assign({
+          statusCode: 200,
+          message: '사업자등록번호가 존재합니다.',
+          isDuplicate: true,
+        })
+      : Object.assign({
+          statusCode: 200,
+          message: '사업자등록번호가 없습니다.',
+          isDuplicate: false,
+        });
+  }
 
   async personalSignUp(
     authCredentialsPersonalDto: AuthCredentialsPersonalDto,

@@ -76,6 +76,7 @@ import {
   LoginInputDto,
   LoginOutputDto,
   TermsOutputDto,
+  UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
 import {
   GetUserByBizrnoDto,
@@ -88,6 +89,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   //유저ID 중복체크 API
+  @Get('/duplicate/id/:userid')
   @ApiOperation({ summary: '유저 아이디 중복체크 API(완료)' })
   @ApiParam({
     name: 'userid',
@@ -103,7 +105,6 @@ export class AuthController {
     description: '아이디가 있는경우',
     type: GetUserByIdDto,
   })
-  @Get('/duplicate/id/:userid')
   async getUserById(
     @Param() param: { userid: string },
   ): Promise<GetUserByIdNotDto> {
@@ -111,11 +112,11 @@ export class AuthController {
   }
 
   //유저 이메일 중복체크 API
-  @ApiOperation({ summary: '유저 이메일 중복체크 API' })
+  @Get('/duplicate/email/:email')
+  @ApiOperation({ summary: '유저 이메일 중복체크 API(완료)' })
   @ApiParam({
-    name: 'userEmail',
-    example: 'hee1234@gmail.com',
-    description: '중복체크할 유저 이메일',
+    name: 'email',
+    type: UserByEmailInputDto,
   })
   @ApiOkResponse({
     description: '이메일이 없는경우',
@@ -126,15 +127,18 @@ export class AuthController {
     description: '이메일이 있는경우',
     type: GetUserByEmailDto,
   })
-  @Get('/duplicate/email/:email')
-  async getUserByEmail() {
-    //   @Param('email') email: string,
-    // ): Promise<GetUserByEmailNotDto> {
-    //   return await this.authService.getUserByEmail(email);
+  @ApiResponse({
+    status: 400,
+    description: '이메일 형태가 아닙니다.',
+  })
+  async getUserByEmail(
+    @Param(ValidationPipe) userByEmailInputDto: UserByEmailInputDto,
+  ): Promise<GetUserByEmailNotDto> {
+    return await this.authService.getUserByEmail(userByEmailInputDto);
   }
 
-  //기업 사업자등록번호 중복체크 API
-  @ApiOperation({ summary: '사업자등록번호 중복체크 API' })
+  //사업자등록번호 중복체크 API
+  @ApiOperation({ summary: '사업자등록번호 중복체크 API(완료)' })
   @ApiParam({
     name: 'bizrno',
     example: '1231212345',
@@ -150,10 +154,10 @@ export class AuthController {
     type: GetUserByBizrnoDto,
   })
   @Get('/duplicate/bizrno/:bizrno')
-  async getUserBybizrno() {
-    //   @Param('email') email: string,
-    // ): Promise<GetUserByEmailNotDto> {
-    //   return await this.authService.getUserByEmail(email);
+  async getUserBybizrno(
+    @Param() param: { bizrno: string },
+  ): Promise<GetUserByBizrnoNotDto> {
+    return await this.authService.getUserBybizrno(param);
   }
 
   //유저 아이디 찾기
