@@ -87,7 +87,7 @@ export class AuthService {
 
     const conn = getConnection();
     const [user] = await conn.query(
-      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}'`,
+      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS=true`,
     );
 
     if (user && user.PASSWORD == PASSWORD) {

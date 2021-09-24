@@ -101,9 +101,12 @@ export class LoginInputDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(20)
-  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
-    message: 'password hash error',
-  })
+  @Matches(
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-_]).{20,}$/,
+    {
+      message: 'password hash error',
+    },
+  )
   PASSWORD: string;
 }
 

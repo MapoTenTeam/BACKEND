@@ -300,12 +300,16 @@ export class AuthController {
 
   // 로그인 API
   @Post('/signin')
-  @ApiOperation({ summary: '로그인 API' })
+  @ApiOperation({ summary: '로그인 API(완료)' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
   @ApiResponse({
     status: 201,
     description: '로그인 성공',
     type: LoginOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인 실패',
   })
   async siginIn(
     @Body(ValidationPipe) loginInputDto: LoginInputDto,
