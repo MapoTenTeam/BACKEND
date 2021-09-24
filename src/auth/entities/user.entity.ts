@@ -1,4 +1,4 @@
-import { Board } from 'src/jobs/jobs.entity';
+// import { Board } from 'src/jobs/jobs.entity';
 import {
   Column,
   Entity,
@@ -46,6 +46,6 @@ export class User {
   // @JoinColumn()
   // userEnterprise: UserEnterprise;
 
-  @OneToMany((type) => Board, (board) => board.user, { eager: true })
-  boards: Board[];
+  // @OneToMany((type) => Board, (board) => board.user, { eager: true })
+  // boards: Board[];
 }

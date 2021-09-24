@@ -66,6 +66,9 @@ export class COMTNGNRLMBER {
   SBSCRB_DE: Date;
 
   @Column({ nullable: true })
+  SECSN_DE: Date;
+
+  @Column({ nullable: true })
   SEXDSTN_CODE: string;
 
   @Column({ nullable: true })
@@ -83,6 +86,9 @@ export class COMTNGNRLMBER {
   @Column({ nullable: true })
   CHG_PWD_LAST_PNTTM: Date;
 
-  @Column({ nullable: true })
+  @Column()
+  EMAIL_VRFCT: boolean;
+
+  @Column()
   TERMS: boolean;
 }

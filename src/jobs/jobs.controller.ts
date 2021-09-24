@@ -25,7 +25,7 @@ import {
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
 import { BoardStatus } from './jobs-status.enum';
-import { Board } from './jobs.entity';
+// import { Board } from './jobs.entity';
 import { BoardsService } from './jobs.service';
 import { CreateBoardDto } from './dtos/create-job.dto';
 import { BoardStatusValidationPipe } from './pipes/jobs-status-validation.pipe';

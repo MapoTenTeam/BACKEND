@@ -258,6 +258,10 @@ export class AuthController {
     type: SignupPersonalOutputDto,
   })
   @ApiResponse({
+    status: 406,
+    description: '이메일 인증 or 이용약관 동의 실패',
+  })
+  @ApiResponse({
     status: 409,
     description: '중복된 ID가 있습니다.',
   })

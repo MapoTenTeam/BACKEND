@@ -37,6 +37,10 @@ export class AuthCredentialsPersonalDto {
   // })
   PASSWORD: string;
 
+  @ApiProperty({ description: '이메일 인증 여부' })
+  @IsNotEmpty()
+  EMAIL_VRFCT: boolean;
+
   @ApiProperty({ description: '이용약관 체크여부' })
   @IsNotEmpty()
   TERMS: boolean;

@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { BoardsModule } from './jobs/jobs.module';
 import { User } from './auth/entities/user.entity';
-import { Board } from './jobs/jobs.entity';
+// import { Board } from './jobs/jobs.entity';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { COMTNGNRLMBER } from './auth/entities/user-personal.entity';
 
@@ -24,7 +24,7 @@ import { COMTNGNRLMBER } from './auth/entities/user-personal.entity';
       synchronize: false, // false로 해두는 게 안전하다.
     }),
     AuthModule,
-    // BoardsModule,
+    BoardsModule,
     BookmarksModule,
   ],
 })

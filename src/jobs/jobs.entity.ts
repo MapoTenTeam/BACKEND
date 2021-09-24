@@ -3,19 +3,19 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BoardStatus } from './jobs-status.enum';
 
 // @Entity()
-export class Board {
-  @PrimaryGeneratedColumn()
-  id: number;
+// export class Board {
+//   @PrimaryGeneratedColumn()
+//   id: number;
 
-  @Column()
-  title: string;
+//   @Column()
+//   title: string;
 
-  @Column()
-  description: string;
+//   @Column()
+//   description: string;
 
-  @Column()
-  status: BoardStatus;
+//   @Column()
+//   status: BoardStatus;
 
-  @ManyToOne((type) => User, (user) => user.boards)
-  user: User;
-}
+//   @ManyToOne((type) => User, (user) => user.boards)
+//   user: User;
+// }

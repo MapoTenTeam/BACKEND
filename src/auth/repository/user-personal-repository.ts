@@ -11,8 +11,9 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
   async createPersonalUser(
     authCredentialsPersonalDto: AuthCredentialsPersonalDto,
   ): Promise<void> {
-    const { MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, TERMS } =
+    const { MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, EMAIL_VRFCT, TERMS } =
       authCredentialsPersonalDto;
+    const MBER_STTUS = true;
     // const user = this.create({
     //   MBER_ID,
     //   PASSWORD,
@@ -22,15 +23,30 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
     // });
     const conn = getConnection();
     var sql =
-      'INSERT INTO COMTNGNRLMBER (MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, TERMS, SBSCRB_DE) values(?,?,?,?,?,NOW())';
-    var params = [MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, TERMS];
+      'INSERT INTO COMTNGNRLMBER (MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, MBER_STTUS, EMAIL_VRFCT, TERMS, SBSCRB_DE) values(?,?,?,?,?,?,?,NOW())';
+    var params = [
+      MBER_ID,
+      PASSWORD,
+      MBER_NM,
+      MBER_EMAIL_ADRES,
+      MBER_STTUS,
+      EMAIL_VRFCT,
+      TERMS,
+    ];
     try {
       // await this.save(user);
-      await conn.query(sql, params);
-      return Object.assign({
-        statusCode: 200,
-        message: '개인 회원가입 성공',
-      });
+      if (EMAIL_VRFCT && TERMS == true) {
+        await conn.query(sql, params);
+        return Object.assign({
+          statusCode: 200,
+          message: '개인 회원가입 성공',
+        });
+      } else {
+        return Object.assign({
+          statusCode: 406,
+          message: '이메일 인증 or 이용약관 동의 실패',
+        });
+      }
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('중복된 MBER_ID');
