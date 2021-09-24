@@ -1,12 +1,4 @@
-import { IsEmpty, IsNotEmpty } from 'class-validator';
-import {
-  Column,
-  Double,
-  Entity,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['MBER_ID'])

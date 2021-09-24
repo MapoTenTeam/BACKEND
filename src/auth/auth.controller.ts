@@ -40,7 +40,6 @@ import {
   GetUserByIdFindOutputDto,
   GetUserByIdNotDto,
 } from './dtos/response/getUserById.dto';
-import { UserEnterprise } from './entities/user-enterprise.entity';
 import {
   GetUserByEmailAuthDto,
   GetUserByEmailDto,
@@ -253,7 +252,8 @@ export class AuthController {
     description: '유저 정보',
     type: AuthCredentialsPersonalDto,
   })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: '개인 회원가입 성공',
     type: SignupPersonalOutputDto,
   })
@@ -273,24 +273,30 @@ export class AuthController {
   }
 
   // 기업 회원가입 API
-  // @Post('/enterprise/signup')
-  // @ApiOperation({ summary: '기업 회원 가입 API' })
-  // @ApiBody({ type: AuthCredentialsDto })
-  // async enterpriseSignUp(
-  //   @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
-  // ): Promise<void> {
-  //   return await this.authService.enterpriseSignUp(authCredentialsDto);
-  // }
-
-  // 기업 회원가입 API
   @Post('/enterprise/signup')
-  @ApiOperation({ summary: '기업 회원 가입 API' })
+  @ApiOperation({ summary: '기업 회원 가입 API(완료)' })
   @ApiBody({ description: '유저 정보', type: AuthCredentialsEnterpriseDto })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: '기업 회원가입 성공',
     type: SignupEnterpriseOutputDto,
   })
-  async enterpriseSignUp() {}
+  @ApiResponse({
+    status: 406,
+    description: '이메일 인증 or 이용약관 동의 실패',
+  })
+  @ApiResponse({
+    status: 409,
+    description: '중복된 ID가 있습니다.',
+  })
+  async enterpriseSignUp(
+    @Body(ValidationPipe)
+    authCredentialsEnterpriseDto: AuthCredentialsEnterpriseDto,
+  ): Promise<void> {
+    return await this.authService.enterpriseSignUp(
+      authCredentialsEnterpriseDto,
+    );
+  }
 
   // 로그인 API
   @Post('/signin')

@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { UserEnterprise } from './user-enterprise.entity';
 
 // @Entity()
 @Unique(['userId'])

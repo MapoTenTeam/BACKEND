@@ -3,11 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './entities/user.entity';
-import { UserEnterprise } from './entities/user-enterprise.entity';
 import { GetUserByIdDto } from './dtos/response/getUserById.dto';
 import { GetUserByEmailDto } from './dtos/response/getUserByEmail.dto';
-import { AuthCredentialsPersonalDto } from './dtos/auth-credential.dto';
+import {
+  AuthCredentialsEnterpriseDto,
+  AuthCredentialsPersonalDto,
+} from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
+import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +20,8 @@ export class AuthService {
     // private userPersonalDetailRepository: UserPersonalDetailRepository,
     // private userEnterpriseDetailRepository: UserEnterpriseDetailRepository,
     private jwtService: JwtService,
+    @InjectRepository(UserEnterpriseRepository)
+    private userEnterpriseRepository: UserEnterpriseRepository,
   ) {}
 
   // async getUserById(param: { userid: string }): Promise<GetUserByIdDto> {
@@ -63,11 +68,13 @@ export class AuthService {
     );
   }
 
-  // async enterpriseSignUp(
-  //   authCredentialsDto: AuthCredentialsPersonalDto,
-  // ): Promise<void> {
-  //   return await this.userRepository.createEnterpriseUser(authCredentialsDto);
-  // }
+  async enterpriseSignUp(
+    authCredentialsEnterpriseDto: AuthCredentialsEnterpriseDto,
+  ): Promise<void> {
+    return await this.userEnterpriseRepository.createEnterpriseUser(
+      authCredentialsEnterpriseDto,
+    );
+  }
 
   // async signIn(authCredentialsDto: AuthCredentialsPersonalDto): Promise<{
   //   statusCode: number;

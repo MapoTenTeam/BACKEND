@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEmail,
   IsNotEmpty,
   IsString,
   Matches,
@@ -7,7 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class AuthCredentialsDto {}
+//개인회원 회원가입
 export class AuthCredentialsPersonalDto {
   @ApiProperty({ example: '이름' })
   @IsString()
@@ -22,19 +23,13 @@ export class AuthCredentialsPersonalDto {
   MBER_ID: string;
 
   @ApiProperty({ example: '이메일' })
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
   MBER_EMAIL_ADRES: string;
 
   @ApiProperty({ example: '패스워드' })
   @IsString()
   @IsNotEmpty()
-  // @MinLength(4)
-  // @MaxLength(20)
-  // //영어랑 숫자만 가능한 유효성 검사
-  // @Matches(/^[a-zA-Z0-9]*$/, {
-  //   message: 'password only accepts english and number',
-  // })
   PASSWORD: string;
 
   @ApiProperty({ description: '이메일 인증 여부' })
@@ -46,37 +41,46 @@ export class AuthCredentialsPersonalDto {
   TERMS: boolean;
 }
 
+//기업회원 회원가입
 export class AuthCredentialsEnterpriseDto {
-  @ApiProperty({ example: '사업체명' })
+  @ApiProperty({ example: '회사명' })
+  @IsString()
+  @IsNotEmpty()
   CMPNY_NM: string;
 
   @ApiProperty({ example: '아이디' })
   @IsString()
+  @IsNotEmpty()
   @MinLength(4)
   @MaxLength(20)
   ENTRPRS_MBER_ID: string;
 
-  @ApiProperty({ example: '이메일' })
+  @ApiProperty({ example: '신청자 이메일' })
+  @IsEmail()
+  @IsNotEmpty()
   APPLCNT_EMAIL_ADRES: string;
 
   @ApiProperty({ example: '패스워드' })
   @IsString()
-  @MinLength(4)
-  @MaxLength(20)
-  //영어랑 숫자만 가능한 유효성 검사
-  @Matches(/^[a-zA-Z0-9]*$/, {
-    message: 'password only accepts english and number',
-  })
+  @IsNotEmpty()
   ENTRPRS_MBER_PASSWORD: string;
 
-  @ApiProperty({ description: '이용약관 체크여부' })
-  TERMS: boolean;
-
-  @ApiProperty({ example: '담당자명' })
+  @ApiProperty({ example: '신청인명' })
+  @IsString()
+  @IsNotEmpty()
   APPLCNT_NM: string;
 
   @ApiProperty({ example: '사업자 등록번호' })
+  @IsNotEmpty()
   BIZRNO: string;
+
+  @ApiProperty({ description: '이메일 인증 여부' })
+  @IsNotEmpty()
+  EMAIL_VRFCT: boolean;
+
+  @ApiProperty({ description: '이용약관 체크여부' })
+  @IsNotEmpty()
+  TERMS: boolean;
 }
 
 export class LoginInputDto {

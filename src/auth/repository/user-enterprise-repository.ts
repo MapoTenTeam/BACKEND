@@ -1,45 +1,51 @@
 import { EntityRepository, getConnection, Repository } from 'typeorm';
-import { AuthCredentialsPersonalDto } from '../dtos/auth-credential.dto';
-import { COMTNGNRLMBER } from '../entities/user-personal.entity';
+import {
+  AuthCredentialsEnterpriseDto,
+  AuthCredentialsPersonalDto,
+} from '../dtos/auth-credential.dto';
 import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { COMTNENTRPRSMBER } from '../entities/user-enterprise.entity';
 
-@EntityRepository(COMTNGNRLMBER)
-export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
-  async createPersonalUser(
-    authCredentialsPersonalDto: AuthCredentialsPersonalDto,
+@EntityRepository(COMTNENTRPRSMBER)
+export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
+  async createEnterpriseUser(
+    authCredentialsEnterpriseDto: AuthCredentialsEnterpriseDto,
   ): Promise<void> {
-    const { MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, EMAIL_VRFCT, TERMS } =
-      authCredentialsPersonalDto;
-    const MBER_STTUS = true;
-    // const user = this.create({
-    //   MBER_ID,
-    //   PASSWORD,
-    //   MBER_NM,
-    //   MBER_EMAIL_ADRES,
-    //   TERMS,
-    // });
+    const {
+      CMPNY_NM,
+      ENTRPRS_MBER_ID,
+      APPLCNT_EMAIL_ADRES,
+      ENTRPRS_MBER_PASSWORD,
+      APPLCNT_NM,
+      BIZRNO,
+      EMAIL_VRFCT,
+      TERMS,
+    } = authCredentialsEnterpriseDto;
+    const ENTRPRS_MBER_STTUS = true;
+
     const conn = getConnection();
     var sql =
-      'INSERT INTO COMTNGNRLMBER (MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, MBER_STTUS, EMAIL_VRFCT, TERMS, SBSCRB_DE) values(?,?,?,?,?,?,?,NOW())';
+      'INSERT INTO COMTNENTRPRSMBER (CMPNY_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES, ENTRPRS_MBER_PASSWORD, APPLCNT_NM, BIZRNO, ENTRPRS_MBER_STTUS, EMAIL_VRFCT, TERMS, SBSCRB_DE) values(?,?,?,?,?,?,?,?,?,NOW())';
     var params = [
-      MBER_ID,
-      PASSWORD,
-      MBER_NM,
-      MBER_EMAIL_ADRES,
-      MBER_STTUS,
+      CMPNY_NM,
+      ENTRPRS_MBER_ID,
+      APPLCNT_EMAIL_ADRES,
+      ENTRPRS_MBER_PASSWORD,
+      APPLCNT_NM,
+      BIZRNO,
+      ENTRPRS_MBER_STTUS,
       EMAIL_VRFCT,
       TERMS,
     ];
     try {
-      // await this.save(user);
       if (EMAIL_VRFCT && TERMS == true) {
         await conn.query(sql, params);
         return Object.assign({
           statusCode: 201,
-          message: '개인 회원가입 성공',
+          message: '기업 회원가입 성공',
         });
       } else {
         return Object.assign({
