@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './entities/user.entity';
-import { GetUserByIdDto } from './dtos/response/getUserById.dto';
+import {
+  GetUserByIdDto,
+  GetUserByIdFindInputDto,
+  GetUserByIdFindOutputDto,
+} from './dtos/response/getUserById.dto';
 import { GetUserByEmailDto } from './dtos/response/getUserByEmail.dto';
 import {
   AuthCredentialsEnterpriseDto,
@@ -53,7 +57,7 @@ export class AuthService {
     const { email } = userByEmailInputDto;
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT EMAIL_ADRES FROM COMVNUSERMASTER WHERE EMAIL_ADRES='${email}'`,
+      `SELECT EMAIL_ADRES FROM COMVNUSERMASTER WHERE EMAIL_ADRES='${email}' AND USER_STTUS=true`,
     );
 
     return found
@@ -74,7 +78,7 @@ export class AuthService {
   }): Promise<GetUserByBizrnoDto> {
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}'`,
+      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}' AND USER_STTUS=true`,
     );
 
     return found
@@ -87,6 +91,28 @@ export class AuthService {
           statusCode: 200,
           message: '사업자등록번호가 없습니다.',
           isDuplicate: false,
+        });
+  }
+
+  async getUserByIdFind(
+    getUserByIdFindInputDto: GetUserByIdFindInputDto,
+  ): Promise<GetUserByIdFindOutputDto> {
+    const { USER_NM, USER_EMAIL } = getUserByIdFindInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_NM='${USER_NM}' AND EMAIL_ADRES='${USER_EMAIL}' AND USER_STTUS=true`,
+    );
+
+    return found
+      ? Object.assign({
+          statusCode: 200,
+          message: '유저 아이디 조회 성공',
+          userId: found.USER_ID,
+        })
+      : Object.assign({
+          statusCode: 200,
+          message: '가입된 회원정보가 없습니다.',
         });
   }
 

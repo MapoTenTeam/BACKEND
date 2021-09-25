@@ -161,17 +161,23 @@ export class AuthController {
   }
 
   //유저 아이디 찾기
-  @ApiOperation({ summary: '유저 아이디 찾기 API' })
+  @ApiOperation({ summary: '유저 아이디 찾기 API(완료)' })
   @ApiBody({
     description: '유저 정보',
     type: GetUserByIdFindInputDto,
   })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: '유저 아이디 찾기 성공',
     type: GetUserByIdFindOutputDto,
   })
-  @Get('/find/id')
-  async getUserByIdFind() {}
+  @Post('/find/id')
+  async getUserByIdFind(
+    @Body(ValidationPipe)
+    getUserByIdFindInputDto: GetUserByIdFindInputDto,
+  ): Promise<GetUserByIdFindOutputDto> {
+    return await this.authService.getUserByIdFind(getUserByIdFindInputDto);
+  }
 
   //유저 패스워드 찾기
   @ApiOperation({ summary: '유저 패스워드 찾기 API' })
@@ -183,7 +189,7 @@ export class AuthController {
     description: '임시 비밀번호 생성 성공',
     type: GetUserByPasswordFindOutputDto,
   })
-  @Get('/find/password')
+  @Post('/find/password')
   async getUserByPasswordFind() {}
 
   //이용 약관

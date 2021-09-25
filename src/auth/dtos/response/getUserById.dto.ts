@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString } from 'class-validator';
 
 export class GetUserByIdNotDto {
   @ApiProperty({
@@ -42,8 +43,11 @@ export class GetUserByIdDto {
 
 export class GetUserByIdFindInputDto {
   @ApiProperty({ example: '이름' })
+  @IsString()
   USER_NM: string;
+
   @ApiProperty({ example: '이메일' })
+  @IsEmail()
   USER_EMAIL: string;
 }
 
