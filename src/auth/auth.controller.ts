@@ -32,7 +32,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
-import { GetUser } from './get-user.decorator';
 import { Request } from 'express';
 import {
   GetUserByIdDto,
@@ -90,7 +89,7 @@ export class AuthController {
 
   //유저ID 중복체크 API
   @Get('/duplicate/id/:userid')
-  @ApiOperation({ summary: '유저 아이디 중복체크 API(완료)' })
+  @ApiOperation({ summary: '유저 아이디 중복체크 API(완료)*' })
   @ApiParam({
     name: 'userid',
     example: 'hee1234',
@@ -113,7 +112,7 @@ export class AuthController {
 
   //유저 이메일 중복체크 API
   @Get('/duplicate/email/:email')
-  @ApiOperation({ summary: '유저 이메일 중복체크 API(완료)' })
+  @ApiOperation({ summary: '유저 이메일 중복체크 API(완료)*' })
   @ApiParam({
     name: 'email',
     type: UserByEmailInputDto,
@@ -138,7 +137,7 @@ export class AuthController {
   }
 
   //사업자등록번호 중복체크 API
-  @ApiOperation({ summary: '사업자등록번호 중복체크 API(완료)' })
+  @ApiOperation({ summary: '사업자등록번호 중복체크 API(완료)*' })
   @ApiParam({
     name: 'bizrno',
     example: '1231212345',
@@ -161,7 +160,7 @@ export class AuthController {
   }
 
   //유저 아이디 찾기
-  @ApiOperation({ summary: '유저 아이디 찾기 API(완료)' })
+  @ApiOperation({ summary: '유저 아이디 찾기 API(완료)*' })
   @ApiBody({
     description: '유저 정보',
     type: GetUserByIdFindInputDto,
@@ -192,24 +191,22 @@ export class AuthController {
   @Post('/find/password')
   async getUserByPasswordFind() {}
 
-  //이용 약관
-  @ApiOperation({ summary: '이용 약관 API' })
+  //이용 약관 조회
+  @ApiOperation({ summary: '이용 약관 API(완료)' })
   @ApiOkResponse({
-    description: '이용약관 가져오기',
+    description: '이용약관 조회 성공',
     type: TermsOutputDto,
   })
   @Get('/terms')
-  async getTerms() {}
+  async getTerms() {
+    return await this.authService.getTerms();
+  }
 
   //개인 회원 탈퇴하기
-  @ApiOperation({ summary: '개인 회원 탈퇴 API' })
-  @ApiParam({
-    name: 'userId',
-    example: 'hee1234',
-    description: '유저Id',
-  })
+  @Delete('/personal')
+  @ApiOperation({ summary: '개인 회원 탈퇴 API(완료)*' })
   @ApiOkResponse({
-    description: '회원 탈퇴 성공 성공',
+    description: '회원 탈퇴 성공',
     type: GetUserByDeleteOutputDto,
   })
   @ApiResponse({
@@ -218,18 +215,15 @@ export class AuthController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Delete('/personal/:userId')
-  async deletePersonalUser() {}
+  async deletePersonalUser(@Req() req) {
+    return await this.authService.deletePersonalUser(req.user);
+  }
 
   //기업 회원 탈퇴하기
-  @ApiOperation({ summary: '기업 회원 탈퇴 API' })
-  @ApiParam({
-    name: 'userId',
-    example: 'hee1234',
-    description: '유저Id',
-  })
+  @Delete('/enterprise')
+  @ApiOperation({ summary: '기업 회원 탈퇴 API(완료)*' })
   @ApiOkResponse({
-    description: '회원 탈퇴 성공 성공',
+    description: '회원 탈퇴 성공',
     type: GetUserByDeleteOutputDto,
   })
   @ApiResponse({
@@ -238,8 +232,9 @@ export class AuthController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  @Delete('/enterprise/:userId')
-  async deleteEnterpriseUser() {}
+  async deleteEnterpriseUser(@Req() req) {
+    return await this.authService.deleteEnterpriseUser(req.user);
+  }
 
   //이메일 인증
   @Post('/auth/email/:email')
@@ -257,7 +252,7 @@ export class AuthController {
 
   //개인 회원가입 API
   @Post('/personal/signup')
-  @ApiOperation({ summary: '개인 회원 가입 API(완료)' })
+  @ApiOperation({ summary: '개인 회원 가입 API(완료)*' })
   @ApiBody({
     description: '유저 정보',
     type: AuthCredentialsPersonalDto,
@@ -284,7 +279,7 @@ export class AuthController {
 
   // 기업 회원가입 API
   @Post('/enterprise/signup')
-  @ApiOperation({ summary: '기업 회원 가입 API(완료)' })
+  @ApiOperation({ summary: '기업 회원 가입 API(완료)*' })
   @ApiBody({ description: '유저 정보', type: AuthCredentialsEnterpriseDto })
   @ApiResponse({
     status: 201,
@@ -310,7 +305,7 @@ export class AuthController {
 
   // 로그인 API
   @Post('/signin')
-  @ApiOperation({ summary: '로그인 API(완료)' })
+  @ApiOperation({ summary: '로그인 API(완료)*' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
   @ApiResponse({
     status: 201,

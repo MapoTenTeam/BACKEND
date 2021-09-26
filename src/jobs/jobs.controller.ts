@@ -22,7 +22,6 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
 import { BoardStatus } from './jobs-status.enum';
 // import { Board } from './jobs.entity';

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Req, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -13,6 +13,7 @@ import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,
   LoginInputDto,
+  TermsOutputDto,
   UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
@@ -116,6 +117,18 @@ export class AuthService {
         });
   }
 
+  async getTerms() {
+    const conn = getConnection();
+    const [found] = await conn.query(`SELECT * FROM terms`);
+
+    return Object.assign({
+      statusCode: 200,
+      message: '이용약관 조회 성공',
+      terms: found.TERMS,
+      agree: found.AGREE,
+    });
+  }
+
   async personalSignUp(
     authCredentialsPersonalDto: AuthCredentialsPersonalDto,
   ): Promise<void> {
@@ -156,6 +169,30 @@ export class AuthService {
     } else {
       throw new UnauthorizedException('로그인 실패');
     }
+  }
+
+  async deletePersonalUser(@Req() req) {
+    const conn = getConnection();
+    await conn.query(
+      `UPDATE COMTNGNRLMBER SET MBER_STTUS=false, SECSN_DE=NOW() WHERE MBER_ID='${req.USER_ID}'`,
+    );
+
+    return Object.assign({
+      statusCode: 200,
+      message: '회원 탈퇴 성공',
+    });
+  }
+
+  async deleteEnterpriseUser(@Req() req) {
+    const conn = getConnection();
+    await conn.query(
+      `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_STTUS=false, SECSN_DE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+
+    return Object.assign({
+      statusCode: 200,
+      message: '회원 탈퇴 성공',
+    });
   }
 
   // async personalUser(
