@@ -56,6 +56,7 @@ import {
   SignupPersonalOutputDto,
 } from './dtos/personalUser.dto';
 import {
+  PatchAprblEnterpriseOutputDto,
   ProfileEnterpriseInputDto,
   ProfileEnterpriseOutputDto,
   ProfileImageEnterpriseOutputDto,
@@ -451,13 +452,16 @@ export class AuthController {
 
   //기업 사업자 승인 요청
   @Patch('/enterprise/approval')
-  @ApiOperation({ summary: '기업 사업자 승인 요청 API' })
+  @ApiOperation({ summary: '사업자 승인 요청 API(완료)*' })
   @ApiOkResponse({
-    description: '기업 사업자 승인 요청 성공',
+    description: '사업자 승인 요청 성공',
+    type: PatchAprblEnterpriseOutputDto,
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async enterpriseBusinessApproval() {}
+  async enterpriseBusinessApproval(@Req() req) {
+    return await this.authService.enterpriseBusinessApproval(req.user);
+  }
 
   //개인 회원 비밀번호 변경
   @Patch('/personal/change/password')

@@ -330,6 +330,18 @@ export class AuthService {
     });
   }
 
+  async enterpriseBusinessApproval(@Req() req) {
+    const conn = getConnection();
+    await conn.query(
+      `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL='M' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+
+    return Object.assign({
+      statusCode: 200,
+      message: '사업자 승인 요청 성공',
+    });
+  }
+
   async personalUploadProfile(
     @Req() req,
     profilePersonalInputDto: ProfilePersonalInputDto,
