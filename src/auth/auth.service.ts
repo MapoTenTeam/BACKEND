@@ -23,6 +23,7 @@ import { getConnection } from 'typeorm';
 import { GetUserByBizrnoDto } from './dtos/response/getUserByBizrno.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { GetUserByPasswordFindInputDto } from './dtos/response/getUserByPassword.dto';
+import { ProfilePersonalInputDto } from './dtos/personalUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -299,6 +300,24 @@ export class AuthService {
     return Object.assign({
       statusCode: 200,
       message: '회원 탈퇴 성공',
+    });
+  }
+
+  async personalUploadProfile(
+    @Req() req,
+    profilePersonalInputDto: ProfilePersonalInputDto,
+  ) {
+    const { MBER_NM, MBER_EMAIL_ADRES, MBTLNUM, ADRES, DETAIL_ADRES } =
+      profilePersonalInputDto;
+
+    const conn = getConnection();
+
+    await conn.query(
+      `UPDATE COMTNGNRLMBER SET MBER_NM='${MBER_NM}', MBER_EMAIL_ADRES='${MBER_EMAIL_ADRES}', MBTLNUM='${MBTLNUM}', ADRES='${ADRES}', DETAIL_ADRES='${DETAIL_ADRES}' WHERE MBER_ID='${req.USER_ID}'`,
+    );
+    return Object.assign({
+      statusCode: 200,
+      message: '개인회원 프로필 등록 성공',
     });
   }
 

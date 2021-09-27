@@ -50,16 +50,12 @@ import {
 } from './dtos/response/getUserByPassword.dto';
 import { GetUserByDeleteOutputDto } from './dtos/response/getUserByDelete.dto';
 import {
-  EditProfilePersonalInputDto,
-  EditProfilePersonalOutputDto,
   ProfilePersonalInputDto,
   ProfilePersonalOutputDto,
   SelectProfilePersonalOutputDto,
   SignupPersonalOutputDto,
 } from './dtos/personalUser.dto';
 import {
-  EditProfileEnterpriseInputDto,
-  EditProfileEnterpriseOutputDto,
   ProfileEnterpriseInputDto,
   ProfileEnterpriseOutputDto,
   ProfileImageEnterpriseOutputDto,
@@ -377,9 +373,9 @@ export class AuthController {
   @ApiBearerAuth()
   async getenterpriseProfile() {}
 
-  //개인 회원 프로필 등록
-  @Post('/personal/upload/profile')
-  @ApiOperation({ summary: '개인 회원 프로필 등록 API' })
+  //개인 회원 프로필 등록 or 수정
+  @Put('/personal/upload/profile')
+  @ApiOperation({ summary: '개인 회원 프로필 등록 or 수정 API(완료)*' })
   @ApiBody({
     description: '등록 할 프로필 정보',
     type: ProfilePersonalInputDto,
@@ -389,11 +385,20 @@ export class AuthController {
     type: ProfilePersonalOutputDto,
   })
   @ApiBearerAuth()
-  async personalProfile() {}
+  @UseGuards(AuthGuard())
+  async personalUploadProfile(
+    @Req() req,
+    @Body(ValidationPipe) profilePersonalInputDto: ProfilePersonalInputDto,
+  ) {
+    return await this.authService.personalUploadProfile(
+      req.user,
+      profilePersonalInputDto,
+    );
+  }
 
-  //기업 회원 프로필 등록
-  @Post('/enterprise/upload/profile')
-  @ApiOperation({ summary: '기업 회원 프로필 등록 API' })
+  //기업 회원 프로필 등록 or 수정
+  @Put('/enterprise/upload/profile')
+  @ApiOperation({ summary: '기업 회원 프로필 등록 or 수정 API' })
   @ApiBody({
     description: '등록 할 프로필 정보',
     type: ProfileEnterpriseInputDto,
@@ -404,34 +409,6 @@ export class AuthController {
   })
   @ApiBearerAuth()
   async enterpriseProfile() {}
-
-  //개인 회원 프로필 수정
-  @Put('/personal/edit/profile')
-  @ApiOperation({ summary: '개인 회원 프로필 수정 API' })
-  @ApiBody({
-    description: '수정 할 프로필 정보',
-    type: EditProfilePersonalInputDto,
-  })
-  @ApiOkResponse({
-    description: '개인 회원 프로필 수정 성공',
-    type: EditProfilePersonalOutputDto,
-  })
-  @ApiBearerAuth()
-  async personalEditProfile() {}
-
-  //기업 회원 프로필 수정
-  @Put('/enterprise/edit/profile')
-  @ApiOperation({ summary: '기업 회원 프로필 수정 API' })
-  @ApiBody({
-    description: '수정 할 프로필 정보',
-    type: EditProfileEnterpriseInputDto,
-  })
-  @ApiOkResponse({
-    description: '기업 회원 프로필 수정 성공',
-    type: EditProfileEnterpriseOutputDto,
-  })
-  @ApiBearerAuth()
-  async enterpriseEditProfile() {}
 
   //기업 회원 프로필 이미지 등록 or 수정
   @Patch('/enterprise/upload/profile/image')
