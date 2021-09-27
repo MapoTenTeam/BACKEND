@@ -13,6 +13,7 @@ import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,
   LoginInputDto,
+  PasswordChangeInputDto,
   TermsOutputDto,
   UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
@@ -20,6 +21,8 @@ import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
 import { getConnection } from 'typeorm';
 import { GetUserByBizrnoDto } from './dtos/response/getUserByBizrno.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { GetUserByPasswordFindInputDto } from './dtos/response/getUserByPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +32,8 @@ export class AuthService {
     // private userPersonalDetailRepository: UserPersonalDetailRepository,
     // private userEnterpriseDetailRepository: UserEnterpriseDetailRepository,
     private jwtService: JwtService,
+    private mailerService: MailerService,
+
     @InjectRepository(UserEnterpriseRepository)
     private userEnterpriseRepository: UserEnterpriseRepository,
   ) {}
@@ -58,7 +63,7 @@ export class AuthService {
     const { email } = userByEmailInputDto;
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT EMAIL_ADRES FROM COMVNUSERMASTER WHERE EMAIL_ADRES='${email}' AND USER_STTUS=true`,
+      `SELECT EMAIL_ADRES FROM COMVNUSERMASTER WHERE EMAIL_ADRES='${email}' AND USER_STTUS='P'`,
     );
 
     return found
@@ -79,7 +84,7 @@ export class AuthService {
   }): Promise<GetUserByBizrnoDto> {
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}' AND USER_STTUS=true`,
+      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}' AND USER_STTUS='P'`,
     );
 
     return found
@@ -102,7 +107,7 @@ export class AuthService {
 
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_NM='${USER_NM}' AND EMAIL_ADRES='${USER_EMAIL}' AND USER_STTUS=true`,
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_NM='${USER_NM}' AND EMAIL_ADRES='${USER_EMAIL}' AND USER_STTUS='P'`,
     );
 
     return found
@@ -117,6 +122,88 @@ export class AuthService {
         });
   }
 
+  async getpersonalByPasswordFind(
+    getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
+  ) {
+    const { USER_ID, USER_EMAIL } = getUserByPasswordFindInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT MBER_EMAIL_ADRES FROM COMTNGNRLMBER WHERE MBER_ID='${USER_ID}' AND MBER_EMAIL_ADRES='${USER_EMAIL}' AND MBER_STTUS='P'`,
+    );
+
+    if (found) {
+      try {
+        const number: number =
+          Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
+        await this.mailerService.sendMail({
+          to: found.MBER_EMAIL_ADRES, // list of receivers
+          from: process.env.EMAIL_ADRES, // sender address
+          subject: '이메일 인증 요청 메일입니다.', // Subject line
+          html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
+        });
+        const password = String(number);
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await conn.query(
+          `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
+        );
+
+        return Object.assign({
+          statusCode: 201,
+          message: '임시 비밀번호 생성 성공',
+        });
+      } catch (err) {}
+    } else {
+      return Object.assign({
+        statusCode: 200,
+        message: '가입된 회원정보가 없습니다.',
+      });
+    }
+  }
+
+  async getenterpriseByPasswordFind(
+    getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
+  ) {
+    const { USER_ID, USER_EMAIL } = getUserByPasswordFindInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT APPLCNT_EMAIL_ADRES FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${USER_ID}' AND APPLCNT_EMAIL_ADRES='${USER_EMAIL}' AND ENTRPRS_MBER_STTUS='P'`,
+    );
+
+    if (found) {
+      try {
+        const number: number =
+          Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
+        await this.mailerService.sendMail({
+          to: found.APPLCNT_EMAIL_ADRES, // list of receivers
+          from: process.env.EMAIL_ADRES, // sender address
+          subject: '이메일 인증 요청 메일입니다.', // Subject line
+          html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
+        });
+        const password = String(number);
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await conn.query(
+          `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${hashedPassword}' WHERE ENTRPRS_MBER_ID='${USER_ID}'`,
+        );
+
+        return Object.assign({
+          statusCode: 201,
+          message: '임시 비밀번호 생성 성공',
+        });
+      } catch (err) {}
+    } else {
+      return Object.assign({
+        statusCode: 200,
+        message: '가입된 회원정보가 없습니다.',
+      });
+    }
+  }
+
   async getTerms() {
     const conn = getConnection();
     const [found] = await conn.query(`SELECT * FROM terms`);
@@ -127,6 +214,26 @@ export class AuthService {
       terms: found.TERMS,
       agree: found.AGREE,
     });
+  }
+
+  async emailAuth(param: { email: string }) {
+    try {
+      const number: number =
+        Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
+      await this.mailerService.sendMail({
+        to: param.email, // list of receivers
+        from: process.env.EMAIL_ADRES, // sender address
+        subject: '이메일 인증 요청 메일입니다.', // Subject line
+        html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
+      });
+      return Object.assign({
+        statusCode: 201,
+        message: '이메일 인증 번호 생성 성공',
+        code: number,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async personalSignUp(
@@ -154,7 +261,7 @@ export class AuthService {
 
     const conn = getConnection();
     const [user] = await conn.query(
-      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS=true`,
+      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
     );
 
     if (user && user.PASSWORD == PASSWORD) {
@@ -174,7 +281,7 @@ export class AuthService {
   async deletePersonalUser(@Req() req) {
     const conn = getConnection();
     await conn.query(
-      `UPDATE COMTNGNRLMBER SET MBER_STTUS=false, SECSN_DE=NOW() WHERE MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNGNRLMBER SET MBER_STTUS='D', SECSN_DE=NOW() WHERE MBER_ID='${req.USER_ID}'`,
     );
 
     return Object.assign({
@@ -186,13 +293,65 @@ export class AuthService {
   async deleteEnterpriseUser(@Req() req) {
     const conn = getConnection();
     await conn.query(
-      `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_STTUS=false, SECSN_DE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_STTUS='D', SECSN_DE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
     return Object.assign({
       statusCode: 200,
       message: '회원 탈퇴 성공',
     });
+  }
+
+  async personalPasswordChange(
+    @Req() req,
+    passwordChangeInputDto: PasswordChangeInputDto,
+  ) {
+    const { PASSWORD } = passwordChangeInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT MBER_ID FROM COMTNGNRLMBER WHERE MBER_ID='${req.USER_ID}'`,
+    );
+
+    if (found) {
+      await conn.query(
+        `UPDATE COMTNGNRLMBER SET PASSWORD='${PASSWORD}' WHERE MBER_ID='${req.USER_ID}'`,
+      );
+      return Object.assign({
+        statusCode: 200,
+        message: '비밀 번호 변경 성공',
+      });
+    } else {
+      {
+        throw new UnauthorizedException();
+      }
+    }
+  }
+
+  async enterprisePasswordChange(
+    @Req() req,
+    passwordChangeInputDto: PasswordChangeInputDto,
+  ) {
+    const { PASSWORD } = passwordChangeInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT ENTRPRS_MBER_ID FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+
+    if (found) {
+      await conn.query(
+        `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${PASSWORD}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      );
+      return Object.assign({
+        statusCode: 200,
+        message: '비밀 번호 변경 성공',
+      });
+    } else {
+      {
+        throw new UnauthorizedException();
+      }
+    }
   }
 
   // async personalUser(

@@ -18,7 +18,7 @@ export class PersonalJwtStrategy extends PassportStrategy(Strategy) {
     const { USER_ID } = payload;
     const conn = getConnection();
     const [user] = await conn.query(
-      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS=true`,
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
     );
 
     if (!user) {

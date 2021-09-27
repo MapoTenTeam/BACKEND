@@ -16,21 +16,6 @@ export class SignupPersonalOutputDto {
   message: string;
 }
 
-//개인 회원 비밀번호 변경 성공했을때
-export class PasswordPersonalOutputDto {
-  @ApiProperty({
-    example: '200',
-    description: '상태코드',
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    example: '비밀 번호 변경 성공',
-    description: '설명',
-  })
-  message: string;
-}
-
 //개인 회원 프로필 등록
 export class ProfilePersonalInputDto {
   @ApiProperty({ example: '휴대폰 번호' })

@@ -13,7 +13,7 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
   ): Promise<void> {
     const { MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, EMAIL_VRFCT, TERMS } =
       authCredentialsPersonalDto;
-    const MBER_STTUS = true;
+    const MBER_STTUS = 'P';
     // const user = this.create({
     //   MBER_ID,
     //   PASSWORD,

@@ -100,13 +100,13 @@ export class LoginInputDto {
   @ApiProperty({ example: '비밀번호' })
   @IsString()
   @IsNotEmpty()
-  @MinLength(20)
-  @Matches(
-    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-_]).{20,}$/,
-    {
-      message: 'password hash error',
-    },
-  )
+  // @MinLength(20)
+  // @Matches(
+  //   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-_]).{20,}$/,
+  //   {
+  //     message: 'password hash error',
+  //   },
+  // )
   PASSWORD: string;
 }
 
@@ -143,6 +143,7 @@ export class UserByEmailInputDto {
   email: string;
 }
 
+//이용약관 조회 성공했을때
 export class TermsOutputDto {
   @ApiProperty({
     example: '200',
@@ -167,4 +168,25 @@ export class TermsOutputDto {
     description: '개인정보 수집 및 이용',
   })
   agree: string;
+}
+
+//비밀번호 변경 요청했을때
+export class PasswordChangeInputDto {
+  @ApiProperty({ example: '변경할 비밀번호' })
+  PASSWORD: string;
+}
+
+//비밀번호 변경 성공했을때
+export class PasswordChangeOutputDto {
+  @ApiProperty({
+    example: '200',
+    description: '상태코드',
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '비밀 번호 변경 성공',
+    description: '설명',
+  })
+  message: string;
 }

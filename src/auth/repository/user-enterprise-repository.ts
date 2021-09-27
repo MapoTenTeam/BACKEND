@@ -24,7 +24,7 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
       EMAIL_VRFCT,
       TERMS,
     } = authCredentialsEnterpriseDto;
-    const ENTRPRS_MBER_STTUS = true;
+    const ENTRPRS_MBER_STTUS = 'P';
 
     const conn = getConnection();
     var sql =

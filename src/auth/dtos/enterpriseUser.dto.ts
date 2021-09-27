@@ -16,21 +16,6 @@ export class SignupEnterpriseOutputDto {
   message: string;
 }
 
-//기업회원 비밀번호 변경
-export class PasswordEnterpriseOutputDto {
-  @ApiProperty({
-    example: '200',
-    description: '상태코드',
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    example: '비밀 번호 변경 성공',
-    description: '설명',
-  })
-  message: string;
-}
-
 //기업 회원 프로필 등록
 export class ProfileEnterpriseInputDto {
   @ApiProperty({ example: '대표자' })

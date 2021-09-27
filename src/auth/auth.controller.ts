@@ -52,7 +52,6 @@ import { GetUserByDeleteOutputDto } from './dtos/response/getUserByDelete.dto';
 import {
   EditProfilePersonalInputDto,
   EditProfilePersonalOutputDto,
-  PasswordPersonalOutputDto,
   ProfilePersonalInputDto,
   ProfilePersonalOutputDto,
   SelectProfilePersonalOutputDto,
@@ -61,7 +60,6 @@ import {
 import {
   EditProfileEnterpriseInputDto,
   EditProfileEnterpriseOutputDto,
-  PasswordEnterpriseOutputDto,
   ProfileEnterpriseInputDto,
   ProfileEnterpriseOutputDto,
   ProfileImageEnterpriseOutputDto,
@@ -74,6 +72,8 @@ import {
   AuthCredentialsPersonalDto,
   LoginInputDto,
   LoginOutputDto,
+  PasswordChangeInputDto,
+  PasswordChangeOutputDto,
   TermsOutputDto,
   UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
@@ -178,8 +178,10 @@ export class AuthController {
     return await this.authService.getUserByIdFind(getUserByIdFindInputDto);
   }
 
-  //유저 패스워드 찾기
-  @ApiOperation({ summary: '유저 패스워드 찾기 API' })
+  //개인회원 패스워드 찾기(임시비밀번호 생성)
+  @ApiOperation({
+    summary: '개인회원 패스워드 찾기(임시비밀번호 생성) API(완료)*',
+  })
   @ApiBody({
     description: '유저 정보',
     type: GetUserByPasswordFindInputDto,
@@ -188,8 +190,37 @@ export class AuthController {
     description: '임시 비밀번호 생성 성공',
     type: GetUserByPasswordFindOutputDto,
   })
-  @Post('/find/password')
-  async getUserByPasswordFind() {}
+  @Post('/find/personal/password')
+  async getpersonalByPasswordFind(
+    @Body(ValidationPipe)
+    getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
+  ) {
+    return await this.authService.getpersonalByPasswordFind(
+      getUserByPasswordFindInputDto,
+    );
+  }
+
+  //기업회원 패스워드 찾기(임시비밀번호 생성)
+  @ApiOperation({
+    summary: '기업회원 패스워드 찾기(임시비밀번호 생성) API(완료)*',
+  })
+  @ApiBody({
+    description: '유저 정보',
+    type: GetUserByPasswordFindInputDto,
+  })
+  @ApiOkResponse({
+    description: '임시 비밀번호 생성 성공',
+    type: GetUserByPasswordFindOutputDto,
+  })
+  @Post('/find/enterprise/password')
+  async getenterpriseByPasswordFind(
+    @Body(ValidationPipe)
+    getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
+  ) {
+    return await this.authService.getenterpriseByPasswordFind(
+      getUserByPasswordFindInputDto,
+    );
+  }
 
   //이용 약관 조회
   @ApiOperation({ summary: '이용 약관 API(완료)' })
@@ -216,7 +247,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async deletePersonalUser(@Req() req) {
-    return await this.authService.deletePersonalUser(req.user);
+    console.log('asdfasdf', req.user);
+    // return await this.authService.deletePersonalUser(req.user);
   }
 
   //기업 회원 탈퇴하기
@@ -238,17 +270,20 @@ export class AuthController {
 
   //이메일 인증
   @Post('/auth/email/:email')
-  @ApiOperation({ summary: '이메일 인증 API' })
+  @ApiOperation({ summary: '이메일 인증 API(완료)*' })
   @ApiParam({
     name: 'email',
     example: 'hee1234@gmail.com',
     description: '인증 받을 이메일',
   })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: '인증번호',
     type: GetUserByEmailAuthDto,
   })
-  async emailAuth() {}
+  async emailAuth(@Param() param: { email: string }) {
+    return await this.authService.emailAuth(param);
+  }
 
   //개인 회원가입 API
   @Post('/personal/signup')
@@ -343,7 +378,7 @@ export class AuthController {
   async getenterpriseProfile() {}
 
   //개인 회원 프로필 등록
-  @Put('/personal/upload/profile')
+  @Post('/personal/upload/profile')
   @ApiOperation({ summary: '개인 회원 프로필 등록 API' })
   @ApiBody({
     description: '등록 할 프로필 정보',
@@ -357,7 +392,7 @@ export class AuthController {
   async personalProfile() {}
 
   //기업 회원 프로필 등록
-  @Put('/enterprise/upload/profile')
+  @Post('/enterprise/upload/profile')
   @ApiOperation({ summary: '기업 회원 프로필 등록 API' })
   @ApiBody({
     description: '등록 할 프로필 정보',
@@ -398,9 +433,9 @@ export class AuthController {
   @ApiBearerAuth()
   async enterpriseEditProfile() {}
 
-  //기업 회원 프로필 이미지 등록
+  //기업 회원 프로필 이미지 등록 or 수정
   @Patch('/enterprise/upload/profile/image')
-  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 API' })
+  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API' })
   @ApiOkResponse({
     description: '기업 회원 프로필 이미지 등록 성공',
     type: ProfileImageEnterpriseOutputDto,
@@ -422,35 +457,61 @@ export class AuthController {
   @ApiBearerAuth()
   async enterpriseProfileImage(@UploadedFile('file') file) {}
 
+  //기업 사업자 승인 요청
+  @Patch('/enterprise/approval')
+  @ApiOperation({ summary: '기업 사업자 승인 요청 API' })
+  @ApiOkResponse({
+    description: '기업 사업자 승인 요청 성공',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseBusinessApproval() {}
+
   //개인 회원 비밀번호 변경
-  @Patch('/personal/password/:password')
-  @ApiOperation({ summary: '개인 회원 비밀번호 변경 API' })
-  @ApiParam({
-    name: 'password',
-    example: '$2a$10$57qAQNibiL0DChHArBwNj.RKeWUny19Men6GQW76WIhCx84gkxuXi',
+  @Patch('/personal/change/password')
+  @ApiOperation({ summary: '개인 회원 비밀번호 변경 API(완료)*' })
+  @ApiBody({
     description: '변경할 비밀번호',
+    type: PasswordChangeInputDto,
   })
   @ApiOkResponse({
     description: '비밀번호 변경 성공',
-    type: PasswordPersonalOutputDto,
+    type: PasswordChangeOutputDto,
   })
   @ApiBearerAuth()
-  async personalPassword() {}
+  @UseGuards(AuthGuard())
+  async personalPasswordChange(
+    @Req() req,
+    @Body(ValidationPipe) passwordChangeInputDto: PasswordChangeInputDto,
+  ) {
+    return await this.authService.personalPasswordChange(
+      req.user,
+      passwordChangeInputDto,
+    );
+  }
 
   //기업 회원 비밀번호 변경
-  @Patch('/enterprise/password/:password')
-  @ApiOperation({ summary: '기업 회원 비밀번호 변경 API' })
-  @ApiParam({
-    name: 'password',
-    example: '$2a$10$57qAQNibiL0DChHArBwNj.RKeWUny19Men6GQW76WIhCx84gkxuXi',
+  @Patch('/enterprise/change/password/')
+  @ApiOperation({ summary: '기업 회원 비밀번호 변경 API(완료)*' })
+  @ApiBody({
     description: '변경할 비밀번호',
+    type: PasswordChangeInputDto,
   })
   @ApiOkResponse({
     description: '비밀번호 변경 성공',
-    type: PasswordEnterpriseOutputDto,
+    type: PasswordChangeOutputDto,
   })
   @ApiBearerAuth()
-  async enterprisePassword() {}
+  @UseGuards(AuthGuard())
+  async enterprisePasswordChange(
+    @Req() req,
+    @Body(ValidationPipe) passwordChangeInputDto: PasswordChangeInputDto,
+  ) {
+    return await this.authService.enterprisePasswordChange(
+      req.user,
+      passwordChangeInputDto,
+    );
+  }
 
   // //개인 프로필 정보 보내기 API
   // @ApiOperation({ summary: '개인 프로필 정보 보내기 API' })

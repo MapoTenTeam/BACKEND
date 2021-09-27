@@ -42,13 +42,13 @@ export class GetUserByEmailDto {
 
 export class GetUserByEmailAuthDto {
   @ApiProperty({
-    example: '200',
+    example: '201',
     description: '상태코드',
   })
   statusCode: number;
 
   @ApiProperty({
-    example: '이메일 인증 번호',
+    example: '이메일 인증 번호 생성 성공',
     description: '설명',
   })
   message: string;
@@ -57,5 +57,5 @@ export class GetUserByEmailAuthDto {
     example: '026456',
     description: '인증 번호',
   })
-  authNumber: number;
+  code: number;
 }
