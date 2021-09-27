@@ -355,23 +355,29 @@ export class AuthController {
 
   //개인 회원 프로필 조회
   @Get('/personal/profile')
-  @ApiOperation({ summary: '개인 회원 프로필 조회 API' })
+  @ApiOperation({ summary: '개인 회원 프로필 조회 API(완료)*' })
   @ApiOkResponse({
     description: '개인 회원 프로필 조회 성공',
     type: SelectProfilePersonalOutputDto,
   })
   @ApiBearerAuth()
-  async getpersonalProfile() {}
+  @UseGuards(AuthGuard())
+  async getpersonalProfile(@Req() req) {
+    return await this.authService.getpersonalProfile(req.user);
+  }
 
   //기업 회원 프로필 조회
   @Get('/enterprise/profile')
-  @ApiOperation({ summary: '기업 회원 프로필 조회 API' })
+  @ApiOperation({ summary: '기업 회원 프로필 조회 API(완료)*' })
   @ApiOkResponse({
     description: '기업 회원 프로필 조회 성공',
     type: SelectProfileEnterpriseOutputDto,
   })
   @ApiBearerAuth()
-  async getenterpriseProfile() {}
+  @UseGuards(AuthGuard())
+  async getenterpriseProfile(@Req() req) {
+    return await this.authService.getenterpriseProfile(req.user);
+  }
 
   //개인 회원 프로필 등록 or 수정
   @Put('/personal/upload/profile')
@@ -408,7 +414,16 @@ export class AuthController {
     type: ProfileEnterpriseOutputDto,
   })
   @ApiBearerAuth()
-  async enterpriseProfile() {}
+  @UseGuards(AuthGuard())
+  async enterpriseProfile(
+    @Req() req,
+    @Body(ValidationPipe) profileEnterpriseInputDto: ProfileEnterpriseInputDto,
+  ) {
+    return await this.authService.enterpriseProfile(
+      req.user,
+      profileEnterpriseInputDto,
+    );
+  }
 
   //기업 회원 프로필 이미지 등록 or 수정
   @Patch('/enterprise/upload/profile/image')

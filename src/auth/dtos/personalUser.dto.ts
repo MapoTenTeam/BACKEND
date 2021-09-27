@@ -61,11 +61,13 @@ export class ProfileDetailPersonalOutputDto {
   @ApiProperty({ example: '이메일' })
   MBER_EMAIL_ADRES: string;
   @ApiProperty({ example: '휴대폰번호' })
-  MOBLPHON_NO: string;
+  MBTLNUM: string;
   @ApiProperty({ example: '주소' })
   ADRES: string;
   @ApiProperty({ example: '상세주소' })
   DETAIL_ADRES: string;
+  @ApiProperty({ description: '프로필 등록여부' })
+  PROFILE_STTUS: boolean;
 }
 
 //개인 회원 프로필 조회

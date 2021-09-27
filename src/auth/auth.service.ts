@@ -24,6 +24,7 @@ import { GetUserByBizrnoDto } from './dtos/response/getUserByBizrno.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { GetUserByPasswordFindInputDto } from './dtos/response/getUserByPassword.dto';
 import { ProfilePersonalInputDto } from './dtos/personalUser.dto';
+import { ProfileEnterpriseInputDto } from './dtos/enterpriseUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -303,6 +304,32 @@ export class AuthService {
     });
   }
 
+  async getpersonalProfile(@Req() req) {
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT MBER_NM, MBER_ID, MBER_EMAIL_ADRES, MBTLNUM, ADRES, DETAIL_ADRES, PROFILE_STTUS  FROM COMTNGNRLMBER WHERE MBER_ID='${req.USER_ID}'`,
+    );
+    return Object.assign({
+      statusCode: 200,
+      message: '개인 회원 프로필 조회 성공',
+      data: user,
+    });
+  }
+
+  async getenterpriseProfile(@Req() req) {
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT APPLCNT_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES, CMPNY_NM, BIZRNO,
+      CEO, ADRES, DETAIL_ADRES, INDUTY, NMBR_WRKRS, WEB_ADRES,
+      CEO_EMAIL_ADRES, PROFILE_STTUS, CASE WHEN BSNNM_APRVL ='M' THEN '승인 요청중' WHEN BSNNM_APRVL ='A' THEN '승인완료' ELSE '승인 요청 필요' END AS BSNNM_APRVL FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+    return Object.assign({
+      statusCode: 200,
+      message: '기업 회원 프로필 조회 성공',
+      data: user,
+    });
+  }
+
   async personalUploadProfile(
     @Req() req,
     profilePersonalInputDto: ProfilePersonalInputDto,
@@ -313,11 +340,39 @@ export class AuthService {
     const conn = getConnection();
 
     await conn.query(
-      `UPDATE COMTNGNRLMBER SET MBER_NM='${MBER_NM}', MBER_EMAIL_ADRES='${MBER_EMAIL_ADRES}', MBTLNUM='${MBTLNUM}', ADRES='${ADRES}', DETAIL_ADRES='${DETAIL_ADRES}' WHERE MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNGNRLMBER SET MBER_NM='${MBER_NM}', MBER_EMAIL_ADRES='${MBER_EMAIL_ADRES}', MBTLNUM='${MBTLNUM}', ADRES='${ADRES}', DETAIL_ADRES='${DETAIL_ADRES}', PROFILE_STTUS=true WHERE MBER_ID='${req.USER_ID}'`,
     );
     return Object.assign({
       statusCode: 200,
       message: '개인회원 프로필 등록 성공',
+    });
+  }
+
+  async enterpriseProfile(
+    @Req() req,
+    profileEnterpriseInputDto: ProfileEnterpriseInputDto,
+  ) {
+    const {
+      APPLCNT_NM,
+      APPLCNT_EMAIL_ADRES,
+      CMPNY_NM,
+      BIZRNO,
+      CEO,
+      ADRES,
+      DETAIL_ADRES,
+      INDUTY,
+      NMBR_WRKRS,
+      WEB_ADRES,
+      CEO_EMAIL_ADRES,
+    } = profileEnterpriseInputDto;
+
+    const conn = getConnection();
+    await conn.query(
+      `UPDATE COMTNENTRPRSMBER SET APPLCNT_NM='${APPLCNT_NM}', APPLCNT_EMAIL_ADRES='${APPLCNT_EMAIL_ADRES}', CMPNY_NM='${CMPNY_NM}',BIZRNO='${BIZRNO}',CEO='${CEO}',ADRES='${ADRES}',DETAIL_ADRES='${DETAIL_ADRES}',INDUTY='${INDUTY}',NMBR_WRKRS='${NMBR_WRKRS}',WEB_ADRES='${WEB_ADRES}',CEO_EMAIL_ADRES='${CEO_EMAIL_ADRES}', PROFILE_STTUS=true WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+    return Object.assign({
+      statusCode: 200,
+      message: '기업회원 프로필 등록 성공',
     });
   }
 

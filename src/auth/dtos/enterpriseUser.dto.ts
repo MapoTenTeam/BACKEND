@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 //기업회원 회원가입
 export class SignupEnterpriseOutputDto {
@@ -18,25 +18,49 @@ export class SignupEnterpriseOutputDto {
 
 //기업 회원 프로필 등록
 export class ProfileEnterpriseInputDto {
+  @ApiProperty({ example: '이름' })
+  @IsNotEmpty()
+  APPLCNT_NM: string;
+
+  @ApiProperty({ example: '신청자 이메일' })
+  @IsEmail()
+  @IsNotEmpty()
+  APPLCNT_EMAIL_ADRES: string;
+
+  @ApiProperty({ example: '사업체명' })
+  @IsNotEmpty()
+  CMPNY_NM: string;
+
+  @ApiProperty({ example: '사업자 등록번호' })
+  @IsNotEmpty()
+  BIZRNO: string;
+
   @ApiProperty({ example: '대표자' })
-  CXFC: string;
+  @IsNotEmpty()
+  CEO: string;
 
   @ApiProperty({ example: '주소' })
+  @IsNotEmpty()
   ADRES: string;
 
   @ApiProperty({ example: '상세주소' })
+  @IsNotEmpty()
   DETAIL_ADRES: string;
 
   @ApiProperty({ example: '업종' })
+  @IsNotEmpty()
   INDUTY: string;
 
   @ApiProperty({ example: '근로자 수' })
+  @IsNotEmpty()
   NMBR_WRKRS: string;
 
   @ApiProperty({ example: '홈페이지 주소' })
+  @IsNotEmpty()
   WEB_ADRES: string;
 
   @ApiProperty({ example: '회사대표 이메일' })
+  @IsNotEmpty()
   CEO_EMAIL_ADRES: string;
 }
 
@@ -76,8 +100,6 @@ export class ProfileDetailEnterpriseOutputDto {
   APPLCNT_NM: string;
   @ApiProperty({ example: '아이디' })
   ENTRPRS_MBER_ID: string;
-  @ApiProperty({ description: '사업자 등록번호 승인여부' })
-  VERIFY: boolean;
   @ApiProperty({ example: '신청자 이메일' })
   APPLCNT_EMAIL_ADRES: string;
   @ApiProperty({ example: '사업체명' })
@@ -85,7 +107,7 @@ export class ProfileDetailEnterpriseOutputDto {
   @ApiProperty({ example: '사업자 등록번호' })
   BIZRNO: string;
   @ApiProperty({ example: '대표자' })
-  CXFC: string;
+  CEO: string;
   @ApiProperty({ example: '주소' })
   ADRES: string;
   @ApiProperty({ example: '상세주소' })
@@ -100,6 +122,10 @@ export class ProfileDetailEnterpriseOutputDto {
   CEO_EMAIL_ADRES: string;
   @ApiProperty({ example: '회사 이미지' })
   CMPNY_IM: string;
+  @ApiProperty({ description: '프로필 등록여부' })
+  PROFILE_STTUS: boolean;
+  @ApiProperty({ description: '사업자 등록번호 승인여부' })
+  BSNNM_APRVL: boolean;
 }
 
 //기업 회원 프로필 조회

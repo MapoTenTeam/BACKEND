@@ -25,10 +25,12 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
       TERMS,
     } = authCredentialsEnterpriseDto;
     const ENTRPRS_MBER_STTUS = 'P';
+    const PROFILE_STTUS = false;
+    const BSNNM_APRVL = 'B';
 
     const conn = getConnection();
     var sql =
-      'INSERT INTO COMTNENTRPRSMBER (CMPNY_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES, ENTRPRS_MBER_PASSWORD, APPLCNT_NM, BIZRNO, ENTRPRS_MBER_STTUS, EMAIL_VRFCT, TERMS, SBSCRB_DE) values(?,?,?,?,?,?,?,?,?,NOW())';
+      'INSERT INTO COMTNENTRPRSMBER (CMPNY_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES, ENTRPRS_MBER_PASSWORD, APPLCNT_NM, BIZRNO, ENTRPRS_MBER_STTUS, EMAIL_VRFCT, TERMS, PROFILE_STTUS, BSNNM_APRVL, SBSCRB_DE) values(?,?,?,?,?,?,?,?,?,?,?,NOW())';
     var params = [
       CMPNY_NM,
       ENTRPRS_MBER_ID,
@@ -39,6 +41,8 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
       ENTRPRS_MBER_STTUS,
       EMAIL_VRFCT,
       TERMS,
+      PROFILE_STTUS,
+      BSNNM_APRVL,
     ];
     try {
       if (EMAIL_VRFCT && TERMS == true) {

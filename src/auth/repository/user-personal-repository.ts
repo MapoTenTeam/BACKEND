@@ -14,6 +14,7 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
     const { MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, EMAIL_VRFCT, TERMS } =
       authCredentialsPersonalDto;
     const MBER_STTUS = 'P';
+    const PROFILE_STTUS = false;
     // const user = this.create({
     //   MBER_ID,
     //   PASSWORD,
@@ -23,7 +24,7 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
     // });
     const conn = getConnection();
     var sql =
-      'INSERT INTO COMTNGNRLMBER (MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, MBER_STTUS, EMAIL_VRFCT, TERMS, SBSCRB_DE) values(?,?,?,?,?,?,?,NOW())';
+      'INSERT INTO COMTNGNRLMBER (MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, MBER_STTUS, EMAIL_VRFCT, TERMS, PROFILE_STTUS, SBSCRB_DE) values(?,?,?,?,?,?,?,?,NOW())';
     var params = [
       MBER_ID,
       PASSWORD,
@@ -32,6 +33,7 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
       MBER_STTUS,
       EMAIL_VRFCT,
       TERMS,
+      PROFILE_STTUS,
     ];
     try {
       // await this.save(user);
