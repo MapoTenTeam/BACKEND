@@ -4,6 +4,10 @@ import HttpError from './HttpError';
 import uuidRandom from './uuidRandom';
 
 export const multerOptions = {
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+
   fileFilter: (request, file, callback) => {
     if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
       // 이미지 형식은 jpg, jpeg, png만 허용합니다.

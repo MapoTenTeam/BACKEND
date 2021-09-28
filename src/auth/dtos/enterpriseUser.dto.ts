@@ -98,7 +98,7 @@ export class ProfileEnterpriseDivisionOutputDto {
   message: string;
 
   @ApiProperty()
-  data: string[];
+  ENTRPRS_SE_CODE: string[];
 }
 
 //기업 회원 프로필 이미지 등록

@@ -84,19 +84,6 @@ import { multerOptions } from './multerOptions';
 @Controller('user')
 export class AuthController {
   constructor(private authService: AuthService) {}
-  @UseInterceptors(FilesInterceptor('images', null, multerOptions))
-  @Post('/')
-  public uploadFiles(@UploadedFiles() files: File[]) {
-    const uploadedFiles: string[] = this.authService.uploadFiles(files);
-
-    return {
-      status: 200,
-      message: '파일 업로드를 성공하였습니다.',
-      data: {
-        files: uploadedFiles,
-      },
-    };
-  }
 
   //유저ID 중복체크 API
   @Get('/duplicate/id/:userid')
@@ -450,7 +437,7 @@ export class AuthController {
 
   //기업 회원 프로필 이미지 등록 or 수정
   @Patch('/enterprise/upload/profile/image')
-  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API(수정중)' })
+  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API(완료)*' })
   @ApiOkResponse({
     description: '기업 회원 프로필 이미지 등록 성공',
     type: ProfileImageEnterpriseOutputDto,
@@ -468,9 +455,12 @@ export class AuthController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   @ApiBearerAuth()
-  async enterpriseProfileImage(@UploadedFile('file') file) {}
+  @UseGuards(AuthGuard())
+  async enterpriseProfileImage(@Req() req, @UploadedFiles() files: string) {
+    return await this.authService.enterpriseProfileImage(req.user, files);
+  }
 
   //기업 사업자 승인 요청
   @Patch('/enterprise/approval')
@@ -530,37 +520,4 @@ export class AuthController {
       passwordChangeInputDto,
     );
   }
-
-  // //개인 프로필 정보 보내기 API
-  // @ApiOperation({ summary: '개인 프로필 정보 보내기 API' })
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard())
-  // @UsePipes(ValidationPipe)
-  // @Post('/personal/profile')
-  // async personalUser(
-  //   @Body() createPersonalUserDto: CreatePersonalUserDto,
-  //   @GetUser() user: User,
-  // ): Promise<UserPersonal> {
-  //   return await this.authService.personalUser(createPersonalUserDto, user);
-  // }
-
-  // //기업 프로필 정보 보내기 API
-  // @ApiOperation({ summary: '기업 프로필 정보 보내기 API' })
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard())
-  // @UsePipes(ValidationPipe)
-  // @Post('/enterprise/profile')
-  // async enterpriseUser(
-  //   @Body() createEnterpriseUserDto: CreateEnterpriseUserDto,
-  //   @GetUser() user: User,
-  // ): Promise<UserEnterprise> {
-  //   return await this.authService.enterpriseUser(createEnterpriseUserDto, user);
-  // }
-
-  // @Post('/test')
-  // @UseGuards(AuthGuard())
-  // async test(@GetUser() user: User) {
-  //   console.log('req', user);
-  //   return await user;
-  // }
 }

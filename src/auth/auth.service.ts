@@ -45,17 +45,6 @@ export class AuthService {
     private userEnterpriseRepository: UserEnterpriseRepository,
   ) {}
 
-  public uploadFiles(files: File[]): string[] {
-    const generatedFiles: string[] = [];
-
-    for (const file of files) {
-      generatedFiles.push(createImageURL(file));
-      // http://localhost:8080/public/파일이름 형식으로 저장이 됩니다.
-    }
-
-    return generatedFiles;
-  }
-
   async getUserById(param: { userid: string }): Promise<GetUserByIdDto> {
     const conn = getConnection();
     const [found] = await conn.query(
@@ -357,14 +346,12 @@ export class AuthService {
   async getEnterpriseDivision() {
     const conn = getConnection();
     const user = await conn.query(
-      `SELECT  B.CODE, B.CODE_NM
-      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'COM026';`,
+      `SELECT  CODE, CODE_NM FROM  COMTCCMMNDETAILCODE WHERE CODE_ID ='COM026'`,
     );
     return Object.assign({
       statusCode: 200,
       message: '기업회원 프로필 기업유형 조회 성공',
-      data: user,
+      ENTRPRS_SE_CODE: user,
     });
   }
 
@@ -432,6 +419,24 @@ export class AuthService {
     });
   }
 
+  async enterpriseProfileImage(req, files: string) {
+    const generatedFiles: string[] = [];
+
+    for (const file of files) {
+      generatedFiles.push(createImageURL(file));
+      // http://주소:포트번호/upload/파일이름 형식으로 저장이 됩니다.
+    }
+
+    const conn = getConnection();
+    await conn.query(
+      `UPDATE COMTNENTRPRSMBER SET CMPNY_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+    return Object.assign({
+      statusCode: 200,
+      message: '기업 이미지 등록 성공',
+    });
+  }
+
   async personalPasswordChange(
     @Req() req,
     passwordChangeInputDto: PasswordChangeInputDto,
@@ -483,28 +488,4 @@ export class AuthService {
       }
     }
   }
-
-  // async personalUser(
-  //   createPersonalUserDto: CreatePersonalUserDto,
-  //   user: User,
-  // ): Promise<UserPersonal> {
-  //   // console.log('createPersonalUserDto', createPersonalUserDto);
-  //   // console.log('user', user.id);
-  //   return await this.userPersonalDetailRepository.createPersonalUserDetail(
-  //     createPersonalUserDto,
-  //     user,
-  //   );
-  // }
-
-  // async enterpriseUser(
-  //   createPersonalUserDto: CreateEnterpriseUserDto,
-  //   user: User,
-  // ): Promise<UserEnterprise> {
-  //   // console.log('createPersonalUserDto', createPersonalUserDto);
-  //   // console.log('user', user.id);
-  //   return await this.userEnterpriseDetailRepository.createEnterpriseUserDetail(
-  //     createPersonalUserDto,
-  //     user,
-  //   );
-  // }
 }
