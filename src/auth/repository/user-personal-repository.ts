@@ -15,13 +15,7 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
       authCredentialsPersonalDto;
     const MBER_STTUS = 'P';
     const PROFILE_STTUS = false;
-    // const user = this.create({
-    //   MBER_ID,
-    //   PASSWORD,
-    //   MBER_NM,
-    //   MBER_EMAIL_ADRES,
-    //   TERMS,
-    // });
+
     const conn = getConnection();
     var sql =
       'INSERT INTO COMTNGNRLMBER (MBER_ID, PASSWORD, MBER_NM, MBER_EMAIL_ADRES, MBER_STTUS, EMAIL_VRFCT, TERMS, PROFILE_STTUS, SBSCRB_DE) values(?,?,?,?,?,?,?,?,NOW())';
@@ -36,7 +30,6 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
       PROFILE_STTUS,
     ];
     try {
-      // await this.save(user);
       if (EMAIL_VRFCT && TERMS == true) {
         await conn.query(sql, params);
         return Object.assign({
@@ -57,16 +50,4 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
       }
     }
   }
-  // async createPersonalUserDetail(
-  //   createPersonalUserDto: CreatePersonalUserDto,
-  //   user: User,
-  // ): Promise<UserPersonal> {
-  //   const { description } = createPersonalUserDto;
-  //   const personalUser = this.create({
-  //     description,
-  //     user,
-  //   });
-  //   await this.save(personalUser);
-  //   return personalUser;
-  // }
 }

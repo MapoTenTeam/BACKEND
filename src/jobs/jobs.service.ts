@@ -14,6 +14,65 @@ export class BoardsService {
   //   private boardRepository: BoardRepository,
   // ) {}
 
+  async getEnterpriseRegisterJob() {
+    const conn = getConnection();
+    const educd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'educd'`,
+    );
+    const career = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'career'`,
+    );
+    const areacd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'areacd'`,
+    );
+    const empcd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'empcd'`,
+    );
+    const empdet = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'empdet'`,
+    );
+    const paycd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'paycd'`,
+    );
+    const sevpay = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'sevpay'`,
+    );
+    const clstyp = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'clstyp'`,
+    );
+
+    return Object.assign({
+      statusCode: 200,
+      message: '기업 채용공고 등록 메뉴 조회 성공',
+      data: {
+        educd: educd,
+        career: career,
+        areacd: areacd,
+        empcd: empcd,
+        empdet: empdet,
+        paycd: paycd,
+        sevpay: sevpay,
+        clstyp: clstyp,
+      },
+    });
+  }
+
   // async getAllBoards(user: User): Promise<Board[]> {
   async getAllBoards(user: User) {
     // const query = this.boardRepository.createQueryBuilder('board');

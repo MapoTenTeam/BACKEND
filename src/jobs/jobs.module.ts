@@ -7,7 +7,7 @@ import { BoardsService } from './jobs.service';
 
 @Module({
   // imports: [TypeOrmModule.forFeature([BoardRepository]), AuthModule],
-  imports: [AuthModule],
+  imports: [AuthModule, TypeOrmModule.forFeature()],
   controllers: [BoardsController],
   providers: [BoardsService],
 })

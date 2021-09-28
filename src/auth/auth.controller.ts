@@ -8,11 +8,9 @@ import {
   Post,
   Put,
   Req,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
-  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -24,15 +22,10 @@ import {
   ApiOkResponse,
   ApiParam,
   ApiResponse,
-  getSchemaPath,
-  refs,
   ApiBearerAuth,
-  ApiBasicAuth,
   ApiConsumes,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from './entities/user.entity';
-import { Request } from 'express';
 import {
   GetUserByIdDto,
   GetUserByIdFindInputDto,
@@ -64,7 +57,7 @@ import {
   SelectProfileEnterpriseOutputDto,
   SignupEnterpriseOutputDto,
 } from './dtos/enterpriseUser.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,

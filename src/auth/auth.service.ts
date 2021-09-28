@@ -1,25 +1,17 @@
-import {
-  ConsoleLogger,
-  Injectable,
-  Req,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, Req, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { User } from './entities/user.entity';
 import {
   GetUserByIdDto,
   GetUserByIdFindInputDto,
   GetUserByIdFindOutputDto,
 } from './dtos/response/getUserById.dto';
-import { GetUserByEmailDto } from './dtos/response/getUserByEmail.dto';
 import {
   AuthCredentialsEnterpriseDto,
   AuthCredentialsPersonalDto,
   LoginInputDto,
   PasswordChangeInputDto,
-  TermsOutputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
@@ -331,7 +323,7 @@ export class AuthService {
       `SELECT APPLCNT_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES,
       (SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='COM026' AND CODE='${find.ENTRPRS_SE_CODE}') AS ENTRPRS_SE,
       CMPNY_NM, BIZRNO, CEO, ADRES, DETAIL_ADRES, INDUTY, NMBR_WRKRS, WEB_ADRES,
-      CEO_EMAIL_ADRES, PROFILE_STTUS, 
+      CEO_EMAIL_ADRES, CMPNY_IM, PROFILE_STTUS, 
       (SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='crnst' AND CODE='${find.BSNNM_APRVL_CODE}') AS BSNNM_APRVL
       FROM COMTNENTRPRSMBER
       WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,

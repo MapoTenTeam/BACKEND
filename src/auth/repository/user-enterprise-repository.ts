@@ -1,8 +1,5 @@
 import { EntityRepository, getConnection, Repository } from 'typeorm';
-import {
-  AuthCredentialsEnterpriseDto,
-  AuthCredentialsPersonalDto,
-} from '../dtos/auth-credential.dto';
+import { AuthCredentialsEnterpriseDto } from '../dtos/auth-credential.dto';
 import {
   ConflictException,
   InternalServerErrorException,
@@ -65,16 +62,4 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
       }
     }
   }
-  // async createPersonalUserDetail(
-  //   createPersonalUserDto: CreatePersonalUserDto,
-  //   user: User,
-  // ): Promise<UserPersonal> {
-  //   const { description } = createPersonalUserDto;
-  //   const personalUser = this.create({
-  //     description,
-  //     user,
-  //   });
-  //   await this.save(personalUser);
-  //   return personalUser;
-  // }
 }

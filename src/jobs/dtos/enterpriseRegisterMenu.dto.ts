@@ -74,22 +74,22 @@ export class EnterpriseRegisterMenuClstypDto {
   2: string[];
 }
 export class EnterpriseRegisterMenuOutputDto {
-  @ApiProperty({ description: '기업구분' })
-  crprtdvcd: EnterpriseRegisterMenuCrprtdvcdDto;
-  @ApiProperty({ description: '학력' })
-  educd: EnterpriseRegisterMenuEducdDto;
-  @ApiProperty({ description: '경력' })
-  career: EnterpriseRegisterMenuCareerDto;
-  @ApiProperty({ description: '근무예정지' })
-  areacd: EnterpriseRegisterMenuAreacdDto;
-  @ApiProperty({ description: '고용형태' })
-  empcd: EnterpriseRegisterMenuEmpcdDto;
-  @ApiProperty({ description: '임금지급형태' })
-  paycd: EnterpriseRegisterMenuPaycdDto;
-  @ApiProperty({ description: '퇴직금' })
-  sevpay: EnterpriseRegisterMenuSevpayDto;
-  @ApiProperty({ description: '접수마감일' })
-  clstyp: EnterpriseRegisterMenuClstypDto;
+  @ApiProperty({ description: '학력', example: ['학력'] })
+  educd: [];
+  @ApiProperty({ description: '경력', example: ['경력'] })
+  career: [];
+  @ApiProperty({ description: '근무예정지', example: ['근무예정지'] })
+  areacd: [];
+  @ApiProperty({ description: '고용형태', example: ['고용형태'] })
+  empcd: [];
+  @ApiProperty({ description: '고용형태-상세', example: ['고용형태-상세'] })
+  empdet: [];
+  @ApiProperty({ description: '임금지급형태', example: ['임금지급형태'] })
+  paycd: [];
+  @ApiProperty({ description: '퇴직금형태', example: ['퇴직금형태'] })
+  sevpay: [];
+  @ApiProperty({ description: '접수마감일', example: ['접수마감일'] })
+  clstyp: [];
 }
 
 //

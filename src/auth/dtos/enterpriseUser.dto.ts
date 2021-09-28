@@ -97,7 +97,7 @@ export class ProfileEnterpriseDivisionOutputDto {
   })
   message: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: ['기업유형'] })
   ENTRPRS_SE_CODE: string[];
 }
 

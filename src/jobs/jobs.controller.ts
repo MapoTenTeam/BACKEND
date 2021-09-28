@@ -105,12 +105,16 @@ export class BoardsController {
 
   //기업 채용공고 등록 메뉴 조회
   @Get('/enterprise/register/all')
-  @ApiOperation({ summary: '기업 채용공고 등록 메뉴 조회 API (ex 학력,경력)' })
+  @ApiOperation({
+    summary: '기업 채용공고 등록 메뉴 조회 API (ex 학력,경력)(완료)*',
+  })
   @ApiOkResponse({
     type: EnterpriseRegisterMenuDto,
     description: '채용공고 등록 메뉴',
   })
-  async getEnterpriseRegisterJob() {}
+  async getEnterpriseRegisterJob() {
+    return await this.boardsService.getEnterpriseRegisterJob();
+  }
 
   //기업 채용공고 등록
   @Post('/enterprise/register')
