@@ -1,4 +1,9 @@
-import { Injectable, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  Injectable,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -15,7 +20,6 @@ import {
   LoginInputDto,
   PasswordChangeInputDto,
   TermsOutputDto,
-  UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
@@ -25,6 +29,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { GetUserByPasswordFindInputDto } from './dtos/response/getUserByPassword.dto';
 import { ProfilePersonalInputDto } from './dtos/personalUser.dto';
 import { ProfileEnterpriseInputDto } from './dtos/enterpriseUser.dto';
+import { createImageURL } from './multerOptions';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +44,17 @@ export class AuthService {
     @InjectRepository(UserEnterpriseRepository)
     private userEnterpriseRepository: UserEnterpriseRepository,
   ) {}
+
+  public uploadFiles(files: File[]): string[] {
+    const generatedFiles: string[] = [];
+
+    for (const file of files) {
+      generatedFiles.push(createImageURL(file));
+      // http://localhost:8080/public/파일이름 형식으로 저장이 됩니다.
+    }
+
+    return generatedFiles;
+  }
 
   async getUserById(param: { userid: string }): Promise<GetUserByIdDto> {
     const conn = getConnection();
@@ -59,13 +75,11 @@ export class AuthService {
         });
   }
 
-  async getUserByEmail(
-    userByEmailInputDto: UserByEmailInputDto,
-  ): Promise<GetUserByEmailDto> {
-    const { email } = userByEmailInputDto;
+  async getUserByEmail(param: { email: string }) {
+    // const { email } = userByEmailInputDto;
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT EMAIL_ADRES FROM COMVNUSERMASTER WHERE EMAIL_ADRES='${email}' AND USER_STTUS='P'`,
+      `SELECT USER_EMAIL FROM COMVNUSERMASTER WHERE USER_EMAIL='${param.email}' AND USER_STTUS='P'`,
     );
 
     return found
@@ -86,7 +100,7 @@ export class AuthService {
   }): Promise<GetUserByBizrnoDto> {
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}' AND USER_STTUS='P'`,
+      `SELECT BIZRNO FROM COMTNENTRPRSMBER WHERE BIZRNO='${param.bizrno}' AND ENTRPRS_MBER_STTUS='P'`,
     );
 
     return found
@@ -109,7 +123,7 @@ export class AuthService {
 
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_NM='${USER_NM}' AND EMAIL_ADRES='${USER_EMAIL}' AND USER_STTUS='P'`,
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_NM='${USER_NM}' AND USER_EMAIL='${USER_EMAIL}' AND USER_STTUS='P'`,
     );
 
     return found
@@ -172,7 +186,8 @@ export class AuthService {
 
     const conn = getConnection();
     const [found] = await conn.query(
-      `SELECT APPLCNT_EMAIL_ADRES FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${USER_ID}' AND APPLCNT_EMAIL_ADRES='${USER_EMAIL}' AND ENTRPRS_MBER_STTUS='P'`,
+      `SELECT APPLCNT_EMAIL_ADRES FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${USER_ID}' 
+      AND APPLCNT_EMAIL_ADRES='${USER_EMAIL}' AND ENTRPRS_MBER_STTUS='P'`,
     );
 
     if (found) {
@@ -304,10 +319,11 @@ export class AuthService {
     });
   }
 
-  async getpersonalProfile(@Req() req) {
+  async getPersonalProfile(@Req() req) {
     const conn = getConnection();
     const [user] = await conn.query(
-      `SELECT MBER_NM, MBER_ID, MBER_EMAIL_ADRES, MBTLNUM, ADRES, DETAIL_ADRES, PROFILE_STTUS  FROM COMTNGNRLMBER WHERE MBER_ID='${req.USER_ID}'`,
+      `SELECT MBER_NM, MBER_ID, MBER_EMAIL_ADRES, MBTLNUM, ADRES, DETAIL_ADRES, PROFILE_STTUS  
+      FROM COMTNGNRLMBER WHERE MBER_ID='${req.USER_ID}'`,
     );
     return Object.assign({
       statusCode: 200,
@@ -316,12 +332,20 @@ export class AuthService {
     });
   }
 
-  async getenterpriseProfile(@Req() req) {
+  async getEnterpriseProfile(@Req() req) {
     const conn = getConnection();
+    const [find] = await conn.query(
+      `SELECT ENTRPRS_SE_CODE, BSNNM_APRVL_CODE FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+
     const [user] = await conn.query(
-      `SELECT APPLCNT_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES, CMPNY_NM, BIZRNO,
-      CEO, ADRES, DETAIL_ADRES, INDUTY, NMBR_WRKRS, WEB_ADRES,
-      CEO_EMAIL_ADRES, PROFILE_STTUS, CASE WHEN BSNNM_APRVL ='M' THEN '승인 요청중' WHEN BSNNM_APRVL ='A' THEN '승인완료' ELSE '승인 요청 필요' END AS BSNNM_APRVL FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      `SELECT APPLCNT_NM, ENTRPRS_MBER_ID, APPLCNT_EMAIL_ADRES,
+      (SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='COM026' AND CODE='${find.ENTRPRS_SE_CODE}') AS ENTRPRS_SE,
+      CMPNY_NM, BIZRNO, CEO, ADRES, DETAIL_ADRES, INDUTY, NMBR_WRKRS, WEB_ADRES,
+      CEO_EMAIL_ADRES, PROFILE_STTUS, 
+      (SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='crnst' AND CODE='${find.BSNNM_APRVL_CODE}') AS BSNNM_APRVL
+      FROM COMTNENTRPRSMBER
+      WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
     return Object.assign({
       statusCode: 200,
@@ -330,10 +354,24 @@ export class AuthService {
     });
   }
 
+  async getEnterpriseDivision() {
+    const conn = getConnection();
+    const user = await conn.query(
+      `SELECT  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'COM026';`,
+    );
+    return Object.assign({
+      statusCode: 200,
+      message: '기업회원 프로필 기업유형 조회 성공',
+      data: user,
+    });
+  }
+
   async enterpriseBusinessApproval(@Req() req) {
     const conn = getConnection();
     await conn.query(
-      `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL='M' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL_CODE='20' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
     return Object.assign({
@@ -352,7 +390,9 @@ export class AuthService {
     const conn = getConnection();
 
     await conn.query(
-      `UPDATE COMTNGNRLMBER SET MBER_NM='${MBER_NM}', MBER_EMAIL_ADRES='${MBER_EMAIL_ADRES}', MBTLNUM='${MBTLNUM}', ADRES='${ADRES}', DETAIL_ADRES='${DETAIL_ADRES}', PROFILE_STTUS=true WHERE MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNGNRLMBER SET MBER_NM='${MBER_NM}', MBER_EMAIL_ADRES='${MBER_EMAIL_ADRES}', 
+      MBTLNUM='${MBTLNUM}', ADRES='${ADRES}', DETAIL_ADRES='${DETAIL_ADRES}', PROFILE_STTUS=true 
+      WHERE MBER_ID='${req.USER_ID}'`,
     );
     return Object.assign({
       statusCode: 200,
@@ -367,6 +407,7 @@ export class AuthService {
     const {
       APPLCNT_NM,
       APPLCNT_EMAIL_ADRES,
+      ENTRPRS_SE_CODE,
       CMPNY_NM,
       BIZRNO,
       CEO,
@@ -380,7 +421,10 @@ export class AuthService {
 
     const conn = getConnection();
     await conn.query(
-      `UPDATE COMTNENTRPRSMBER SET APPLCNT_NM='${APPLCNT_NM}', APPLCNT_EMAIL_ADRES='${APPLCNT_EMAIL_ADRES}', CMPNY_NM='${CMPNY_NM}',BIZRNO='${BIZRNO}',CEO='${CEO}',ADRES='${ADRES}',DETAIL_ADRES='${DETAIL_ADRES}',INDUTY='${INDUTY}',NMBR_WRKRS='${NMBR_WRKRS}',WEB_ADRES='${WEB_ADRES}',CEO_EMAIL_ADRES='${CEO_EMAIL_ADRES}', PROFILE_STTUS=true WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNENTRPRSMBER SET APPLCNT_NM='${APPLCNT_NM}', APPLCNT_EMAIL_ADRES='${APPLCNT_EMAIL_ADRES}', 
+      ENTRPRS_SE_CODE='${ENTRPRS_SE_CODE}', CMPNY_NM='${CMPNY_NM}',BIZRNO='${BIZRNO}',CEO='${CEO}',ADRES='${ADRES}',
+      DETAIL_ADRES='${DETAIL_ADRES}',INDUTY='${INDUTY}',NMBR_WRKRS='${NMBR_WRKRS}',WEB_ADRES='${WEB_ADRES}',
+      CEO_EMAIL_ADRES='${CEO_EMAIL_ADRES}', PROFILE_STTUS=true WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
     return Object.assign({
       statusCode: 200,

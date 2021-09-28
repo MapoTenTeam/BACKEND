@@ -57,6 +57,7 @@ import {
 } from './dtos/personalUser.dto';
 import {
   PatchAprblEnterpriseOutputDto,
+  ProfileEnterpriseDivisionOutputDto,
   ProfileEnterpriseInputDto,
   ProfileEnterpriseOutputDto,
   ProfileImageEnterpriseOutputDto,
@@ -72,17 +73,30 @@ import {
   PasswordChangeInputDto,
   PasswordChangeOutputDto,
   TermsOutputDto,
-  UserByEmailInputDto,
 } from './dtos/auth-credential.dto';
 import {
   GetUserByBizrnoDto,
   GetUserByBizrnoNotDto,
 } from './dtos/response/getUserByBizrno.dto';
+import { multerOptions } from './multerOptions';
 
 @ApiTags('유저 API')
 @Controller('user')
 export class AuthController {
   constructor(private authService: AuthService) {}
+  @UseInterceptors(FilesInterceptor('images', null, multerOptions))
+  @Post('/')
+  public uploadFiles(@UploadedFiles() files: File[]) {
+    const uploadedFiles: string[] = this.authService.uploadFiles(files);
+
+    return {
+      status: 200,
+      message: '파일 업로드를 성공하였습니다.',
+      data: {
+        files: uploadedFiles,
+      },
+    };
+  }
 
   //유저ID 중복체크 API
   @Get('/duplicate/id/:userid')
@@ -112,7 +126,7 @@ export class AuthController {
   @ApiOperation({ summary: '유저 이메일 중복체크 API(완료)*' })
   @ApiParam({
     name: 'email',
-    type: UserByEmailInputDto,
+    example: 'hee1234@gmail.com',
   })
   @ApiOkResponse({
     description: '이메일이 없는경우',
@@ -123,14 +137,12 @@ export class AuthController {
     description: '이메일이 있는경우',
     type: GetUserByEmailDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: '이메일 형태가 아닙니다.',
-  })
-  async getUserByEmail(
-    @Param(ValidationPipe) userByEmailInputDto: UserByEmailInputDto,
-  ): Promise<GetUserByEmailNotDto> {
-    return await this.authService.getUserByEmail(userByEmailInputDto);
+  // @ApiResponse({
+  //   status: 400,
+  //   description: '이메일 형태가 아닙니다.',
+  // })
+  async getUserByEmail(@Param() param: { email: string }) {
+    return await this.authService.getUserByEmail(param);
   }
 
   //사업자등록번호 중복체크 API
@@ -244,8 +256,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async deletePersonalUser(@Req() req) {
-    console.log('asdfasdf', req.user);
-    // return await this.authService.deletePersonalUser(req.user);
+    return await this.authService.deletePersonalUser(req.user);
   }
 
   //기업 회원 탈퇴하기
@@ -363,8 +374,8 @@ export class AuthController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async getpersonalProfile(@Req() req) {
-    return await this.authService.getpersonalProfile(req.user);
+  async getPersonalProfile(@Req() req) {
+    return await this.authService.getPersonalProfile(req.user);
   }
 
   //기업 회원 프로필 조회
@@ -376,8 +387,19 @@ export class AuthController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async getenterpriseProfile(@Req() req) {
-    return await this.authService.getenterpriseProfile(req.user);
+  async getEnterpriseProfile(@Req() req) {
+    return await this.authService.getEnterpriseProfile(req.user);
+  }
+
+  //기업회원 프로필 기업유형 조회
+  @Get('/enterprise/division')
+  @ApiOperation({ summary: '기업회원 프로필 기업유형 조회 API(완료)*' })
+  @ApiOkResponse({
+    description: '기업회원 프로필 기업유형 조회 성공',
+    type: ProfileEnterpriseDivisionOutputDto,
+  })
+  async getEnterpriseDivision() {
+    return await this.authService.getEnterpriseDivision();
   }
 
   //개인 회원 프로필 등록 or 수정
@@ -405,7 +427,7 @@ export class AuthController {
 
   //기업 회원 프로필 등록 or 수정
   @Put('/enterprise/upload/profile')
-  @ApiOperation({ summary: '기업 회원 프로필 등록 or 수정 API' })
+  @ApiOperation({ summary: '기업 회원 프로필 등록 or 수정 API(완료)*' })
   @ApiBody({
     description: '등록 할 프로필 정보',
     type: ProfileEnterpriseInputDto,
@@ -428,7 +450,7 @@ export class AuthController {
 
   //기업 회원 프로필 이미지 등록 or 수정
   @Patch('/enterprise/upload/profile/image')
-  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API' })
+  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API(수정중)' })
   @ApiOkResponse({
     description: '기업 회원 프로필 이미지 등록 성공',
     type: ProfileImageEnterpriseOutputDto,

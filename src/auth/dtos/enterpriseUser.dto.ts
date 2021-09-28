@@ -27,6 +27,10 @@ export class ProfileEnterpriseInputDto {
   @IsNotEmpty()
   APPLCNT_EMAIL_ADRES: string;
 
+  @ApiProperty({ example: '기업구분코드' })
+  @IsNotEmpty()
+  ENTRPRS_SE_CODE: string;
+
   @ApiProperty({ example: '사업체명' })
   @IsNotEmpty()
   CMPNY_NM: string;
@@ -79,6 +83,24 @@ export class ProfileEnterpriseOutputDto {
   message: string;
 }
 
+//기업회원 프로필 기업유형 조회
+export class ProfileEnterpriseDivisionOutputDto {
+  @ApiProperty({
+    example: '200',
+    description: '상태코드',
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '기업회원 프로필 기업유형 조회 성공',
+    description: '설명',
+  })
+  message: string;
+
+  @ApiProperty()
+  data: string[];
+}
+
 //기업 회원 프로필 이미지 등록
 export class ProfileImageEnterpriseOutputDto {
   @ApiProperty({
@@ -102,6 +124,8 @@ export class ProfileDetailEnterpriseOutputDto {
   ENTRPRS_MBER_ID: string;
   @ApiProperty({ example: '신청자 이메일' })
   APPLCNT_EMAIL_ADRES: string;
+  @ApiProperty({ example: '기업구분' })
+  ENTRPRS_SE: string;
   @ApiProperty({ example: '사업체명' })
   CMPNY_NM: string;
   @ApiProperty({ example: '사업자 등록번호' })
