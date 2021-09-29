@@ -189,16 +189,16 @@ export class BoardsController {
 
   //기업 채용공고 상세 조회
   @Get('/enterprise/list/detail/:jobid')
-  @ApiOperation({ summary: '기업 채용공고 상세 조회 API' })
+  @ApiOperation({ summary: '기업 채용공고 상세 조회 API(완료)*' })
   @ApiParam({
     name: 'jobid',
     example: '1',
     description: '채용공고 아이디',
   })
-  // @ApiOkResponse({
-  //   description: '채용공고 상세 조회',
-  //   type: SelectJobEnterpriseDetailOutputDto,
-  // })
+  @ApiOkResponse({
+    description: '채용공고 상세 조회',
+    type: SelectJobEnterpriseDetailOutputDto,
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseListDetailJob(@Req() req, @Param() param: { jobid: number }) {
@@ -206,11 +206,10 @@ export class BoardsController {
   }
 
   //기업 채용공고 수정
-  @Put('/enterprise/edit/:id')
-  @ApiBearerAuth()
+  @Put('/enterprise/edit/:jobid')
   @ApiOperation({ summary: '기업 채용공고 수정 API' })
   @ApiParam({
-    name: 'jobId',
+    name: 'jobid',
     example: '1',
     description: '일자리Id',
   })
@@ -222,7 +221,20 @@ export class BoardsController {
     description: '채용공고 수정',
     type: UpdateJobEnterpriseOutputDto,
   })
-  async enterpriseEditJob() {}
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseEditJob(
+    @Req() req,
+    @Param() param: { jobid: number },
+    @Body(ValidationPipe)
+    jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
+  ) {
+    return await this.boardsService.enterpriseEditJob(
+      req.user,
+      param,
+      jobEnterpriseRegisterInputDto,
+    );
+  }
 
   //기업 채용공고 삭제
   @Delete('/enterprise/delete/:id')

@@ -254,113 +254,84 @@ export class SelectJobDetailOutputDto {
 }
 
 export class JobEnterpriseDetailOutputDto {
+  @ApiProperty({ example: '채용공고ID' })
+  JOBID: string;
   @ApiProperty({ example: '사업체명' })
-  name: string;
-
+  CMPNY_NM: string;
+  @ApiProperty({ example: '사업자등록번호' })
+  BIZRNO: string;
+  @ApiProperty({ example: '대표' })
+  CEO: string;
   @ApiProperty({ example: '주소' })
-  address: string;
-
+  ADRES: string;
+  @ApiProperty({ example: '상세주소' })
+  DETAIL_ADRES: string;
   @ApiProperty({ example: '업종' })
-  sector: string;
-
-  @ApiProperty({ example: '대표자' })
-  ceo: string;
-
+  INDUTY: string;
   @ApiProperty({ example: '사원수' })
-  quaternion: string;
-
-  @ApiProperty({ example: '홈페이지' })
-  web_site: string;
-
+  NMBR_WRKRS: string;
   @ApiProperty({ example: '채용제목' })
-  title: string;
-
+  TITLE: string;
   @ApiProperty({ example: '모집직종' })
-  job_type_desc: string;
-
+  JOB_TYPE_DESC: string;
   @ApiProperty({ example: '모집인원' })
-  require_count: string;
-
+  REQUIRE_COUNT: string;
   @ApiProperty({ example: '직무내용' })
-  job_desc: string;
-
+  JOB_DESC: string;
   @ApiProperty({ example: '학력' })
-  education: string;
-
+  DEUCATION: string;
   @ApiProperty({ example: '경력' })
-  career: string;
-
+  CAREER: string;
   @ApiProperty({ example: '경력기간' })
-  career_period: string;
-
+  CAREER_PERIOD: string;
   @ApiProperty({ example: '근무예정지' })
-  work_area: string;
-
+  WORK_AREA: string;
   @ApiProperty({ example: '근무예정지 주소' })
-  work_address: string;
-
+  WORK_ADDRESS: string;
   @ApiProperty({ example: '소속산업단지' })
-  work_area_desc: string;
-
+  WORK_AREA_DESC: string;
   @ApiProperty({ example: '고용형태' })
-  employType: string;
-
+  EMPLOYTYPE: string;
   @ApiProperty({ example: '고용형태상세' })
-  employType_det: string;
-
+  EMPLOYTYPE_DET: string;
   @ApiProperty({ example: '임금 지급형태' })
-  paycd: string;
-
+  PAYCD: string;
   @ApiProperty({ example: '임금금액' })
-  pay_amount: string;
-
+  PAY_AMOUNT: string;
   @ApiProperty({ example: '근무시간유형' })
-  work_time_type: string;
-
+  WORK_TIME_TYPE: string;
   @ApiProperty({ example: '식사제공' })
-  meal_cod: string;
-
+  MEAL_COD: string;
   @ApiProperty({ example: '1주당근로시간' })
-  workingHours: string;
-
+  WORKINGHOURS: string;
   @ApiProperty({ example: '퇴직금형태' })
-  severance_pay_type: string;
-
+  SEVERANCE_PAY_TYPE: string;
   @ApiProperty({ example: '사회보험' })
-  social_insurance: string;
-
+  SOCIAL_INSURANCE: string;
   @ApiProperty({ example: '접수마감일구분' })
-  closing_type: string;
-
+  CLOSING_TYPE: string;
+  @ApiProperty({ example: '접수기간시작' })
+  STARTRECEPTION: string;
   @ApiProperty({ example: '접수마감일' })
-  end_reception: string;
-
+  ENDRECEPTION: string;
   @ApiProperty({ example: '접수방법' })
-  apply_method: string;
-
+  APPLY_METHOD: string;
   @ApiProperty({ example: '접수방법 상세' })
-  apply_method_etc: string;
-
+  APPLY_METHOD_ETC: string;
   @ApiProperty({ example: '전형방법' })
-  test_mthod: string;
-
+  TEST_METHOD: string;
   @ApiProperty({ example: '전형방법 상세' })
-  test_method_etc: string;
-
+  TEST_METHOD_DTC: string;
   @ApiProperty({ example: '제출서류' })
-  apply_document: string;
-
+  APPLY_DOCUMENT: string;
   @ApiProperty({ example: '채용담당자-성명' })
-  contact_name: string;
-
+  CONTACT_NAME: string;
   @ApiProperty({ example: '채용담당자-부서' })
-  contact_department: string;
-
+  CONTACT_DEPARTMENT: string;
   @ApiProperty({ example: '채용담당자-전화번호' })
-  contact_phone: string;
-
+  CONTACT_PHONE: string;
   @ApiProperty({ example: '채용담당자-이메일' })
-  contact_email: string;
+  CONTACT_EMAIL: string;
 }
 
 export class SelectJobEnterpriseDetailOutputDto {
@@ -425,7 +396,7 @@ export class JobEnterpriseOutputDto {
   COMENTS: string;
 
   @ApiProperty({ example: '승인상태' })
-  APPROVAL_YN: string;
+  JOB_STAT: string;
 }
 
 export class SelectJobEnterpriseOutputDto {

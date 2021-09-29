@@ -217,16 +217,110 @@ export class BoardsService {
     }
   }
 
+  async enterpriseEditJob(
+    @Req() req,
+    param: { jobid: number },
+    jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
+  ) {
+    const {
+      TITLE,
+      JOB_TYPE_DESC,
+      REQUIRE_COUNT,
+      JOB_DESC,
+      DEUCATION,
+      CAREER,
+      CAREER_PERIOD,
+      WORK_AREA,
+      WORK_ADDRESS,
+      WORK_AREA_DESC,
+      EMPLOYTYPE,
+      EMPLOYTYPE_DET,
+      PAYCD,
+      PAY_AMOUNT,
+      WORK_TIME_TYPE,
+      MEAL_COD,
+      WORKINGHOURS,
+      SEVERANCE_PAY_TYPE,
+      SOCIAL_INSURANCE,
+      CLOSING_TYPE,
+      ENDRECEPTION,
+      APPLY_METHOD,
+      APPLY_METHOD_ETC,
+      TEST_METHOD,
+      TEST_METHOD_DTC,
+      APPLY_DOCUMENT,
+      CONTACT_NAME,
+      CONTACT_DEPARTMENT,
+      CONTACT_PHONE,
+      CONTACT_EMAIL,
+    } = jobEnterpriseRegisterInputDto;
+
+    const conn = getConnection();
+
+    const [found] = await conn.query(
+      `SELECT JOBID, ENTRPRS_MBER_ID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+    );
+
+    if (found) {
+      var sql =
+        'UPDATE jobInformation SET TITLE=?,JOB_TYPE_DESC=?,REQUIRE_COUNT=?,JOB_DESC=?,DEUCATION=?,CAREER=?,CAREER_PERIOD=?,WORK_AREA=?,WORK_ADDRESS=?,WORK_AREA_DESC=?,EMPLOYTYPE=?,EMPLOYTYPE_DET=?,PAYCD=?,PAY_AMOUNT=?,WORK_TIME_TYPE=?,MEAL_COD=?,WORKINGHOURS=?,SEVERANCE_PAY_TYPE=?,SOCIAL_INSURANCE=?,CLOSING_TYPE=?,ENDRECEPTION=?,APPLY_METHOD=?,APPLY_METHOD_ETC=?,TEST_METHOD=?,TEST_METHOD_DTC=?,APPLY_DOCUMENT=?,CONTACT_NAME=?,CONTACT_DEPARTMENT=?,CONTACT_PHONE=?,CONTACT_EMAIL=?,UPDATE_AT=NOW() WHERE ENTRPRS_MBER_ID=? AND JOBID=?';
+      var params = [
+        TITLE,
+        JOB_TYPE_DESC,
+        REQUIRE_COUNT,
+        JOB_DESC,
+        DEUCATION,
+        CAREER,
+        CAREER_PERIOD,
+        WORK_AREA,
+        WORK_ADDRESS,
+        WORK_AREA_DESC,
+        EMPLOYTYPE,
+        EMPLOYTYPE_DET,
+        PAYCD,
+        PAY_AMOUNT,
+        WORK_TIME_TYPE,
+        MEAL_COD,
+        WORKINGHOURS,
+        SEVERANCE_PAY_TYPE,
+        SOCIAL_INSURANCE,
+        CLOSING_TYPE,
+        ENDRECEPTION,
+        APPLY_METHOD,
+        APPLY_METHOD_ETC,
+        TEST_METHOD,
+        TEST_METHOD_DTC,
+        APPLY_DOCUMENT,
+        CONTACT_NAME,
+        CONTACT_DEPARTMENT,
+        CONTACT_PHONE,
+        CONTACT_EMAIL,
+        found.ENTRPRS_MBER_ID,
+        found.JOBID,
+      ];
+      await conn.query(sql, params);
+      return Object.assign({
+        statusCode: 200,
+        message: '채용공고 수정 성공',
+      });
+    } else {
+      return Object.assign({
+        statusCode: 400,
+        message: '채용공고 수정 실패',
+      });
+    }
+  }
+
   async enterpriseJudgeJob(@Req() req, param: { jobid: number }) {
     const conn = getConnection();
 
     const [found] = await conn.query(
-      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND APPROVAL_YN='REG'`,
+      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STAT='REG'`,
     );
 
     if (found) {
       await conn.query(
-        `UPDATE jobInformation SET APPROVAL_YN='REQ', REQUEST_DATE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+        `UPDATE jobInformation SET JOB_STAT='REQ', REQUEST_DATE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
       );
       return Object.assign({
         statusCode: 200,
@@ -250,13 +344,13 @@ export class BoardsService {
     const found = await conn.query(
       `SELECT JOBID,TITLE,CREATE_AT,REQUEST_DATE,COMENTS, 
       CASE
-      WHEN APPROVAL_YN = 'REQ'
+      WHEN JOB_STAT = 'REQ'
       THEN '승인요청'
-      WHEN APPROVAL_YN = 'DENI'
+      WHEN JOB_STAT = 'DENI'
       THEN '승인거절'
-      WHEN APPROVAL_YN = 'APPRV'
+      WHEN JOB_STAT = 'APPRV'
       THEN '승인완료'
-      ELSE '등록 대기중' END AS APPROVAL_YN FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      ELSE '등록' END AS JOB_STAT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
     if (jobfound) {
@@ -281,12 +375,99 @@ export class BoardsService {
     const [found] = await conn.query(
       `SELECT * FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
     );
+    const [user] = await conn.query(
+      `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+    const [educd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
+    );
+    const [career] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
+    );
+    const [areacd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
+    );
+    const [timecd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
+    );
+    const [empcd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
+    );
+    const [empdet] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
+    );
+    const [paycd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
+    );
+    const [sevpay] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
+    );
+    const [clstyp] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
+    );
+    const [apytyp] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
+    );
+    const [doccd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
+    );
+    const [mealcd] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
+    );
+    const [socins] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
+    );
+    const [testmt] = await conn.query(
+      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
+    );
 
     if (found) {
       return Object.assign({
         statusCode: 200,
         message: '채용공고 상세 조회 성공',
-        data: found,
+        data: {
+          JOBID: found.JOBID,
+
+          CMPNY_NM: user.CMPNY_NM,
+          BIZRNO: user.BIZRNO,
+          CEO: user.CEO,
+          ADRES: user.ADRES,
+          DETAIL_ADRES: user.DETAIL_ADRES,
+          INDUTY: user.INDUTY,
+          NMBR_WRKRS: user.NMBR_WRKRS,
+
+          TITLE: found.TITLE,
+          JOB_TYPE_DESC: found.JOB_TYPE_DESC,
+          REQUIRE_COUNT: found.REQUIRE_COUNT,
+          JOB_DESC: found.JOB_DESC,
+          DEUCATION: educd.CODE_NM,
+          CAREER: career.CODE_NM,
+          WORK_AREA: areacd.CODE_NM,
+          EMPLOYTYPE: empcd.CODE_NM,
+          EMPLOYTYPE_DET: empdet.CODE_NM,
+          PAYCD: paycd.CODE_NM,
+          WORK_TIME_TYPE: timecd.CODE_NM,
+          STARTRECEPTION: found.STARTRECEPTION,
+          ENDRECEPTION: found.ENDRECEPTION,
+          CAREER_PERIOD: found.CAREER_PERIOD,
+          WORK_ADDRESS: found.WORK_ADDRESS,
+          WORK_AREA_DESC: found.WORK_AREA_DESC,
+          PAY_AMOUNT: found.PAY_AMOUNT,
+          MEAL_COD: mealcd.CODE_NM,
+          WORKINGHOURS: found.WORKINGHOURS,
+          SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+          SOCIAL_INSURANCE: socins.CODE_NM,
+          CLOSING_TYPE: clstyp.CODE_NM,
+          APPLY_METHOD: apytyp.CODE_NM,
+          APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
+          TEST_METHOD: testmt.CODE_NM,
+          TEST_METHOD_DTC: found.TEST_METHOD_DTC,
+          APPLY_DOCUMENT: doccd.CODE_NM,
+          CONTACT_NAME: found.CONTACT_NAME,
+          CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
+          CONTACT_PHONE: found.CONTACT_PHONE,
+          CONTACT_EMAIL: found.CONTACT_EMAIL,
+        },
       });
     } else {
       return Object.assign({
