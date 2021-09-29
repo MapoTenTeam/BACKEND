@@ -64,10 +64,10 @@ export class BoardsController {
   async getPublicJob() {}
 
   //공공 일자리 상세 조회
-  @Get('/public/detail/:id')
+  @Get('/public/detail/:jobid')
   @ApiOperation({ summary: '공공 일자리 상세 조회 API' })
   @ApiParam({
-    name: 'jobId',
+    name: 'jobid',
     example: '1',
     description: '일자리Id',
   })
@@ -92,10 +92,10 @@ export class BoardsController {
   async getGeneralJob() {}
 
   //일반 일자리 상세 조회
-  @Get('/general/detail/:id')
+  @Get('/general/detail/:jobid')
   @ApiOperation({ summary: '일반 일자리 상세 조회 API' })
   @ApiParam({
-    name: 'jobId',
+    name: 'jobid',
     example: '1',
     description: '일자리Id',
   })

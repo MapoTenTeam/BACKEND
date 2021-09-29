@@ -375,53 +375,53 @@ export class BoardsService {
     const [found] = await conn.query(
       `SELECT * FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
     );
-    const [user] = await conn.query(
-      `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
-    );
-    const [educd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
-    );
-    const [career] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
-    );
-    const [areacd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
-    );
-    const [timecd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
-    );
-    const [empcd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
-    );
-    const [empdet] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
-    );
-    const [paycd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
-    );
-    const [sevpay] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
-    );
-    const [clstyp] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
-    );
-    const [apytyp] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
-    );
-    const [doccd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
-    );
-    const [mealcd] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
-    );
-    const [socins] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
-    );
-    const [testmt] = await conn.query(
-      `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
-    );
 
     if (found) {
+      const [user] = await conn.query(
+        `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      );
+      const [educd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
+      );
+      const [career] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
+      );
+      const [areacd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
+      );
+      const [timecd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
+      );
+      const [empcd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
+      );
+      const [empdet] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
+      );
+      const [paycd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
+      );
+      const [sevpay] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
+      );
+      const [clstyp] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
+      );
+      const [apytyp] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
+      );
+      const [doccd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
+      );
+      const [mealcd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
+      );
+      const [socins] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
+      );
+      const [testmt] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
+      );
       return Object.assign({
         statusCode: 200,
         message: '채용공고 상세 조회 성공',
