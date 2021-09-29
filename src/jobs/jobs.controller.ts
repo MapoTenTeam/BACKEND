@@ -207,7 +207,7 @@ export class BoardsController {
 
   //기업 채용공고 수정
   @Put('/enterprise/edit/:jobid')
-  @ApiOperation({ summary: '기업 채용공고 수정 API' })
+  @ApiOperation({ summary: '기업 채용공고 수정 API(완료)*' })
   @ApiParam({
     name: 'jobid',
     example: '1',
@@ -220,6 +220,10 @@ export class BoardsController {
   @ApiOkResponse({
     description: '채용공고 수정',
     type: UpdateJobEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '채용공고 수정 실패',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -237,11 +241,10 @@ export class BoardsController {
   }
 
   //기업 채용공고 삭제
-  @Delete('/enterprise/delete/:id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '기업 채용공고 삭제 API' })
+  @Delete('/enterprise/delete/:jobid')
+  @ApiOperation({ summary: '기업 채용공고 삭제 API(완료)*' })
   @ApiParam({
-    name: 'jobId',
+    name: 'jobid',
     example: '1',
     description: '일자리Id',
   })
@@ -249,41 +252,9 @@ export class BoardsController {
     description: '채용공고 삭제',
     type: DeleteJobEnterpriseOutputDto,
   })
-  async enterpriseDeleteJob() {}
-
-  // @Get()
-  // @UseGuards(AuthGuard())
-  // getAllBoard(@GetUser() user: User): Promise<Board[]> {
-  //   return this.boardsService.getAllBoards(user);
-  // }
-
-  // @Post()
-  // @UseGuards(AuthGuard())
-  // @UsePipes(ValidationPipe)
-  // createBoard(
-  //   @Body() createBoardDto: CreateBoardDto,
-  //   @GetUser() user: User,
-  // ): Promise<Board> {
-  //   // console.log('CreateBoardDto', CreateBoardDto);
-  //   // console.log('user', user);
-  //   return this.boardsService.createBoard(createBoardDto, user);
-  // }
-
-  // @Get('/:id')
-  // getBoardById(@Param('id') id: number): Promise<Board> {
-  //   return this.boardsService.getBoardById(id);
-  // }
-
-  // @Delete('/:id')
-  // deleteBoard(@Param('id', ParseIntPipe) id): Promise<void> {
-  //   return this.boardsService.deleteBoard(id);
-  // }
-
-  // @Put('/:id/status')
-  // updateBoardStatus(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body('status', BoardStatusValidationPipe) status: BoardStatus,
-  // ) {
-  //   return this.boardsService.updateBoardStatus(id, status);
-  // }
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseDeleteJob(@Req() req, @Param() param: { jobid: number }) {
+    return await this.boardsService.enterpriseDeleteJob(req.user, param);
+  }
 }

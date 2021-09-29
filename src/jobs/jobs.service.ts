@@ -258,7 +258,7 @@ export class BoardsService {
     const conn = getConnection();
 
     const [found] = await conn.query(
-      `SELECT JOBID, ENTRPRS_MBER_ID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+      `SELECT JOBID, ENTRPRS_MBER_ID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
     );
 
     if (found) {
@@ -315,7 +315,7 @@ export class BoardsService {
     const conn = getConnection();
 
     const [found] = await conn.query(
-      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STAT='REG'`,
+      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STAT='REG' AND JOB_STTUS='Y'`,
     );
 
     if (found) {
@@ -338,7 +338,7 @@ export class BoardsService {
     const conn = getConnection();
 
     const [jobfound] = await conn.query(
-      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,
     );
 
     const found = await conn.query(
@@ -350,7 +350,7 @@ export class BoardsService {
       THEN '승인거절'
       WHEN JOB_STAT = 'APPRV'
       THEN '승인완료'
-      ELSE '등록' END AS JOB_STAT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      ELSE '등록' END AS JOB_STAT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,
     );
 
     if (jobfound) {
@@ -373,7 +373,7 @@ export class BoardsService {
     const conn = getConnection();
 
     const [found] = await conn.query(
-      `SELECT * FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+      `SELECT * FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
     );
     const [user] = await conn.query(
       `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
@@ -477,63 +477,26 @@ export class BoardsService {
     }
   }
 
-  // async getAllBoards(user: User): Promise<Board[]> {
-  async getAllBoards(user: User) {
-    // const query = this.boardRepository.createQueryBuilder('board');
-    // query.where('board.userId = :userId', { userId: user.id });
-    // const boards = await this.boardRepository
-    //   .createQueryBuilder('board')
-    //   .where('board.userId = :userId', { userId: user.id })
-    //   .select(['board.title', 'board.description', 'board.status'])
-    //   .getMany();
-    // return boards;
-    // const conn = getConnection();
-    // try {
-    //   const rows = await conn.query(
-    //     `SELECT USER_ID FROM COMVNUSERMASTER WHERE ESNTL_ID='USRCNFRM_00000000000'`,
-    //   );
-    //   return Object.assign({
-    //     statusCode: 201,
-    //     message: '유저 아이디 찾기 성공',
-    //     USER_ID: rows[0].USER_ID,
-    //   });
-    // } catch (error) {
-    //   throw new Error(error);
-    // }
+  async enterpriseDeleteJob(@Req() req, param: { jobid: number }) {
+    const conn = getConnection();
+
+    const [found] = await conn.query(
+      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
+    );
+
+    if (found) {
+      await conn.query(
+        `UPDATE jobInformation SET JOB_STTUS='N', DELEETE_AT=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+      );
+      return Object.assign({
+        statusCode: 200,
+        message: '채용공고 삭제 성공',
+      });
+    } else {
+      return Object.assign({
+        statusCode: 400,
+        message: '채용공고 삭제 실패',
+      });
+    }
   }
-
-  // createBoard(createBoardDto: CreateBoardDto, user: User): Promise<Board> {
-  //   console.log('CreateBoardDto', createBoardDto);
-  //   console.log('user', user.id);
-  //   return this.boardRepository.createBoard(createBoardDto, user);
-  // }
-
-  // async getBoardById(id: number): Promise<Board> {
-  //   const found = await this.boardRepository.findOne(id);
-
-  //   if (!found) {
-  //     throw new NotFoundException(`Can't find Board with id ${id}`);
-  //   }
-
-  //   return found;
-  // }
-
-  // async deleteBoard(id: number): Promise<void> {
-  //   const result = await this.boardRepository.delete(id);
-
-  //   if (result.affected === 0) {
-  //     throw new NotFoundException(`Can't find Board with id ${id}`);
-  //   }
-
-  //   console.log('result', result);
-  // }
-
-  // async updateBoardStatus(id: number, status: BoardStatus): Promise<Board> {
-  //   const board = await this.getBoardById(id);
-
-  //   board.status = status;
-  //   await this.boardRepository.save(board);
-
-  //   return board;
-  // }
 }
