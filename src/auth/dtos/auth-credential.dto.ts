@@ -169,6 +169,48 @@ export class TermsOutputDto {
   agree: string;
 }
 
+//회원 비밀번호 조회 요청했을때
+export class PasswordConfirmInputDto {
+  @ApiProperty({ example: '조회할 비밀번호' })
+  PASSWORD: string;
+}
+
+//비밀번호 조회 성공했을때
+export class PasswordConfirmOutputSuccessDto {
+  @ApiProperty({
+    example: '200',
+    description: '상태코드',
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '유저 비밀번호 조회 성공',
+    description: '설명',
+  })
+  message: string;
+
+  @ApiProperty({ description: '비밀번호 조회 성공여부', example: true })
+  ok: boolean;
+}
+
+//비밀번호 조회 실패했을때
+export class PasswordConfirmOutputFailDto {
+  @ApiProperty({
+    example: '201',
+    description: '상태코드',
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '유저 비밀번호 조회 실패',
+    description: '설명',
+  })
+  message: string;
+
+  @ApiProperty({ description: '비밀번호 조회 성공여부', example: false })
+  ok: boolean;
+}
+
 //비밀번호 변경 요청했을때
 export class PasswordChangeInputDto {
   @ApiProperty({ example: '변경할 비밀번호' })

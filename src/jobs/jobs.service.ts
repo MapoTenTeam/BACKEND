@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Req } from '@nestjs/common';
 import { BoardStatus } from './jobs-status.enum';
 import { CreateBoardDto } from './dtos/create-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 // import { Board } from './jobs.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { getConnection } from 'typeorm';
+import { JobEnterpriseRegisterInputDto } from './dtos/job-enterprise.dto';
 
 @Injectable()
 export class BoardsService {
@@ -71,6 +72,129 @@ export class BoardsService {
         clstyp: clstyp,
       },
     });
+  }
+
+  async enterpriseRegisterJob(
+    @Req() req,
+    jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
+  ) {
+    const {
+      TITLE,
+      JOB_TYPE_DESC,
+      REQUIRE_COUNT,
+      JOB_DESC,
+      DEUCATION,
+      CAREER,
+      CAREER_PERIOD,
+      WORK_AREA,
+      WORK_ADDRESS,
+      WORK_AREA_DESC,
+      EMPLOYTYPE,
+      EMPLOYTYPE_DET,
+      PAYCD,
+      PAY_AMOUNT,
+      WORK_TIME_TYPE,
+      MEAL_COD,
+      WORKINGHOURS,
+      SEVERANCE_PAY_TYPE,
+      SOCIAL_INSURANCE,
+      CLOSING_TYPE,
+      ENDRECEPTION,
+      APPLY_METHOD,
+      APPLY_METHOD_ETC,
+      TEST_METHOD,
+      TEST_METHOD_DTC,
+      APPLY_DOCUMENT,
+      CONTACT_NAME,
+      CONTACT_DEPARTMENT,
+      CONTACT_PHONE,
+      CONTACT_EMAIL,
+    } = jobEnterpriseRegisterInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT ENTRPRS_MBER_ID FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND BSNNM_APRVL_CODE='30'`,
+    );
+
+    if (found) {
+      const [job_type] = await conn.query(
+        `SELECT ENTRPRS_SE_CODE AS CODE FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      );
+      var JOB_TYPE = '';
+      if (job_type.CODE == 10 || job_type.CODE == 20) {
+        JOB_TYPE = 'GEN';
+      } else if (job_type.CODE == 30) {
+        JOB_TYPE = 'PUB';
+      } else {
+        return Object.assign({
+          statusCode: 400,
+          message: '기업구분 오류',
+        });
+      }
+      var sql =
+        'INSERT INTO jobInformation (ENTRPRS_MBER_ID,TITLE,JOB_TYPE_DESC,REQUIRE_COUNT,JOB_DESC,DEUCATION,CAREER,CAREER_PERIOD,WORK_AREA,WORK_ADDRESS,WORK_AREA_DESC,EMPLOYTYPE,EMPLOYTYPE_DET,PAYCD,PAY_AMOUNT,WORK_TIME_TYPE,MEAL_COD,WORKINGHOURS,SEVERANCE_PAY_TYPE,SOCIAL_INSURANCE,CLOSING_TYPE,ENDRECEPTION,APPLY_METHOD,APPLY_METHOD_ETC,TEST_METHOD,TEST_METHOD_DTC,APPLY_DOCUMENT,CONTACT_NAME,CONTACT_DEPARTMENT,CONTACT_PHONE,CONTACT_EMAIL,JOB_TYPE,CREATE_AT) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())';
+      var params = [
+        found.ENTRPRS_MBER_ID,
+        TITLE,
+        JOB_TYPE_DESC,
+        REQUIRE_COUNT,
+        JOB_DESC,
+        DEUCATION,
+        CAREER,
+        CAREER_PERIOD,
+        WORK_AREA,
+        WORK_ADDRESS,
+        WORK_AREA_DESC,
+        EMPLOYTYPE,
+        EMPLOYTYPE_DET,
+        PAYCD,
+        PAY_AMOUNT,
+        WORK_TIME_TYPE,
+        MEAL_COD,
+        WORKINGHOURS,
+        SEVERANCE_PAY_TYPE,
+        SOCIAL_INSURANCE,
+        CLOSING_TYPE,
+        ENDRECEPTION,
+        APPLY_METHOD,
+        APPLY_METHOD_ETC,
+        TEST_METHOD,
+        TEST_METHOD_DTC,
+        APPLY_DOCUMENT,
+        CONTACT_NAME,
+        CONTACT_DEPARTMENT,
+        CONTACT_PHONE,
+        CONTACT_EMAIL,
+        JOB_TYPE,
+      ];
+      await conn.query(sql, params);
+      return Object.assign({
+        statusCode: 201,
+        message: '채용공고 등록 성공',
+      });
+    } else {
+      return Object.assign({
+        statusCode: 401,
+        message: '사업자등록번호 승인 필요',
+      });
+    }
+  }
+
+  async enterpriseJudgeJob(@Req() req, param: { jobid: number }) {
+    const conn = getConnection();
+    const row = await conn.query(
+      `UPDATE jobInformation SET APPROVAL_YN='REQ' WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+    );
+    console.log(row);
+    return row
+      ? Object.assign({
+          statusCode: 200,
+          message: '채용공고 심사요청 성공',
+        })
+      : Object.assign({
+          statusCode: 400,
+          message: '채용공고 심사요청 실패',
+        });
   }
 
   // async getAllBoards(user: User): Promise<Board[]> {

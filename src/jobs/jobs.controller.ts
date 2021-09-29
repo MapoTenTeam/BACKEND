@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -20,6 +21,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from 'src/auth/entities/user.entity';
@@ -119,26 +121,58 @@ export class BoardsController {
   //기업 채용공고 등록
   @Post('/enterprise/register')
   @ApiBearerAuth()
-  @ApiOperation({ summary: '기업 채용공고 등록 API' })
+  @ApiOperation({ summary: '기업 채용공고 등록 API(완료)*' })
   @ApiBody({
     description: '채용공고 등록',
     type: JobEnterpriseRegisterInputDto,
   })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: '채용공고 등록 성공',
     type: JobEnterpriseRegisterOutputDto,
   })
-  async enterpriseRegisterJob() {}
+  @ApiResponse({
+    status: 400,
+    description: '기업구분 오류',
+  })
+  @ApiResponse({
+    status: 401,
+    description: '사업자등록번호 승인 필요',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseRegisterJob(
+    @Req() req,
+    @Body(ValidationPipe)
+    jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
+  ) {
+    return await this.boardsService.enterpriseRegisterJob(
+      req.user,
+      jobEnterpriseRegisterInputDto,
+    );
+  }
 
   //기업 채용공고 심사요청
-  @Patch('/enterprise/judge')
-  @ApiBearerAuth()
+  @Patch('/enterprise/judge/:jobid')
   @ApiOperation({ summary: '기업 채용공고 심사요청 API' })
+  @ApiParam({
+    name: 'jobid',
+    example: '1',
+    description: '채용공고 심사요청 아이디',
+  })
   @ApiOkResponse({
     description: '채용공고 심사요청 성공',
     type: JobEnterpriseJudgeOutputDto,
   })
-  async enterpriseJudgeJob() {}
+  @ApiResponse({
+    status: 400,
+    description: '채용공고 심사요청 실패',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseJudgeJob(@Req() req, @Param() param: { jobid: number }) {
+    return await this.boardsService.enterpriseJudgeJob(req.user, param);
+  }
 
   //기업 채용공고 목록 조회
   @Get('/enterprise/list')

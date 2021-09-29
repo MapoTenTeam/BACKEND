@@ -65,6 +65,9 @@ import {
   LoginOutputDto,
   PasswordChangeInputDto,
   PasswordChangeOutputDto,
+  PasswordConfirmInputDto,
+  PasswordConfirmOutputFailDto,
+  PasswordConfirmOutputSuccessDto,
   TermsOutputDto,
 } from './dtos/auth-credential.dto';
 import {
@@ -462,10 +465,43 @@ export class AuthController {
     description: '사업자 승인 요청 성공',
     type: PatchAprblEnterpriseOutputDto,
   })
+  @ApiResponse({
+    status: 400,
+    description: '사업자 승인 요청 실패',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseBusinessApproval(@Req() req) {
     return await this.authService.enterpriseBusinessApproval(req.user);
+  }
+
+  //회원 비밀번호 확인
+  @Post('/personal/change/password')
+  @ApiOperation({ summary: '회원 비밀번호 확인 API(완료)*' })
+  @ApiBody({
+    description: '비밀번호 입력',
+    type: PasswordConfirmInputDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '비밀번호 조회 성공',
+    type: PasswordConfirmOutputSuccessDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '비밀번호 조회 실패',
+    type: PasswordConfirmOutputFailDto,
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async getPasswordConfirm(
+    @Req() req,
+    @Body(ValidationPipe) passwordConfirmInputDto: PasswordConfirmInputDto,
+  ) {
+    return await this.authService.getPasswordConfirm(
+      req.user,
+      passwordConfirmInputDto,
+    );
   }
 
   //개인 회원 비밀번호 변경

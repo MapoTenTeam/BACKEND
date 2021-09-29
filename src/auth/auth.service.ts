@@ -12,6 +12,7 @@ import {
   AuthCredentialsPersonalDto,
   LoginInputDto,
   PasswordChangeInputDto,
+  PasswordConfirmInputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
@@ -349,14 +350,19 @@ export class AuthService {
 
   async enterpriseBusinessApproval(@Req() req) {
     const conn = getConnection();
-    await conn.query(
+    const [row] = await conn.query(
       `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL_CODE='20' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
-    return Object.assign({
-      statusCode: 200,
-      message: '사업자 승인 요청 성공',
-    });
+    return row
+      ? Object.assign({
+          statusCode: 200,
+          message: '사업자 승인 요청 성공',
+        })
+      : Object.assign({
+          statusCode: 400,
+          message: '사업자 승인 요청 실패',
+        });
   }
 
   async personalUploadProfile(
@@ -427,6 +433,30 @@ export class AuthService {
       statusCode: 200,
       message: '기업 이미지 등록 성공',
     });
+  }
+
+  async getPasswordConfirm(
+    @Req() req,
+    passwordConfirmInputDto: PasswordConfirmInputDto,
+  ) {
+    const { PASSWORD } = passwordConfirmInputDto;
+
+    const conn = getConnection();
+    const [found] = await conn.query(
+      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${req.USER_ID}' AND PASSWORD='${PASSWORD}'`,
+    );
+
+    return found
+      ? Object.assign({
+          statusCode: 201,
+          message: '유저 비밀번호 조회 성공',
+          ok: true,
+        })
+      : Object.assign({
+          statusCode: 201,
+          message: '유저 비밀번호 조회 실패',
+          ok: false,
+        });
   }
 
   async personalPasswordChange(
