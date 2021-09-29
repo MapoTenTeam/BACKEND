@@ -94,7 +94,7 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   APPLY_METHOD_ETC: string;
 
-  @ApiProperty({ example: '전형방법' })
+  @ApiProperty({ example: '전형방법(코드값)' })
   @IsNotEmpty()
   TEST_METHOD: string;
 
@@ -410,19 +410,22 @@ export class JobEnterpriseJudgeOutputDto {
 
 export class JobEnterpriseOutputDto {
   @ApiProperty({ example: '일자리정보ID' })
-  id: number;
+  JOBID: number;
 
   @ApiProperty({ example: '채용제목' })
-  title: string;
+  TITLE: string;
 
   @ApiProperty({ example: '작성일' })
-  created_at: string;
+  CREATE_AT: string;
 
   @ApiProperty({ example: '심사요청일' })
-  start_reception: string;
+  REQUEST_DATE: string;
 
   @ApiProperty({ example: '비고란' })
-  coments: string;
+  COMENTS: string;
+
+  @ApiProperty({ example: '승인상태' })
+  APPROVAL_YN: string;
 }
 
 export class SelectJobEnterpriseOutputDto {
@@ -438,7 +441,7 @@ export class SelectJobEnterpriseOutputDto {
   })
   message: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: ['채용공고 목록 데이터'] })
   data: JobEnterpriseOutputDto;
 }
 

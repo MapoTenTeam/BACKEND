@@ -17,6 +17,12 @@ export class BoardsService {
 
   async getEnterpriseRegisterJob() {
     const conn = getConnection();
+
+    const apytyp = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'apytyp'`,
+    );
     const educd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
@@ -31,6 +37,11 @@ export class BoardsService {
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
       WHERE   A.CODE_ID = 'areacd'`,
+    );
+    const timecd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'timecd'`,
     );
     const empcd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
@@ -57,6 +68,26 @@ export class BoardsService {
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
       WHERE   A.CODE_ID = 'clstyp'`,
     );
+    const doccd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'doccd'`,
+    );
+    const mealcd = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'mealcd'`,
+    );
+    const socins = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'socins'`,
+    );
+    const testmt = await conn.query(
+      `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
+      FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
+      WHERE   A.CODE_ID = 'testmt'`,
+    );
 
     return Object.assign({
       statusCode: 200,
@@ -65,11 +96,17 @@ export class BoardsService {
         educd: educd,
         career: career,
         areacd: areacd,
+        timecd: timecd,
         empcd: empcd,
         empdet: empdet,
         paycd: paycd,
         sevpay: sevpay,
         clstyp: clstyp,
+        apytyp: apytyp,
+        doccd: doccd,
+        mealcd: mealcd,
+        socins: socins,
+        testmt: testmt,
       },
     });
   }
@@ -199,6 +236,62 @@ export class BoardsService {
       return Object.assign({
         statusCode: 400,
         message: '채용공고 심사요청 실패',
+      });
+    }
+  }
+
+  async enterpriseListJob(@Req() req) {
+    const conn = getConnection();
+
+    const [jobfound] = await conn.query(
+      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+
+    const found = await conn.query(
+      `SELECT JOBID,TITLE,CREATE_AT,REQUEST_DATE,COMENTS, 
+      CASE
+      WHEN APPROVAL_YN = 'REQ'
+      THEN '승인요청'
+      WHEN APPROVAL_YN = 'DENI'
+      THEN '승인거절'
+      WHEN APPROVAL_YN = 'APPRV'
+      THEN '승인완료'
+      ELSE '등록 대기중' END AS APPROVAL_YN FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
+
+    if (jobfound) {
+      return Object.assign({
+        statusCode: 200,
+        message: '채용공고 목록 조회 성공',
+        ok: true,
+        data: found,
+      });
+    } else {
+      return Object.assign({
+        statusCode: 200,
+        message: '채용공고 등록 필요',
+        ok: false,
+      });
+    }
+  }
+
+  async enterpriseListDetailJob(@Req() req, param: { jobid: number }) {
+    const conn = getConnection();
+
+    const [found] = await conn.query(
+      `SELECT * FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+    );
+
+    if (found) {
+      return Object.assign({
+        statusCode: 200,
+        message: '채용공고 상세 조회 성공',
+        data: found,
+      });
+    } else {
+      return Object.assign({
+        statusCode: 400,
+        message: '채용공고 상세 조회 실패',
       });
     }
   }

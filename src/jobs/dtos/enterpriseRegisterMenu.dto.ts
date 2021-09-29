@@ -80,16 +80,28 @@ export class EnterpriseRegisterMenuOutputDto {
   career: [];
   @ApiProperty({ description: '근무예정지', example: ['근무예정지'] })
   areacd: [];
+  @ApiProperty({ description: '근무시간유형', example: ['근무시간유형'] })
+  timecd: [];
   @ApiProperty({ description: '고용형태', example: ['고용형태'] })
   empcd: [];
-  @ApiProperty({ description: '고용형태-상세', example: ['고용형태-상세'] })
+  @ApiProperty({ description: '고용형태 상세', example: ['고용형태 상세'] })
   empdet: [];
   @ApiProperty({ description: '임금지급형태', example: ['임금지급형태'] })
   paycd: [];
   @ApiProperty({ description: '퇴직금형태', example: ['퇴직금형태'] })
   sevpay: [];
-  @ApiProperty({ description: '접수마감일', example: ['접수마감일'] })
+  @ApiProperty({ description: '접수마감일구분', example: ['접수마감일구분'] })
   clstyp: [];
+  @ApiProperty({ description: '접수방법', example: ['접수방법'] })
+  apytyp: [];
+  @ApiProperty({ description: '제출서류', example: ['제출서류'] })
+  doccd: [];
+  @ApiProperty({ description: '식사제공', example: ['식사제공'] })
+  mealcd: [];
+  @ApiProperty({ description: '사회보험', example: ['사회보험'] })
+  socins: [];
+  @ApiProperty({ description: '전형방법', example: ['전형방법'] })
+  testmt: [];
 }
 
 //

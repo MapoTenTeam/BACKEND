@@ -84,6 +84,15 @@ export class ProfileEnterpriseOutputDto {
 }
 
 //기업회원 프로필 기업유형 조회
+export class ProfileEnterpriseDivisionInputDto {
+  @ApiProperty({ example: '코드번호' })
+  CODE: string;
+
+  @ApiProperty({ example: '코드이름' })
+  CODE_NM: string;
+}
+
+//기업회원 프로필 기업유형 조회
 export class ProfileEnterpriseDivisionOutputDto {
   @ApiProperty({
     example: '200',
@@ -98,7 +107,7 @@ export class ProfileEnterpriseDivisionOutputDto {
   message: string;
 
   @ApiProperty({ example: ['기업유형'] })
-  ENTRPRS_SE_CODE: string[];
+  ENTRPRS_SE_CODE: ProfileEnterpriseDivisionInputDto;
 }
 
 //기업 회원 프로필 이미지 등록

@@ -176,23 +176,34 @@ export class BoardsController {
 
   //기업 채용공고 목록 조회
   @Get('/enterprise/list')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '기업 채용공고 목록 조회 API' })
+  @ApiOperation({ summary: '기업 채용공고 목록 조회 API(완료)*' })
   @ApiOkResponse({
     description: '채용공고 목록 조회',
     type: SelectJobEnterpriseOutputDto,
   })
-  async enterpriseListJob() {}
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseListJob(@Req() req) {
+    return await this.boardsService.enterpriseListJob(req.user);
+  }
 
   //기업 채용공고 상세 조회
-  @Get('/enterprise/list/detail/:id')
-  @ApiBearerAuth()
+  @Get('/enterprise/list/detail/:jobid')
   @ApiOperation({ summary: '기업 채용공고 상세 조회 API' })
-  @ApiOkResponse({
-    description: '채용공고 상세 조회',
-    type: SelectJobEnterpriseDetailOutputDto,
+  @ApiParam({
+    name: 'jobid',
+    example: '1',
+    description: '채용공고 아이디',
   })
-  async enterpriseListDetailJob() {}
+  // @ApiOkResponse({
+  //   description: '채용공고 상세 조회',
+  //   type: SelectJobEnterpriseDetailOutputDto,
+  // })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async enterpriseListDetailJob(@Req() req, @Param() param: { jobid: number }) {
+    return await this.boardsService.enterpriseListDetailJob(req.user, param);
+  }
 
   //기업 채용공고 수정
   @Put('/enterprise/edit/:id')
