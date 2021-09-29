@@ -27,7 +27,7 @@ export class ProfileEnterpriseInputDto {
   @IsNotEmpty()
   APPLCNT_EMAIL_ADRES: string;
 
-  @ApiProperty({ example: '기업구분코드' })
+  @ApiProperty({ example: '기업구분(코드값)' })
   @IsNotEmpty()
   ENTRPRS_SE_CODE: string;
 

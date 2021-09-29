@@ -154,7 +154,7 @@ export class BoardsController {
 
   //기업 채용공고 심사요청
   @Patch('/enterprise/judge/:jobid')
-  @ApiOperation({ summary: '기업 채용공고 심사요청 API' })
+  @ApiOperation({ summary: '기업 채용공고 심사요청 API(완료)*' })
   @ApiParam({
     name: 'jobid',
     example: '1',

@@ -18,11 +18,11 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   JOB_DESC: string;
 
-  @ApiProperty({ example: '학력' })
+  @ApiProperty({ example: '학력(코드값)' })
   @IsNotEmpty()
   DEUCATION: string;
 
-  @ApiProperty({ example: '경력' })
+  @ApiProperty({ example: '경력(코드값)' })
   @IsNotEmpty()
   CAREER: string;
 
@@ -30,7 +30,7 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   CAREER_PERIOD: string;
 
-  @ApiProperty({ example: '근무예정지' })
+  @ApiProperty({ example: '근무예정지(코드값)' })
   @IsNotEmpty()
   WORK_AREA: string;
 
@@ -42,15 +42,15 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   WORK_AREA_DESC: string;
 
-  @ApiProperty({ example: '고용형태' })
+  @ApiProperty({ example: '고용형태(코드값)' })
   @IsNotEmpty()
   EMPLOYTYPE: string;
 
-  @ApiProperty({ example: '고용형태상세' })
+  @ApiProperty({ example: '고용형태상세(코드값)' })
   @IsNotEmpty()
   EMPLOYTYPE_DET: string;
 
-  @ApiProperty({ example: '임금 지급형태' })
+  @ApiProperty({ example: '임금 지급형태(코드값)' })
   @IsNotEmpty()
   PAYCD: string;
 
@@ -58,11 +58,11 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   PAY_AMOUNT: string;
 
-  @ApiProperty({ example: '근무시간유형' })
+  @ApiProperty({ example: '근무시간유형(코드값)' })
   @IsNotEmpty()
   WORK_TIME_TYPE: string;
 
-  @ApiProperty({ example: '식사제공' })
+  @ApiProperty({ example: '식사제공(코드값)' })
   @IsNotEmpty()
   MEAL_COD: string;
 
@@ -70,15 +70,15 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   WORKINGHOURS: string;
 
-  @ApiProperty({ example: '퇴직금형태' })
+  @ApiProperty({ example: '퇴직금형태(코드값)' })
   @IsNotEmpty()
   SEVERANCE_PAY_TYPE: string;
 
-  @ApiProperty({ example: '사회보험' })
+  @ApiProperty({ example: '사회보험(코드값)' })
   @IsNotEmpty()
   SOCIAL_INSURANCE: string;
 
-  @ApiProperty({ example: '접수마감일구분' })
+  @ApiProperty({ example: '접수마감일구분(코드값)' })
   @IsNotEmpty()
   CLOSING_TYPE: string;
 
@@ -86,7 +86,7 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   ENDRECEPTION: string;
 
-  @ApiProperty({ example: '접수방법' })
+  @ApiProperty({ example: '접수방법(코드값)' })
   @IsNotEmpty()
   APPLY_METHOD: string;
 
@@ -102,7 +102,7 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   TEST_METHOD_DTC: string;
 
-  @ApiProperty({ example: '제출서류' })
+  @ApiProperty({ example: '제출서류(코드값)' })
   @IsNotEmpty()
   APPLY_DOCUMENT: string;
 

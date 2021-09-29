@@ -465,10 +465,6 @@ export class AuthController {
     description: '사업자 승인 요청 성공',
     type: PatchAprblEnterpriseOutputDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: '사업자 승인 요청 실패',
-  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseBusinessApproval(@Req() req) {

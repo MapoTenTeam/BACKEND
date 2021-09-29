@@ -350,19 +350,14 @@ export class AuthService {
 
   async enterpriseBusinessApproval(@Req() req) {
     const conn = getConnection();
-    const [row] = await conn.query(
+    await conn.query(
       `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL_CODE='20' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
-    return row
-      ? Object.assign({
-          statusCode: 200,
-          message: '사업자 승인 요청 성공',
-        })
-      : Object.assign({
-          statusCode: 400,
-          message: '사업자 승인 요청 실패',
-        });
+    return Object.assign({
+      statusCode: 200,
+      message: '사업자 승인 요청 성공',
+    });
   }
 
   async personalUploadProfile(

@@ -182,19 +182,25 @@ export class BoardsService {
 
   async enterpriseJudgeJob(@Req() req, param: { jobid: number }) {
     const conn = getConnection();
-    const row = await conn.query(
-      `UPDATE jobInformation SET APPROVAL_YN='REQ' WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+
+    const [found] = await conn.query(
+      `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND APPROVAL_YN='REG'`,
     );
-    console.log(row);
-    return row
-      ? Object.assign({
-          statusCode: 200,
-          message: '채용공고 심사요청 성공',
-        })
-      : Object.assign({
-          statusCode: 400,
-          message: '채용공고 심사요청 실패',
-        });
+
+    if (found) {
+      await conn.query(
+        `UPDATE jobInformation SET APPROVAL_YN='REQ', REQUEST_DATE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+      );
+      return Object.assign({
+        statusCode: 200,
+        message: '채용공고 심사요청 성공',
+      });
+    } else {
+      return Object.assign({
+        statusCode: 400,
+        message: '채용공고 심사요청 실패',
+      });
+    }
   }
 
   // async getAllBoards(user: User): Promise<Board[]> {
