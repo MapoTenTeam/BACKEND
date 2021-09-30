@@ -113,11 +113,11 @@ export class BoardsController {
   @ApiOperation({
     summary: '일반 일자리 목록 조회(검색기능) API',
   })
-  // @ApiQuery({
-  //   name: 'page',
-  //   example: '1',
-  //   description: '일반 일자리 페이지 넘버',
-  // })
+  @ApiParam({
+    name: 'name',
+    example: '마포유치원',
+    description: '공고타이틀',
+  })
   // @ApiOkResponse({
   //   description: '페이지별 12개씩 일반일자리 목록',
   //   // type: SelectJobGeneralOutputDto,
@@ -126,8 +126,8 @@ export class BoardsController {
   //   status: 400,
   //   description: '일반일자리 목록 조회 실패',
   // })
-  async getGeneralSearchJob(@Query() query) {
-    // return await this.boardsService.getGeneralJob(query);
+  async getGeneralSearchJob(@Query() query, @Param() param: { name: string }) {
+    return await this.boardsService.getGeneralSearchJob(query, param);
   }
 
   //일자리 상세 조회
