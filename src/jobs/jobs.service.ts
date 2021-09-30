@@ -22,10 +22,10 @@ export class BoardsService {
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     const page = await conn.query(
-      `SELECT  A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
+      `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
       FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
-      ORDER BY JOBID LIMIT 12 OFFSET ${pagecount}`,
+      ORDER BY REQUEST_DATE ASC LIMIT 12 OFFSET ${pagecount}`,
     );
     const [count] = await conn.query(
       `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
@@ -33,13 +33,13 @@ export class BoardsService {
     return found
       ? Object.assign({
           statusCode: 200,
-          message: '일반일자리 목록 조회 성공',
+          message: '공공일자리 목록 조회 성공',
           count: count.COUNT,
           data: page,
         })
       : Object.assign({
           statusCode: 400,
-          message: '일반일자리 목록 조회 실패',
+          message: '공공일자리 목록 조회 실패',
         });
   }
 
@@ -50,10 +50,10 @@ export class BoardsService {
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     const page = await conn.query(
-      `SELECT  A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
+      `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
       FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
-      ORDER BY JOBID LIMIT 12 OFFSET ${pagecount}`,
+      ORDER BY REQUEST_DATE ASC LIMIT 12 OFFSET ${pagecount}`,
     );
     const [count] = await conn.query(
       `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
@@ -69,6 +69,216 @@ export class BoardsService {
           statusCode: 400,
           message: '일반일자리 목록 조회 실패',
         });
+  }
+
+  async getGeneralDetailJob(param: { jobid: number }) {
+    const conn = getConnection();
+
+    const [found] = await conn.query(
+      `SELECT * FROM jobInformation WHERE JOBID='${param.jobid}' AND JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
+
+    if (found) {
+      const [user] = await conn.query(
+        `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${found.ENTRPRS_MBER_ID}' AND ENTRPRS_MBER_STTUS='P'`,
+      );
+
+      const [educd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
+      );
+      const [career] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
+      );
+      const [areacd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
+      );
+      const [timecd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
+      );
+      const [empcd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
+      );
+      const [empdet] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
+      );
+      const [paycd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
+      );
+      const [sevpay] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
+      );
+      const [clstyp] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
+      );
+      const [apytyp] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
+      );
+      const [doccd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
+      );
+      const [mealcd] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
+      );
+      const [socins] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
+      );
+      const [testmt] = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
+      );
+
+      return Object.assign({
+        statusCode: 200,
+        message: '일반일자리 상세 조회 성공',
+        data: {
+          JOBID: found.JOBID,
+
+          CMPNY_NM: user.CMPNY_NM,
+          BIZRNO: user.BIZRNO,
+          CEO: user.CEO,
+          ADRES: user.ADRES,
+          DETAIL_ADRES: user.DETAIL_ADRES,
+          INDUTY: user.INDUTY,
+          NMBR_WRKRS: user.NMBR_WRKRS,
+          CMPNY_IM: user.CMPNY_IM,
+
+          TITLE: found.TITLE,
+          JOB_TYPE_DESC: found.JOB_TYPE_DESC,
+          REQUIRE_COUNT: found.REQUIRE_COUNT,
+          JOB_DESC: found.JOB_DESC,
+          DEUCATION: educd.CODE_NM,
+          CAREER: career.CODE_NM,
+          WORK_AREA: areacd.CODE_NM,
+          EMPLOYTYPE: empcd.CODE_NM,
+          EMPLOYTYPE_DET: empdet.CODE_NM,
+          PAYCD: paycd.CODE_NM,
+          WORK_TIME_TYPE: timecd.CODE_NM,
+          ENDRECEPTION: found.ENDRECEPTION,
+          CAREER_PERIOD: found.CAREER_PERIOD,
+          WORK_ADDRESS: found.WORK_ADDRESS,
+          WORK_AREA_DESC: found.WORK_AREA_DESC,
+          PAY_AMOUNT: found.PAY_AMOUNT,
+          MEAL_COD: mealcd.CODE_NM,
+          WORKINGHOURS: found.WORKINGHOURS,
+          SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+          SOCIAL_INSURANCE: socins.CODE_NM,
+          CLOSING_TYPE: clstyp.CODE_NM,
+          APPLY_METHOD: apytyp.CODE_NM,
+          APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
+          TEST_METHOD: testmt.CODE_NM,
+          TEST_METHOD_DTC: found.TEST_METHOD_DTC,
+          APPLY_DOCUMENT: doccd.CODE_NM,
+          CONTACT_NAME: found.CONTACT_NAME,
+          CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
+          CONTACT_PHONE: found.CONTACT_PHONE,
+          CONTACT_EMAIL: found.CONTACT_EMAIL,
+        },
+      });
+    } else {
+      return Object.assign({
+        statusCode: 400,
+        message: '일반일자리 상세 조회 실패',
+      });
+    }
+
+    // if (found) {
+    //   const [user] = await conn.query(
+    //     `SELECT * FROM COMTNENTRPRSMBER WHERE JOBID='${param.jobid}'`,
+    //   );
+    //   const [educd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
+    //   );
+    //   const [career] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
+    //   );
+    //   const [areacd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
+    //   );
+    //   const [timecd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
+    //   );
+    //   const [empcd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
+    //   );
+    //   const [empdet] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
+    //   );
+    //   const [paycd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
+    //   );
+    //   const [sevpay] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
+    //   );
+    //   const [clstyp] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
+    //   );
+    //   const [apytyp] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
+    //   );
+    //   const [doccd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
+    //   );
+    //   const [mealcd] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
+    //   );
+    //   const [socins] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
+    //   );
+    //   const [testmt] = await conn.query(
+    //     `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
+    //   );
+    //   return Object.assign({
+    //     statusCode: 200,
+    //     message: '채용공고 상세 조회 성공',
+    //     data: {
+    //       JOBID: found.JOBID,
+
+    //       CMPNY_NM: user.CMPNY_NM,
+    //       BIZRNO: user.BIZRNO,
+    //       CEO: user.CEO,
+    //       ADRES: user.ADRES,
+    //       DETAIL_ADRES: user.DETAIL_ADRES,
+    //       INDUTY: user.INDUTY,
+    //       NMBR_WRKRS: user.NMBR_WRKRS,
+
+    //       TITLE: found.TITLE,
+    //       JOB_TYPE_DESC: found.JOB_TYPE_DESC,
+    //       REQUIRE_COUNT: found.REQUIRE_COUNT,
+    //       JOB_DESC: found.JOB_DESC,
+    //       DEUCATION: educd.CODE_NM,
+    //       CAREER: career.CODE_NM,
+    //       WORK_AREA: areacd.CODE_NM,
+    //       EMPLOYTYPE: empcd.CODE_NM,
+    //       EMPLOYTYPE_DET: empdet.CODE_NM,
+    //       PAYCD: paycd.CODE_NM,
+    //       WORK_TIME_TYPE: timecd.CODE_NM,
+    //       STARTRECEPTION: found.STARTRECEPTION,
+    //       ENDRECEPTION: found.ENDRECEPTION,
+    //       CAREER_PERIOD: found.CAREER_PERIOD,
+    //       WORK_ADDRESS: found.WORK_ADDRESS,
+    //       WORK_AREA_DESC: found.WORK_AREA_DESC,
+    //       PAY_AMOUNT: found.PAY_AMOUNT,
+    //       MEAL_COD: mealcd.CODE_NM,
+    //       WORKINGHOURS: found.WORKINGHOURS,
+    //       SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+    //       SOCIAL_INSURANCE: socins.CODE_NM,
+    //       CLOSING_TYPE: clstyp.CODE_NM,
+    //       APPLY_METHOD: apytyp.CODE_NM,
+    //       APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
+    //       TEST_METHOD: testmt.CODE_NM,
+    //       TEST_METHOD_DTC: found.TEST_METHOD_DTC,
+    //       APPLY_DOCUMENT: doccd.CODE_NM,
+    //       CONTACT_NAME: found.CONTACT_NAME,
+    //       CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
+    //       CONTACT_PHONE: found.CONTACT_PHONE,
+    //       CONTACT_EMAIL: found.CONTACT_EMAIL,
+    //     },
+    //   });
+    // } else {
+    //   return Object.assign({
+    //     statusCode: 400,
+    //     message: '채용공고 상세 조회 실패',
+    //   });
+    // }
   }
 
   async getEnterpriseRegisterJob() {
@@ -390,30 +600,35 @@ export class BoardsService {
     }
   }
 
-  async enterpriseListJob(@Req() req) {
+  async enterpriseListJob(@Req() req, query) {
+    var pagecount = (query.page - 1) * 12;
     const conn = getConnection();
-
     const [jobfound] = await conn.query(
       `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,
     );
 
-    const found = await conn.query(
-      `SELECT JOBID,TITLE,CREATE_AT,REQUEST_DATE,COMENTS, 
-      CASE
-      WHEN JOB_STAT = 'REQ'
-      THEN '승인요청'
-      WHEN JOB_STAT = 'DENI'
-      THEN '승인거절'
-      WHEN JOB_STAT = 'APPRV'
-      THEN '승인완료'
-      ELSE '등록' END AS JOB_STAT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,
-    );
-
     if (jobfound) {
+      const found = await conn.query(
+        `SELECT JOBID,TITLE,CREATE_AT,REQUEST_DATE,COMENTS, 
+        CASE
+        WHEN JOB_STAT = 'REQ'
+        THEN '승인요청'
+        WHEN JOB_STAT = 'DENI'
+        THEN '승인거절'
+        WHEN JOB_STAT = 'APPRV'
+        THEN '승인완료'
+        ELSE '등록' END AS JOB_STAT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'
+        ORDER BY CREATE_AT ASC LIMIT 12 OFFSET ${pagecount}`,
+      );
+      const [count] = await conn.query(
+        `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,
+      );
+
       return Object.assign({
         statusCode: 200,
         message: '채용공고 목록 조회 성공',
         ok: true,
+        count: count.COUNT,
         data: found,
       });
     } else {

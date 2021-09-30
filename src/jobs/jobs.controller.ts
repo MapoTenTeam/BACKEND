@@ -67,7 +67,7 @@ export class BoardsController {
   })
   @ApiResponse({
     status: 400,
-    description: '일반일자리 목록 조회 실패',
+    description: '공공일자리 목록 조회 실패',
   })
   async getPublicJob(@Query() query) {
     return await this.boardsService.getPublicJob(query);
@@ -111,7 +111,7 @@ export class BoardsController {
 
   //일반 일자리 상세 조회
   @Get('/general/detail/:jobid')
-  @ApiOperation({ summary: '일반 일자리 상세 조회 API' })
+  @ApiOperation({ summary: '일반 일자리 상세 조회 API(완료)*' })
   @ApiParam({
     name: 'jobid',
     example: '1',
@@ -121,7 +121,9 @@ export class BoardsController {
     description: '일자리 상세 페이지',
     type: SelectJobDetailOutputDto,
   })
-  async getGeneralDetailJob() {}
+  async getGeneralDetailJob(@Param() param: { jobid: number }) {
+    return await this.boardsService.getGeneralDetailJob(param);
+  }
 
   //기업 채용공고 등록 메뉴 조회
   @Get('/enterprise/register/all')
@@ -202,7 +204,12 @@ export class BoardsController {
 
   //기업 채용공고 목록 조회
   @Get('/enterprise/list')
-  @ApiOperation({ summary: '기업 채용공고 목록 조회 API(수정중)*' })
+  @ApiOperation({ summary: '기업 채용공고 목록 조회 API(완료)*' })
+  @ApiQuery({
+    name: 'page',
+    example: '1',
+    description: '채용공고 페이지 넘버',
+  })
   @ApiOkResponse({
     description: '채용공고 목록 조회',
     type: SelectJobEnterpriseOutputDto,
@@ -218,8 +225,8 @@ export class BoardsController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async enterpriseListJob(@Req() req) {
-    return await this.boardsService.enterpriseListJob(req.user);
+  async enterpriseListJob(@Req() req, @Query() query) {
+    return await this.boardsService.enterpriseListJob(req.user, query);
   }
 
   //기업 채용공고 상세 조회

@@ -40,6 +40,12 @@ export class SelectJobGeneralOutputDto {
   })
   message: string;
 
+  @ApiProperty({
+    example: '10',
+    description: '총갯수',
+  })
+  count: string;
+
   @ApiProperty()
   data: JobGeneralOutputDto;
 }

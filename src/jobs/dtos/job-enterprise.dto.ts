@@ -413,6 +413,9 @@ export class SelectJobEnterpriseOutputDto {
   @ApiProperty({ description: '프로필 등록된 데이터 있을경우', example: true })
   ok: boolean;
 
+  @ApiProperty({ description: '페이지 넘버', example: '총갯수' })
+  count: number;
+
   @ApiProperty({ example: ['채용공고 목록 데이터'] })
   data: JobEnterpriseOutputDto;
 }
