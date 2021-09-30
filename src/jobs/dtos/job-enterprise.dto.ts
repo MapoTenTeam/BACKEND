@@ -27,7 +27,6 @@ export class JobEnterpriseRegisterInputDto {
   CAREER: string;
 
   @ApiProperty({ example: '경력기간' })
-  @IsNotEmpty()
   CAREER_PERIOD: string;
 
   @ApiProperty({ example: '근무예정지(코드값)' })
@@ -83,7 +82,6 @@ export class JobEnterpriseRegisterInputDto {
   CLOSING_TYPE: string;
 
   @ApiProperty({ example: '접수마감일' })
-  @IsNotEmpty()
   ENDRECEPTION: string;
 
   @ApiProperty({ example: '접수방법(코드값)' })
@@ -412,8 +410,28 @@ export class SelectJobEnterpriseOutputDto {
   })
   message: string;
 
+  @ApiProperty({ description: '프로필 등록된 데이터 있을경우', example: true })
+  ok: boolean;
+
   @ApiProperty({ example: ['채용공고 목록 데이터'] })
   data: JobEnterpriseOutputDto;
+}
+
+export class SelectJobEnterpriseOutputNotDto {
+  @ApiProperty({
+    example: '200',
+    description: '상태코드',
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '채용공고 등록 필요',
+    description: '설명',
+  })
+  message: string;
+
+  @ApiProperty({ description: '프로필 등록된 데이터 없경우', example: false })
+  ok: boolean;
 }
 
 export class UpdateJobEnterpriseOutputDto {

@@ -15,6 +15,62 @@ export class BoardsService {
   //   private boardRepository: BoardRepository,
   // ) {}
 
+  async getPublicJob(query) {
+    var pagecount = (query.page - 1) * 12;
+    const conn = getConnection();
+    const found = await conn.query(
+      `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
+    const page = await conn.query(
+      `SELECT  A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
+      FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
+      WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
+      ORDER BY JOBID LIMIT 12 OFFSET ${pagecount}`,
+    );
+    const [count] = await conn.query(
+      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
+    return found
+      ? Object.assign({
+          statusCode: 200,
+          message: '일반일자리 목록 조회 성공',
+          count: count.COUNT,
+          data: page,
+        })
+      : Object.assign({
+          statusCode: 400,
+          message: '일반일자리 목록 조회 실패',
+        });
+  }
+
+  async getGeneralJob(query) {
+    var pagecount = (query.page - 1) * 12;
+    const conn = getConnection();
+    const found = await conn.query(
+      `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
+    const page = await conn.query(
+      `SELECT  A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
+      FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
+      WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
+      ORDER BY JOBID LIMIT 12 OFFSET ${pagecount}`,
+    );
+    const [count] = await conn.query(
+      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
+    return found
+      ? Object.assign({
+          statusCode: 200,
+          message: '일반일자리 목록 조회 성공',
+          count: count.COUNT,
+          data: page,
+        })
+      : Object.assign({
+          statusCode: 400,
+          message: '일반일자리 목록 조회 실패',
+        });
+  }
+
   async getEnterpriseRegisterJob() {
     const conn = getConnection();
 
@@ -211,7 +267,7 @@ export class BoardsService {
       });
     } else {
       return Object.assign({
-        statusCode: 401,
+        statusCode: 402,
         message: '사업자등록번호 승인 필요',
       });
     }

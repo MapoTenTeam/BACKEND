@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -41,6 +42,7 @@ import {
   SelectJobDetailOutputDto,
   SelectJobEnterpriseDetailOutputDto,
   SelectJobEnterpriseOutputDto,
+  SelectJobEnterpriseOutputNotDto,
   UpdateJobEnterpriseOutputDto,
 } from './dtos/job-enterprise.dto';
 
@@ -51,17 +53,25 @@ export class BoardsController {
 
   //공공 일자리 목록 조회
   @Get('/public')
-  @ApiOperation({ summary: '공공 일자리 목록 조회 API (페이지당 12개씩)' })
+  @ApiOperation({
+    summary: '공공 일자리 목록 조회 API(1차완료)',
+  })
   @ApiQuery({
     name: 'page',
-    example: 'http://localhost:3000/job/public?page=1',
+    example: '1',
     description: '공공 일자리 목록',
   })
   @ApiOkResponse({
     description: '페이지별 12개씩 공공일자리 목록',
-    type: SelectJobPublicOutputDto,
+    // type: SelectJobPublicOutputDto,
   })
-  async getPublicJob() {}
+  @ApiResponse({
+    status: 400,
+    description: '일반일자리 목록 조회 실패',
+  })
+  async getPublicJob(@Query() query) {
+    return await this.boardsService.getPublicJob(query);
+  }
 
   //공공 일자리 상세 조회
   @Get('/public/detail/:jobid')
@@ -79,17 +89,25 @@ export class BoardsController {
 
   //일반 일자리 목록 조회
   @Get('/general')
-  @ApiOperation({ summary: '일반 일자리 목록 조회 API (페이지당 12개씩)' })
+  @ApiOperation({
+    summary: '일반 일자리 목록 조회 API(1차완료)*',
+  })
   @ApiQuery({
     name: 'page',
-    example: 'http://localhost:3000/job/general?page=1',
-    description: '일반 일자리 목록',
+    example: '1',
+    description: '일반 일자리 페이지 넘버',
   })
   @ApiOkResponse({
     description: '페이지별 12개씩 일반일자리 목록',
-    type: SelectJobGeneralOutputDto,
+    // type: SelectJobGeneralOutputDto,
   })
-  async getGeneralJob() {}
+  @ApiResponse({
+    status: 400,
+    description: '일반일자리 목록 조회 실패',
+  })
+  async getGeneralJob(@Query() query) {
+    return await this.boardsService.getGeneralJob(query);
+  }
 
   //일반 일자리 상세 조회
   @Get('/general/detail/:jobid')
@@ -137,6 +155,10 @@ export class BoardsController {
   })
   @ApiResponse({
     status: 401,
+    description: '인증 오류',
+  })
+  @ApiResponse({
+    status: 402,
     description: '사업자등록번호 승인 필요',
   })
   @ApiBearerAuth()
@@ -168,6 +190,10 @@ export class BoardsController {
     status: 400,
     description: '채용공고 심사요청 실패',
   })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseJudgeJob(@Req() req, @Param() param: { jobid: number }) {
@@ -176,10 +202,19 @@ export class BoardsController {
 
   //기업 채용공고 목록 조회
   @Get('/enterprise/list')
-  @ApiOperation({ summary: '기업 채용공고 목록 조회 API(완료)*' })
+  @ApiOperation({ summary: '기업 채용공고 목록 조회 API(수정중)*' })
   @ApiOkResponse({
     description: '채용공고 목록 조회',
     type: SelectJobEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '채용공고 목록 조회(등록된 데이터 없을때)',
+    type: SelectJobEnterpriseOutputNotDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -198,6 +233,14 @@ export class BoardsController {
   @ApiOkResponse({
     description: '채용공고 상세 조회',
     type: SelectJobEnterpriseDetailOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '채용공고 상세 조회 실패',
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -225,6 +268,10 @@ export class BoardsController {
     status: 400,
     description: '채용공고 수정 실패',
   })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseEditJob(
@@ -251,6 +298,14 @@ export class BoardsController {
   @ApiOkResponse({
     description: '채용공고 삭제',
     type: DeleteJobEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '채용공고 삭제 실패',
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())

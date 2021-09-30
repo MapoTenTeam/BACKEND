@@ -30,9 +30,9 @@ export class AuthCredentialsPersonalDto {
   @ApiProperty({ example: '패스워드' })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
-    message: 'password hash error',
-  })
+  // @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
+  //   message: 'password hash error',
+  // })
   PASSWORD: string;
 
   @ApiProperty({ description: '이메일 인증 여부' })
@@ -66,9 +66,9 @@ export class AuthCredentialsEnterpriseDto {
   @ApiProperty({ example: '패스워드' })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
-    message: 'password hash error',
-  })
+  // @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#.?!@$%^&*-]).{20,}$/, {
+  //   message: 'password hash error',
+  // })
   ENTRPRS_MBER_PASSWORD: string;
 
   @ApiProperty({ example: '신청인명' })
@@ -131,17 +131,6 @@ export class LoginOutputDto {
   accessToken: string;
 }
 
-//이메일 중복확인
-// export class UserByEmailInputDto {
-//   @ApiProperty({
-//     description: '중복체크할 유저 이메일',
-//     example: 'hee1234@gmail.com',
-//   })
-//   @IsEmail()
-//   @IsNotEmpty()
-//   email: string;
-// }
-
 //이용약관 조회 성공했을때
 export class TermsOutputDto {
   @ApiProperty({
@@ -188,9 +177,6 @@ export class PasswordConfirmOutputSuccessDto {
     description: '설명',
   })
   message: string;
-
-  @ApiProperty({ description: '비밀번호 조회 성공여부', example: true })
-  ok: boolean;
 }
 
 //비밀번호 조회 실패했을때

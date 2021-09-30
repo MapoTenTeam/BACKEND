@@ -115,7 +115,7 @@ export class AuthService {
           userId: found.USER_ID,
         })
       : Object.assign({
-          statusCode: 200,
+          statusCode: 400,
           message: '가입된 회원정보가 없습니다.',
         });
   }
@@ -155,7 +155,7 @@ export class AuthService {
       } catch (err) {}
     } else {
       return Object.assign({
-        statusCode: 200,
+        statusCode: 400,
         message: '가입된 회원정보가 없습니다.',
       });
     }
@@ -197,7 +197,7 @@ export class AuthService {
       } catch (err) {}
     } else {
       return Object.assign({
-        statusCode: 200,
+        statusCode: 400,
         message: '가입된 회원정보가 없습니다.',
       });
     }
@@ -445,12 +445,10 @@ export class AuthService {
       ? Object.assign({
           statusCode: 201,
           message: '유저 비밀번호 조회 성공',
-          ok: true,
         })
       : Object.assign({
-          statusCode: 201,
+          statusCode: 400,
           message: '유저 비밀번호 조회 실패',
-          ok: false,
         });
   }
 

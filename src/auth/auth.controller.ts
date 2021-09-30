@@ -162,6 +162,10 @@ export class AuthController {
     description: '유저 아이디 찾기 성공',
     type: GetUserByIdFindOutputDto,
   })
+  @ApiResponse({
+    status: 400,
+    description: '회원정보가 없습니다.',
+  })
   @Post('/find/id')
   async getUserByIdFind(
     @Body(ValidationPipe)
@@ -181,6 +185,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '임시 비밀번호 생성 성공',
     type: GetUserByPasswordFindOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '회원정보가 없습니다.',
   })
   @Post('/find/personal/password')
   async getpersonalByPasswordFind(
@@ -203,6 +211,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '임시 비밀번호 생성 성공',
     type: GetUserByPasswordFindOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '회원정보가 없습니다.',
   })
   @Post('/find/enterprise/password')
   async getenterpriseByPasswordFind(
@@ -234,7 +246,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 401,
-    description: '인증되지 않은 사용자 입니다.',
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -251,7 +263,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 401,
-    description: '인증되지 않은 사용자 입니다.',
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -355,6 +367,10 @@ export class AuthController {
     description: '개인 회원 프로필 조회 성공',
     type: SelectProfilePersonalOutputDto,
   })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async getPersonalProfile(@Req() req) {
@@ -367,6 +383,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '기업 회원 프로필 조회 성공',
     type: SelectProfileEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -396,6 +416,10 @@ export class AuthController {
     description: '개인 회원 프로필 등록 성공',
     type: ProfilePersonalOutputDto,
   })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async personalUploadProfile(
@@ -418,6 +442,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '기업 회원 프로필 등록 성공',
     type: ProfileEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -451,6 +479,18 @@ export class AuthController {
       },
     },
   })
+  @ApiResponse({
+    status: 400,
+    description: '지원하지 않는 이미지 형식',
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
+  })
+  @ApiResponse({
+    status: 413,
+    description: '파일크기 제한',
+  })
   @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -464,6 +504,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '사업자 승인 요청 성공',
     type: PatchAprblEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -484,9 +528,12 @@ export class AuthController {
     type: PasswordConfirmOutputSuccessDto,
   })
   @ApiResponse({
-    status: 201,
+    status: 400,
     description: '비밀번호 조회 실패',
-    type: PasswordConfirmOutputFailDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
@@ -511,6 +558,10 @@ export class AuthController {
     description: '비밀번호 변경 성공',
     type: PasswordChangeOutputDto,
   })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async personalPasswordChange(
@@ -533,6 +584,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '비밀번호 변경 성공',
     type: PasswordChangeOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '인증 오류',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
