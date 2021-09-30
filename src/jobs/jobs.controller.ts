@@ -75,7 +75,7 @@ export class BoardsController {
 
   //공공 일자리 상세 조회
   @Get('/public/detail/:jobid')
-  @ApiOperation({ summary: '공공 일자리 상세 조회 API' })
+  @ApiOperation({ summary: '공공 일자리 상세 조회 API(완료)*' })
   @ApiParam({
     name: 'jobid',
     example: '1',
@@ -85,7 +85,9 @@ export class BoardsController {
     description: '일자리 상세 페이지',
     type: SelectJobDetailOutputDto,
   })
-  async getPublicDetailJob() {}
+  async getPublicDetailJob(@Param() param: { jobid: number }) {
+    return await this.boardsService.getPublicDetailJob(param);
+  }
 
   //일반 일자리 목록 조회
   @Get('/general')
