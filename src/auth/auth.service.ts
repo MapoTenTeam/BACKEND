@@ -294,6 +294,9 @@ export class AuthService {
     await conn.query(
       `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_STTUS='D', SECSN_DE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
+    await conn.query(
+      `UPDATE jobInformation SET JOB_STTUS='N', DELEETE_AT=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+    );
 
     return Object.assign({
       statusCode: 200,

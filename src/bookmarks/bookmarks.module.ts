@@ -5,7 +5,7 @@ import { BookmarksController } from './bookmarks.controller';
 import { BookmarksService } from './bookmarks.service';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, TypeOrmModule.forFeature()],
   controllers: [BookmarksController],
   providers: [BookmarksService],
 })

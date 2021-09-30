@@ -4,14 +4,12 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Put,
   Query,
   Req,
   UseGuards,
-  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,15 +23,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from 'src/auth/entities/user.entity';
-import { BoardStatus } from './jobs-status.enum';
-// import { Board } from './jobs.entity';
 import { BoardsService } from './jobs.service';
-import { CreateBoardDto } from './dtos/create-job.dto';
-import { BoardStatusValidationPipe } from './pipes/jobs-status-validation.pipe';
 import { EnterpriseRegisterMenuDto } from './dtos/enterpriseRegisterMenu.dto';
-import { SelectJobPublicOutputDto } from './dtos/job-public.dto';
-import { SelectJobGeneralOutputDto } from './dtos/job-general.dto';
 import {
   DeleteJobEnterpriseOutputDto,
   JobEnterpriseJudgeOutputDto,
@@ -54,7 +45,7 @@ export class BoardsController {
   //공공 일자리 목록 조회
   @Get('/public')
   @ApiOperation({
-    summary: '공공 일자리 목록 조회 API(1차완료)',
+    summary: '공공 일자리 목록 조회(12개) API(완료)',
   })
   @ApiQuery({
     name: 'page',
@@ -73,26 +64,32 @@ export class BoardsController {
     return await this.boardsService.getPublicJob(query);
   }
 
-  //공공 일자리 상세 조회
-  @Get('/public/detail/:jobid')
-  @ApiOperation({ summary: '공공 일자리 상세 조회 API(완료)*' })
-  @ApiParam({
-    name: 'jobid',
-    example: '1',
-    description: '일자리Id',
+  //공공 일자리 목록 조회(검색)
+  @Get('/public/search')
+  @ApiOperation({
+    summary: '공공 일자리 목록 조회(검색기능) API',
   })
-  @ApiOkResponse({
-    description: '일자리 상세 페이지',
-    type: SelectJobDetailOutputDto,
-  })
-  async getPublicDetailJob(@Param() param: { jobid: number }) {
-    return await this.boardsService.getPublicDetailJob(param);
+  // @ApiQuery({
+  //   name: 'page',
+  //   example: '1',
+  //   description: '공공 일자리 목록',
+  // })
+  // @ApiOkResponse({
+  //   description: '페이지별 12개씩 공공일자리 목록',
+  //   // type: SelectJobPublicOutputDto,
+  // })
+  // @ApiResponse({
+  //   status: 400,
+  //   description: '공공일자리 목록 조회 실패',
+  // })
+  async getPublicSearchJob(@Query() query) {
+    // return await this.boardsService.getPublicJob(query);
   }
 
   //일반 일자리 목록 조회
   @Get('/general')
   @ApiOperation({
-    summary: '일반 일자리 목록 조회 API(1차완료)*',
+    summary: '일반 일자리 목록 조회(12개) API(완료)*',
   })
   @ApiQuery({
     name: 'page',
@@ -111,9 +108,31 @@ export class BoardsController {
     return await this.boardsService.getGeneralJob(query);
   }
 
-  //일반 일자리 상세 조회
-  @Get('/general/detail/:jobid')
-  @ApiOperation({ summary: '일반 일자리 상세 조회 API(완료)*' })
+  //일반 일자리 목록 조회(검색)
+  @Get('/general/search')
+  @ApiOperation({
+    summary: '일반 일자리 목록 조회(검색기능) API',
+  })
+  // @ApiQuery({
+  //   name: 'page',
+  //   example: '1',
+  //   description: '일반 일자리 페이지 넘버',
+  // })
+  // @ApiOkResponse({
+  //   description: '페이지별 12개씩 일반일자리 목록',
+  //   // type: SelectJobGeneralOutputDto,
+  // })
+  // @ApiResponse({
+  //   status: 400,
+  //   description: '일반일자리 목록 조회 실패',
+  // })
+  async getGeneralSearchJob(@Query() query) {
+    // return await this.boardsService.getGeneralJob(query);
+  }
+
+  //일자리 상세 조회
+  @Get('/detail/:jobid')
+  @ApiOperation({ summary: '일자리 상세 조회(일반,공공) API(완료)*' })
   @ApiParam({
     name: 'jobid',
     example: '1',
@@ -123,8 +142,8 @@ export class BoardsController {
     description: '일자리 상세 페이지',
     type: SelectJobDetailOutputDto,
   })
-  async getGeneralDetailJob(@Param() param: { jobid: number }) {
-    return await this.boardsService.getGeneralDetailJob(param);
+  async getDetailJob(@Param() param: { jobid: number }) {
+    return await this.boardsService.getDetailJob(param);
   }
 
   //기업 채용공고 등록 메뉴 조회
