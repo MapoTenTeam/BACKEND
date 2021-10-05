@@ -1,10 +1,12 @@
 import { Injectable, Req } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { JobEnterpriseRegisterInputDto } from './dtos/job-enterprise.dto';
+import { GetUserBySearchInputDto } from './dtos/job-public.dto';
 
 @Injectable()
 export class BoardsService {
-  async getPublicJob(query) {
+  async getPublicJob(getUserBySearchInputDto: GetUserBySearchInputDto, query) {
+    const { SEARCH_NAME } = getUserBySearchInputDto;
     var pagecount = (query.page - 1) * 12;
     const conn = getConnection();
     const found = await conn.query(
@@ -14,10 +16,10 @@ export class BoardsService {
       `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
       FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
-      ORDER BY APPROVAL_DATE DESC LIMIT 12 OFFSET ${pagecount}`,
+      AND TITLE LIKE '%${SEARCH_NAME}%' ORDER BY APPROVAL_DATE DESC LIMIT 12 OFFSET ${pagecount}`,
     );
     const [count] = await conn.query(
-      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE TITLE LIKE '%${SEARCH_NAME}%' AND JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     return found
       ? Object.assign({
@@ -32,8 +34,10 @@ export class BoardsService {
         });
   }
 
-  async getGeneralJob(query) {
+  async getGeneralJob(getUserBySearchInputDto: GetUserBySearchInputDto, query) {
+    const { SEARCH_NAME } = getUserBySearchInputDto;
     var pagecount = (query.page - 1) * 12;
+    console.log(SEARCH_NAME);
     const conn = getConnection();
     const found = await conn.query(
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
@@ -42,39 +46,10 @@ export class BoardsService {
       `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
       FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
-      ORDER BY APPROVAL_DATE DESC LIMIT 12 OFFSET ${pagecount}`,
+      AND TITLE LIKE '%${SEARCH_NAME}%' ORDER BY APPROVAL_DATE DESC LIMIT 12 OFFSET ${pagecount}`,
     );
     const [count] = await conn.query(
-      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
-    );
-    return found
-      ? Object.assign({
-          statusCode: 200,
-          message: '일반일자리 목록 조회 성공',
-          count: count.COUNT,
-          data: page,
-        })
-      : Object.assign({
-          statusCode: 400,
-          message: '일반일자리 목록 조회 실패',
-        });
-  }
-
-  async getGeneralSearchJob(query, param: { name: string }) {
-    var pagecount = (query.page - 1) * 12;
-    console.log(query);
-    const conn = getConnection();
-    const found = await conn.query(
-      `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
-    );
-    const page = await conn.query(
-      `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, B.CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
-      FROM    COMTNENTRPRSMBER A INNER JOIN jobInformation  B  ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
-      WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'
-      AND TITLE LIKE '%마포%' ORDER BY TITLE LIMIT 12 OFFSET ${pagecount} `,
-    );
-    const [count] = await conn.query(
-      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+      `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE TITLE LIKE '%${SEARCH_NAME}%' AND JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     return found
       ? Object.assign({
@@ -116,8 +91,8 @@ export class BoardsService {
       const [empcd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
       );
-      const [empdet] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
+      const empdet = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE IN(${found.EMPLOYTYPE_DET})`,
       );
       const [paycd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
@@ -131,66 +106,88 @@ export class BoardsService {
       const [apytyp] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
       );
-      const [doccd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
+      const doccd = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
       );
       const [mealcd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
       );
-      const [socins] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
+      const socins = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
       );
       const [testmt] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
       );
 
-      return Object.assign({
-        statusCode: 200,
-        message: '일자리 상세 조회 성공',
-        data: {
-          JOBID: found.JOBID,
+      if (
+        educd &&
+        career &&
+        areacd &&
+        timecd &&
+        empcd &&
+        empdet &&
+        paycd &&
+        sevpay &&
+        clstyp &&
+        apytyp &&
+        doccd &&
+        mealcd &&
+        socins &&
+        testmt
+      ) {
+        return Object.assign({
+          statusCode: 200,
+          message: '일자리 상세 조회 성공',
+          data: {
+            JOBID: found.JOBID,
 
-          CMPNY_NM: user.CMPNY_NM,
-          BIZRNO: user.BIZRNO,
-          CEO: user.CEO,
-          ADRES: user.ADRES,
-          DETAIL_ADRES: user.DETAIL_ADRES,
-          INDUTY: user.INDUTY,
-          NMBR_WRKRS: user.NMBR_WRKRS,
-          CMPNY_IM: user.CMPNY_IM,
+            CMPNY_NM: user.CMPNY_NM,
+            BIZRNO: user.BIZRNO,
+            CEO: user.CEO,
+            ADRES: user.ADRES,
+            DETAIL_ADRES: user.DETAIL_ADRES,
+            INDUTY: user.INDUTY,
+            NMBR_WRKRS: user.NMBR_WRKRS,
+            CMPNY_IM: user.CMPNY_IM,
 
-          TITLE: found.TITLE,
-          JOB_TYPE_DESC: found.JOB_TYPE_DESC,
-          REQUIRE_COUNT: found.REQUIRE_COUNT,
-          JOB_DESC: found.JOB_DESC,
-          DEUCATION: educd.CODE_NM,
-          CAREER: career.CODE_NM,
-          WORK_AREA: areacd.CODE_NM,
-          EMPLOYTYPE: empcd.CODE_NM,
-          EMPLOYTYPE_DET: empdet.CODE_NM,
-          PAYCD: paycd.CODE_NM,
-          WORK_TIME_TYPE: timecd.CODE_NM,
-          ENDRECEPTION: found.ENDRECEPTION,
-          CAREER_PERIOD: found.CAREER_PERIOD,
-          WORK_ADDRESS: found.WORK_ADDRESS,
-          WORK_AREA_DESC: found.WORK_AREA_DESC,
-          PAY_AMOUNT: found.PAY_AMOUNT,
-          MEAL_COD: mealcd.CODE_NM,
-          WORKINGHOURS: found.WORKINGHOURS,
-          SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
-          SOCIAL_INSURANCE: socins.CODE_NM,
-          CLOSING_TYPE: clstyp.CODE_NM,
-          APPLY_METHOD: apytyp.CODE_NM,
-          APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
-          TEST_METHOD: testmt.CODE_NM,
-          TEST_METHOD_DTC: found.TEST_METHOD_DTC,
-          APPLY_DOCUMENT: doccd.CODE_NM,
-          CONTACT_NAME: found.CONTACT_NAME,
-          CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
-          CONTACT_PHONE: found.CONTACT_PHONE,
-          CONTACT_EMAIL: found.CONTACT_EMAIL,
-        },
-      });
+            TITLE: found.TITLE,
+            JOB_TYPE_DESC: found.JOB_TYPE_DESC,
+            REQUIRE_COUNT: found.REQUIRE_COUNT,
+            JOB_DESC: found.JOB_DESC,
+            DEUCATION: educd.CODE_NM,
+            CAREER: career.CODE_NM,
+            WORK_AREA: areacd.CODE_NM,
+            EMPLOYTYPE: empcd.CODE_NM,
+            EMPLOYTYPE_DET: empdet,
+            PAYCD: paycd.CODE_NM,
+            WORK_TIME_TYPE: timecd.CODE_NM,
+            ENDRECEPTION: found.ENDRECEPTION,
+            CAREER_PERIOD: found.CAREER_PERIOD,
+            WORK_ADDRESS: found.WORK_ADDRESS,
+            WORK_AREA_DESC: found.WORK_AREA_DESC,
+            PAY_AMOUNT: found.PAY_AMOUNT,
+            MEAL_COD: mealcd.CODE_NM,
+            WORKINGHOURS: found.WORKINGHOURS,
+            SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+            SOCIAL_INSURANCE: socins,
+            CLOSING_TYPE: clstyp.CODE_NM,
+            APPLY_METHOD: apytyp.CODE_NM,
+            APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
+            TEST_METHOD: testmt.CODE_NM,
+            TEST_METHOD_DTC: found.TEST_METHOD_DTC,
+            APPLY_DOCUMENT: doccd,
+            CONTACT_NAME: found.CONTACT_NAME,
+            CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
+            CONTACT_PHONE: found.CONTACT_PHONE,
+            CONTACT_EMAIL: found.CONTACT_EMAIL,
+          },
+        });
+      } else {
+        return Object.assign({
+          statusCode: 404,
+          message: '코드값 확인',
+        });
+      }
     } else {
       return Object.assign({
         statusCode: 400,
@@ -584,8 +581,8 @@ export class BoardsService {
       const [empcd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
       );
-      const [empdet] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE='${found.EMPLOYTYPE_DET}'`,
+      const empdet = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE IN(${found.EMPLOYTYPE_DET})`,
       );
       const [paycd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
@@ -599,65 +596,88 @@ export class BoardsService {
       const [apytyp] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
       );
-      const [doccd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE='${found.APPLY_DOCUMENT}'`,
+      const doccd = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
       );
       const [mealcd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
       );
-      const [socins] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE='${found.SOCIAL_INSURANCE}'`,
+      const socins = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
       );
       const [testmt] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
       );
-      return Object.assign({
-        statusCode: 200,
-        message: '채용공고 상세 조회 성공',
-        data: {
-          JOBID: found.JOBID,
 
-          CMPNY_NM: user.CMPNY_NM,
-          BIZRNO: user.BIZRNO,
-          CEO: user.CEO,
-          ADRES: user.ADRES,
-          DETAIL_ADRES: user.DETAIL_ADRES,
-          INDUTY: user.INDUTY,
-          NMBR_WRKRS: user.NMBR_WRKRS,
+      if (
+        educd &&
+        career &&
+        areacd &&
+        timecd &&
+        empcd &&
+        empdet &&
+        paycd &&
+        sevpay &&
+        clstyp &&
+        apytyp &&
+        doccd &&
+        mealcd &&
+        socins &&
+        testmt
+      ) {
+        return Object.assign({
+          statusCode: 200,
+          message: '채용공고 상세 조회 성공',
+          data: {
+            JOBID: found.JOBID,
 
-          TITLE: found.TITLE,
-          JOB_TYPE_DESC: found.JOB_TYPE_DESC,
-          REQUIRE_COUNT: found.REQUIRE_COUNT,
-          JOB_DESC: found.JOB_DESC,
-          DEUCATION: educd.CODE_NM,
-          CAREER: career.CODE_NM,
-          WORK_AREA: areacd.CODE_NM,
-          EMPLOYTYPE: empcd.CODE_NM,
-          EMPLOYTYPE_DET: empdet.CODE_NM,
-          PAYCD: paycd.CODE_NM,
-          WORK_TIME_TYPE: timecd.CODE_NM,
-          STARTRECEPTION: found.STARTRECEPTION,
-          ENDRECEPTION: found.ENDRECEPTION,
-          CAREER_PERIOD: found.CAREER_PERIOD,
-          WORK_ADDRESS: found.WORK_ADDRESS,
-          WORK_AREA_DESC: found.WORK_AREA_DESC,
-          PAY_AMOUNT: found.PAY_AMOUNT,
-          MEAL_COD: mealcd.CODE_NM,
-          WORKINGHOURS: found.WORKINGHOURS,
-          SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
-          SOCIAL_INSURANCE: socins.CODE_NM,
-          CLOSING_TYPE: clstyp.CODE_NM,
-          APPLY_METHOD: apytyp.CODE_NM,
-          APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
-          TEST_METHOD: testmt.CODE_NM,
-          TEST_METHOD_DTC: found.TEST_METHOD_DTC,
-          APPLY_DOCUMENT: doccd.CODE_NM,
-          CONTACT_NAME: found.CONTACT_NAME,
-          CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
-          CONTACT_PHONE: found.CONTACT_PHONE,
-          CONTACT_EMAIL: found.CONTACT_EMAIL,
-        },
-      });
+            CMPNY_NM: user.CMPNY_NM,
+            BIZRNO: user.BIZRNO,
+            CEO: user.CEO,
+            ADRES: user.ADRES,
+            DETAIL_ADRES: user.DETAIL_ADRES,
+            INDUTY: user.INDUTY,
+            NMBR_WRKRS: user.NMBR_WRKRS,
+
+            TITLE: found.TITLE,
+            JOB_TYPE_DESC: found.JOB_TYPE_DESC,
+            REQUIRE_COUNT: found.REQUIRE_COUNT,
+            JOB_DESC: found.JOB_DESC,
+            DEUCATION: educd.CODE_NM,
+            CAREER: career.CODE_NM,
+            WORK_AREA: areacd.CODE_NM,
+            EMPLOYTYPE: empcd.CODE_NM,
+            EMPLOYTYPE_DET: empdet,
+            PAYCD: paycd.CODE_NM,
+            WORK_TIME_TYPE: timecd.CODE_NM,
+            STARTRECEPTION: found.STARTRECEPTION,
+            ENDRECEPTION: found.ENDRECEPTION,
+            CAREER_PERIOD: found.CAREER_PERIOD,
+            WORK_ADDRESS: found.WORK_ADDRESS,
+            WORK_AREA_DESC: found.WORK_AREA_DESC,
+            PAY_AMOUNT: found.PAY_AMOUNT,
+            MEAL_COD: mealcd.CODE_NM,
+            WORKINGHOURS: found.WORKINGHOURS,
+            SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+            SOCIAL_INSURANCE: socins,
+            CLOSING_TYPE: clstyp.CODE_NM,
+            APPLY_METHOD: apytyp.CODE_NM,
+            APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
+            TEST_METHOD: testmt.CODE_NM,
+            TEST_METHOD_DTC: found.TEST_METHOD_DTC,
+            APPLY_DOCUMENT: doccd,
+            CONTACT_NAME: found.CONTACT_NAME,
+            CONTACT_DEPARTMENT: found.CONTACT_DEPARTMENT,
+            CONTACT_PHONE: found.CONTACT_PHONE,
+            CONTACT_EMAIL: found.CONTACT_EMAIL,
+          },
+        });
+      } else {
+        return Object.assign({
+          statusCode: 404,
+          message: '코드값 확인',
+        });
+      }
     } else {
       return Object.assign({
         statusCode: 400,

@@ -36,6 +36,10 @@ import {
   SelectJobEnterpriseOutputNotDto,
   UpdateJobEnterpriseOutputDto,
 } from './dtos/job-enterprise.dto';
+import {
+  GetUserBySearchInputDto,
+  SelectJobPublicOutputDto,
+} from './dtos/job-public.dto';
 
 @ApiTags('일자리 API')
 @Controller('job')
@@ -43,53 +47,46 @@ export class BoardsController {
   constructor(private boardsService: BoardsService) {}
 
   //공공 일자리 목록 조회
-  @Get('/public')
+  @Post('/public')
   @ApiOperation({
-    summary: '공공 일자리 목록 조회(12개) API(완료)',
+    summary: '공공 일자리 목록 조회(검색-12개) API(완료)*',
+  })
+  @ApiBody({
+    description: '검색 정보(없으면 공백값)',
+    type: GetUserBySearchInputDto,
   })
   @ApiQuery({
     name: 'page',
     example: '1',
-    description: '공공 일자리 목록',
+    description: '공공 일자리 페이지 넘버',
   })
   @ApiOkResponse({
     description: '페이지별 12개씩 공공일자리 목록',
-    // type: SelectJobPublicOutputDto,
+    type: SelectJobPublicOutputDto,
   })
   @ApiResponse({
     status: 400,
     description: '공공일자리 목록 조회 실패',
   })
-  async getPublicJob(@Query() query) {
-    return await this.boardsService.getPublicJob(query);
-  }
-
-  //공공 일자리 목록 조회(검색)
-  @Get('/public/search')
-  @ApiOperation({
-    summary: '공공 일자리 목록 조회(검색기능) API',
-  })
-  // @ApiQuery({
-  //   name: 'page',
-  //   example: '1',
-  //   description: '공공 일자리 목록',
-  // })
-  // @ApiOkResponse({
-  //   description: '페이지별 12개씩 공공일자리 목록',
-  //   // type: SelectJobPublicOutputDto,
-  // })
-  // @ApiResponse({
-  //   status: 400,
-  //   description: '공공일자리 목록 조회 실패',
-  // })
-  async getPublicSearchJob(@Query() query) {
-    // return await this.boardsService.getPublicJob(query);
+  async getPublicJob(
+    @Body()
+    getUserBySearchInputDto: GetUserBySearchInputDto,
+    @Query() query,
+  ) {
+    return await this.boardsService.getPublicJob(
+      getUserBySearchInputDto,
+      query,
+    );
   }
 
   //일반 일자리 목록 조회
-  @Get('/general')
+  @Post('/general')
   @ApiOperation({
-    summary: '일반 일자리 목록 조회(12개) API(완료)*',
+    summary: '일반 일자리 목록 조회(검색-12개) API(완료)*',
+  })
+  @ApiBody({
+    description: '검색 정보(없으면 공백값)',
+    type: GetUserBySearchInputDto,
   })
   @ApiQuery({
     name: 'page',
@@ -98,36 +95,21 @@ export class BoardsController {
   })
   @ApiOkResponse({
     description: '페이지별 12개씩 일반일자리 목록',
-    // type: SelectJobGeneralOutputDto,
+    type: SelectJobPublicOutputDto,
   })
   @ApiResponse({
     status: 400,
     description: '일반일자리 목록 조회 실패',
   })
-  async getGeneralJob(@Query() query) {
-    return await this.boardsService.getGeneralJob(query);
-  }
-
-  //일반 일자리 목록 조회(검색)
-  @Get('/general/search')
-  @ApiOperation({
-    summary: '일반 일자리 목록 조회(검색기능) API',
-  })
-  @ApiParam({
-    name: 'name',
-    example: '마포유치원',
-    description: '공고타이틀',
-  })
-  // @ApiOkResponse({
-  //   description: '페이지별 12개씩 일반일자리 목록',
-  //   // type: SelectJobGeneralOutputDto,
-  // })
-  // @ApiResponse({
-  //   status: 400,
-  //   description: '일반일자리 목록 조회 실패',
-  // })
-  async getGeneralSearchJob(@Query() query, @Param() param: { name: string }) {
-    return await this.boardsService.getGeneralSearchJob(query, param);
+  async getGeneralJob(
+    @Body()
+    getUserBySearchInputDto: GetUserBySearchInputDto,
+    @Query() query,
+  ) {
+    return await this.boardsService.getGeneralJob(
+      getUserBySearchInputDto,
+      query,
+    );
   }
 
   //일자리 상세 조회
@@ -137,6 +119,10 @@ export class BoardsController {
     name: 'jobid',
     example: '1',
     description: '일자리Id',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '코드값이 아닌경우',
   })
   @ApiOkResponse({
     description: '일자리 상세 페이지',
@@ -149,7 +135,7 @@ export class BoardsController {
   //기업 채용공고 등록 메뉴 조회
   @Get('/enterprise/register/all')
   @ApiOperation({
-    summary: '기업 채용공고 등록 메뉴 조회 API (ex 학력,경력)(완료)*',
+    summary: '기업 채용공고 등록 메뉴 조회 API(완료)*',
   })
   @ApiOkResponse({
     type: EnterpriseRegisterMenuDto,
@@ -269,6 +255,10 @@ export class BoardsController {
   @ApiResponse({
     status: 401,
     description: '인증 오류',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '코드값이 아닌경우',
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())

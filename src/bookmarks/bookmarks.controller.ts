@@ -50,7 +50,7 @@ export class BookmarksController {
 
   //북마크 목록 조회
   @Get()
-  @ApiOperation({ summary: '북마크 목록 조회 API(완료)*' })
+  @ApiOperation({ summary: '북마크 목록 조회 API(1차완료)*' })
   @ApiResponse({
     status: 200,
     description: '북마크 조회 성공',
@@ -71,7 +71,7 @@ export class BookmarksController {
 
   //북마크 삭제
   @Patch('/:bookid')
-  @ApiOperation({ summary: '북마크 삭제 API(완료)*' })
+  @ApiOperation({ summary: '북마크 취소 API(완료)*' })
   @ApiParam({
     name: 'bookid',
     example: '1',
