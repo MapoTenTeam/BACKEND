@@ -460,9 +460,10 @@ export class AuthController {
   }
 
   //기업 회원 프로필 이미지 등록 or 수정
-  @Patch('/enterprise/upload/profile/image')
+  @Post('/enterprise/upload/profile/image')
   @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API(완료)*' })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 201,
     description: '기업 회원 프로필 이미지 등록 성공',
     type: ProfileImageEnterpriseOutputDto,
   })
@@ -495,6 +496,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseProfileImage(@Req() req, @UploadedFiles() files: string) {
+    console.log('user', req.user);
+    console.log('files', files);
     return await this.authService.enterpriseProfileImage(req.user, files);
   }
 

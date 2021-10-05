@@ -113,7 +113,7 @@ export class ProfileEnterpriseDivisionOutputDto {
 //기업 회원 프로필 이미지 등록
 export class ProfileImageEnterpriseOutputDto {
   @ApiProperty({
-    example: '200',
+    example: '201',
     description: '상태코드',
   })
   statusCode: number;

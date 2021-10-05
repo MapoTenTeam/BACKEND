@@ -428,7 +428,7 @@ export class AuthService {
       `UPDATE COMTNENTRPRSMBER SET CMPNY_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
     return Object.assign({
-      statusCode: 200,
+      statusCode: 201,
       message: '기업 이미지 등록 성공',
     });
   }

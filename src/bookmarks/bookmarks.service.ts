@@ -36,7 +36,12 @@ export class BookmarksService {
 
     if (found) {
       const bookmark = await conn.query(
-        `SELECT BOOKID, JOBID FROM bookmark WHERE MBER_ID='${req.USER_ID}' AND BOOKMARK='Y'`,
+        `SELECT  A.BOOKID, A.JOBID, C.CMPNY_NM, C.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, D.CODE_NM AS CAREER , B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
+        FROM bookmark A 
+        INNER JOIN jobInformation B ON (A.JOBID = B.JOBID) 
+        INNER JOIN COMTNENTRPRSMBER C ON (B.ENTRPRS_MBER_ID = C.ENTRPRS_MBER_ID) 
+        INNER JOIN COMTCCMMNDETAILCODE D ON (B.CAREER = D.CODE)
+        WHERE MBER_ID='${req.USER_ID}' AND BOOKMARK='Y' AND CODE_ID='career'`,
       );
       return Object.assign({
         statusCode: 200,
