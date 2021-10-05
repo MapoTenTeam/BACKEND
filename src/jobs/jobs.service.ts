@@ -524,16 +524,9 @@ export class BoardsService {
 
     if (jobfound) {
       const found = await conn.query(
-        `SELECT JOBID,TITLE,CREATE_AT,REQUEST_DATE,COMENTS, 
-        CASE
-        WHEN JOB_STAT = 'REQ'
-        THEN '승인요청'
-        WHEN JOB_STAT = 'DENI'
-        THEN '승인거절'
-        WHEN JOB_STAT = 'APPRV'
-        THEN '승인완료'
-        ELSE '등록' END AS JOB_STAT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'
-        ORDER BY CREATE_AT ASC LIMIT 12 OFFSET ${pagecount}`,
+        `SELECT  B.JOBID, B.TITLE, B.CREATE_AT, B.REQUEST_DATE, B.COMENTS, A.CODE_NM AS JOB_STAT
+        FROM COMTCCMMNDETAILCODE A INNER JOIN jobInformation B ON (A.CODE = B.JOB_STAT)
+        WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y' ORDER BY CREATE_AT ASC LIMIT 12 OFFSET ${pagecount}`,
       );
       const [count] = await conn.query(
         `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,

@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { BoardsModule } from './jobs/jobs.module';
-// import { Board } from './jobs/jobs.entity';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { COMTNGNRLMBER } from './auth/entities/user-personal.entity';
 import { COMTNENTRPRSMBER } from './auth/entities/user-enterprise.entity';
