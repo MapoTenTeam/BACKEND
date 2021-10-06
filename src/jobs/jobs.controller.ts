@@ -9,19 +9,24 @@ import {
   Put,
   Query,
   Req,
+  Request,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { BoardsService } from './jobs.service';
 import { EnterpriseRegisterMenuDto } from './dtos/enterpriseRegisterMenu.dto';
@@ -40,6 +45,9 @@ import {
   GetUserBySearchInputDto,
   SelectJobPublicOutputDto,
 } from './dtos/job-public.dto';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/auth/multerOptions';
+import { ProfileImageEnterpriseOutputDto } from 'src/auth/dtos/enterpriseUser.dto';
 
 @ApiTags('일자리 API')
 @Controller('job')
@@ -147,8 +155,8 @@ export class BoardsController {
 
   //기업 채용공고 등록
   @Post('/enterprise/register')
-  @ApiBearerAuth()
   @ApiOperation({ summary: '기업 채용공고 등록 API(완료)*' })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: '채용공고 등록',
     type: JobEnterpriseRegisterInputDto,
@@ -160,7 +168,7 @@ export class BoardsController {
   })
   @ApiResponse({
     status: 400,
-    description: '기업구분 오류',
+    description: '지원하지 않는 이미지 형식',
   })
   @ApiResponse({
     status: 401,
@@ -170,16 +178,27 @@ export class BoardsController {
     status: 402,
     description: '사업자등록번호 승인 필요',
   })
+  @ApiResponse({
+    status: 404,
+    description: '기업구분 오류',
+  })
+  @ApiResponse({
+    status: 413,
+    description: '파일크기 제한',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
+  @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   async enterpriseRegisterJob(
     @Req() req,
+    @UploadedFiles() files: string,
     @Body(ValidationPipe)
     jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
   ) {
     return await this.boardsService.enterpriseRegisterJob(
       req.user,
       jobEnterpriseRegisterInputDto,
+      files,
     );
   }
 
@@ -274,6 +293,7 @@ export class BoardsController {
     example: '1',
     description: '일자리Id',
   })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: '채용공고 수정',
     type: JobEnterpriseRegisterInputDto,
@@ -284,16 +304,30 @@ export class BoardsController {
   })
   @ApiResponse({
     status: 400,
-    description: '채용공고 수정 실패',
+    description: '지원하지 않는 이미지 형식',
   })
   @ApiResponse({
     status: 401,
     description: '인증 오류',
   })
+  @ApiResponse({
+    status: 402,
+    description: '사업자등록번호 승인 필요',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '기업구분 오류',
+  })
+  @ApiResponse({
+    status: 413,
+    description: '파일크기 제한',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
+  @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   async enterpriseEditJob(
     @Req() req,
+    @UploadedFiles() files: string,
     @Param() param: { jobid: number },
     @Body(ValidationPipe)
     jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
@@ -302,6 +336,7 @@ export class BoardsController {
       req.user,
       param,
       jobEnterpriseRegisterInputDto,
+      files,
     );
   }
 

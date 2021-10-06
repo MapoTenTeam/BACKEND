@@ -9,7 +9,7 @@ export const multerOptions = {
   },
 
   fileFilter: (request, file, callback) => {
-    console.log('fileoriginal', file);
+    // console.log('fileoriginal', file);
     if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
       // 이미지 형식은 jpg, jpeg, png만 허용합니다.
       callback(null, true);

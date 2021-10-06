@@ -27,7 +27,8 @@ export class BookmarksService {
     }
   }
 
-  async enterpriseListJob(@Req() req) {
+  async enterpriseListJob(@Req() req, query) {
+    var pagecount = (query.page - 1) * 12;
     const conn = getConnection();
 
     const [found] = await conn.query(
@@ -36,16 +37,22 @@ export class BookmarksService {
 
     if (found) {
       const bookmark = await conn.query(
-        `SELECT  A.BOOKID, A.JOBID, C.CMPNY_NM, C.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, D.CODE_NM AS CAREER , B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
+        `SELECT  A.BOOKID, A.JOBID, C.CMPNY_NM, B.JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, D.CODE_NM AS CAREER , B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION
         FROM bookmark A 
         INNER JOIN jobInformation B ON (A.JOBID = B.JOBID) 
         INNER JOIN COMTNENTRPRSMBER C ON (B.ENTRPRS_MBER_ID = C.ENTRPRS_MBER_ID) 
         INNER JOIN COMTCCMMNDETAILCODE D ON (B.CAREER = D.CODE)
-        WHERE MBER_ID='${req.USER_ID}' AND BOOKMARK='Y' AND CODE_ID='career'`,
+        WHERE MBER_ID='${req.USER_ID}' AND BOOKMARK='Y' AND CODE_ID='career'
+        ORDER BY A.CREATE_AT DESC LIMIT 12 OFFSET ${pagecount}`,
+      );
+
+      const [count] = await conn.query(
+        `SELECT COUNT(BOOKID) AS COUNT FROM bookmark WHERE MBER_ID='${req.USER_ID}' AND BOOKMARK='Y'`,
       );
       return Object.assign({
         statusCode: 200,
         message: '북마크 조회 성공',
+        count: count.COUNT,
         data: bookmark,
       });
     } else {

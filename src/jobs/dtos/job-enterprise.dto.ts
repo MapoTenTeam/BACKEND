@@ -2,6 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class JobEnterpriseRegisterInputDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    name: 'file',
+    required: false,
+  })
+  JOB_IM: string;
+
   @ApiProperty({ example: '채용제목' })
   @IsNotEmpty()
   TITLE: string;

@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -51,6 +53,11 @@ export class BookmarksController {
   //북마크 목록 조회
   @Get()
   @ApiOperation({ summary: '북마크 목록 조회 API(완료)*' })
+  @ApiQuery({
+    name: 'page',
+    example: '1',
+    description: '북마크 페이지 넘버',
+  })
   @ApiResponse({
     status: 200,
     description: '북마크 조회 성공',
@@ -65,8 +72,8 @@ export class BookmarksController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
-  async enterpriseListJob(@Req() req) {
-    return await this.bookmarksService.enterpriseListJob(req.user);
+  async enterpriseListJob(@Req() req, @Query() query) {
+    return await this.bookmarksService.enterpriseListJob(req.user, query);
   }
 
   //북마크 삭제

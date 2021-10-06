@@ -1,4 +1,5 @@
 import { Injectable, Req } from '@nestjs/common';
+import { createImageURL } from 'src/auth/multerOptions';
 import { getConnection } from 'typeorm';
 import { JobEnterpriseRegisterInputDto } from './dtos/job-enterprise.dto';
 import { GetUserBySearchInputDto } from './dtos/job-public.dto';
@@ -13,7 +14,7 @@ export class BoardsService {
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     const page = await conn.query(
-      `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
+      `SELECT  B.JOBID, A.CMPNY_NM, B.JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
       FROM COMTNENTRPRSMBER A 
       INNER JOIN jobInformation B ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       INNER JOIN COMTCCMMNDETAILCODE C ON (B.CAREER = C.CODE)
@@ -39,13 +40,12 @@ export class BoardsService {
   async getGeneralJob(getUserBySearchInputDto: GetUserBySearchInputDto, query) {
     const { SEARCH_NAME } = getUserBySearchInputDto;
     var pagecount = (query.page - 1) * 12;
-    console.log(SEARCH_NAME);
     const conn = getConnection();
     const found = await conn.query(
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     const page = await conn.query(
-      `SELECT  B.JOBID, A.CMPNY_NM, A.CMPNY_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
+      `SELECT  B.JOBID, A.CMPNY_NM, B.JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
       FROM COMTNENTRPRSMBER A 
       INNER JOIN jobInformation B ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       INNER JOIN COMTCCMMNDETAILCODE C ON (B.CAREER = C.CODE)
@@ -153,6 +153,7 @@ export class BoardsService {
             INDUTY: user.INDUTY,
             NMBR_WRKRS: user.NMBR_WRKRS,
             CMPNY_IM: user.CMPNY_IM,
+            JOB_IM: found.JOB_IM,
 
             TITLE: found.TITLE,
             JOB_TYPE_DESC: found.JOB_TYPE_DESC,
@@ -299,7 +300,14 @@ export class BoardsService {
   async enterpriseRegisterJob(
     @Req() req,
     jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
+    files: string,
   ) {
+    const generatedFiles: string[] = [];
+
+    for (const file of files) {
+      generatedFiles.push(createImageURL(file));
+      // http://주소:포트번호/upload/파일이름 형식으로 저장이 됩니다.
+    }
     const {
       TITLE,
       JOB_TYPE_DESC,
@@ -332,7 +340,6 @@ export class BoardsService {
       CONTACT_PHONE,
       CONTACT_EMAIL,
     } = jobEnterpriseRegisterInputDto;
-
     const conn = getConnection();
     const [found] = await conn.query(
       `SELECT ENTRPRS_MBER_ID FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND BSNNM_APRVL_CODE='30'`,
@@ -349,15 +356,26 @@ export class BoardsService {
         JOB_TYPE = 'PUB';
       } else {
         return Object.assign({
-          statusCode: 400,
+          statusCode: 404,
           message: '기업구분 오류',
         });
       }
+      var imageUrl;
+      if (generatedFiles[0]) {
+        imageUrl = generatedFiles[0];
+      } else {
+        const [image] = await conn.query(
+          `SELECT URL FROM image WHERE NAME='JOB_IMAGE_URL'`,
+        );
+        imageUrl = image.URL;
+      }
+
       var sql =
-        'INSERT INTO jobInformation (ENTRPRS_MBER_ID,TITLE,JOB_TYPE_DESC,REQUIRE_COUNT,JOB_DESC,DEUCATION,CAREER,CAREER_PERIOD,WORK_AREA,WORK_ADDRESS,WORK_AREA_DESC,EMPLOYTYPE,EMPLOYTYPE_DET,PAYCD,PAY_AMOUNT,WORK_TIME_TYPE,MEAL_COD,WORKINGHOURS,SEVERANCE_PAY_TYPE,SOCIAL_INSURANCE,CLOSING_TYPE,ENDRECEPTION,APPLY_METHOD,APPLY_METHOD_ETC,TEST_METHOD,TEST_METHOD_DTC,APPLY_DOCUMENT,CONTACT_NAME,CONTACT_DEPARTMENT,CONTACT_PHONE,CONTACT_EMAIL,JOB_TYPE,CREATE_AT) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())';
+        'INSERT INTO jobInformation (ENTRPRS_MBER_ID,TITLE,JOB_IM,JOB_TYPE_DESC,REQUIRE_COUNT,JOB_DESC,DEUCATION,CAREER,CAREER_PERIOD,WORK_AREA,WORK_ADDRESS,WORK_AREA_DESC,EMPLOYTYPE,EMPLOYTYPE_DET,PAYCD,PAY_AMOUNT,WORK_TIME_TYPE,MEAL_COD,WORKINGHOURS,SEVERANCE_PAY_TYPE,SOCIAL_INSURANCE,CLOSING_TYPE,ENDRECEPTION,APPLY_METHOD,APPLY_METHOD_ETC,TEST_METHOD,TEST_METHOD_DTC,APPLY_DOCUMENT,CONTACT_NAME,CONTACT_DEPARTMENT,CONTACT_PHONE,CONTACT_EMAIL,JOB_TYPE,CREATE_AT) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())';
       var params = [
         found.ENTRPRS_MBER_ID,
         TITLE,
+        imageUrl,
         JOB_TYPE_DESC,
         REQUIRE_COUNT,
         JOB_DESC,
@@ -406,7 +424,14 @@ export class BoardsService {
     @Req() req,
     param: { jobid: number },
     jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
+    files: string,
   ) {
+    const generatedFiles: string[] = [];
+
+    for (const file of files) {
+      generatedFiles.push(createImageURL(file));
+      // http://주소:포트번호/upload/파일이름 형식으로 저장이 됩니다.
+    }
     const {
       TITLE,
       JOB_TYPE_DESC,
@@ -484,14 +509,24 @@ export class BoardsService {
         found.JOBID,
       ];
       await conn.query(sql, params);
-      return Object.assign({
-        statusCode: 200,
-        message: '채용공고 수정 성공',
-      });
+      if (generatedFiles[0]) {
+        await conn.query(
+          `UPDATE jobInformation SET JOB_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
+        );
+        return Object.assign({
+          statusCode: 200,
+          message: '채용공고 수정 성공',
+        });
+      } else {
+        return Object.assign({
+          statusCode: 400,
+          message: '채용공고 수정 실패',
+        });
+      }
     } else {
       return Object.assign({
-        statusCode: 400,
-        message: '채용공고 수정 실패',
+        statusCode: 404,
+        message: '일자리 정보 error',
       });
     }
   }
@@ -635,6 +670,8 @@ export class BoardsService {
             DETAIL_ADRES: user.DETAIL_ADRES,
             INDUTY: user.INDUTY,
             NMBR_WRKRS: user.NMBR_WRKRS,
+            CMPNY_IM: user.CMPNY_IM,
+            JOB_IM: found.JOB_IM,
 
             TITLE: found.TITLE,
             JOB_TYPE_DESC: found.JOB_TYPE_DESC,

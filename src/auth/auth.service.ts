@@ -141,12 +141,16 @@ export class AuthService {
           html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
         });
         const password = String(number);
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(password, salt);
 
         await conn.query(
-          `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
+          `UPDATE COMTNGNRLMBER SET PASSWORD='${password}' WHERE MBER_ID='${USER_ID}'`,
         );
+        // const salt = await bcrypt.genSalt();
+        // const hashedPassword = await bcrypt.hash(password, salt);
+
+        // await conn.query(
+        //   `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
+        // );
 
         return Object.assign({
           statusCode: 201,
@@ -260,9 +264,10 @@ export class AuthService {
 
     const conn = getConnection();
     const [user] = await conn.query(
-      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
+      `SELECT USER_ID, PASSWORD, USER_SE FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
     );
 
+    // if (user && bcrypt.compare(PASSWORD, user.PASSWORD)) {
     if (user && user.PASSWORD == PASSWORD) {
       //유저 토큰 생성(Secret + Payload)
       const payload = { USER_ID };
@@ -271,6 +276,7 @@ export class AuthService {
         statusCode: 201,
         message: '로그인 성공',
         accessToken: accessToken,
+        user_se: user.USER_SE,
       });
     } else {
       throw new UnauthorizedException('로그인 실패');
@@ -424,13 +430,21 @@ export class AuthService {
     }
 
     const conn = getConnection();
-    await conn.query(
-      `UPDATE COMTNENTRPRSMBER SET CMPNY_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
-    );
-    return Object.assign({
-      statusCode: 201,
-      message: '기업 이미지 등록 성공',
-    });
+
+    if (generatedFiles[0]) {
+      await conn.query(
+        `UPDATE COMTNENTRPRSMBER SET CMPNY_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      );
+      return Object.assign({
+        statusCode: 201,
+        message: '이미지 등록 성공',
+      });
+    } else {
+      return Object.assign({
+        statusCode: 404,
+        message: '이미지 등록 실패',
+      });
+    }
   }
 
   async getPasswordConfirm(

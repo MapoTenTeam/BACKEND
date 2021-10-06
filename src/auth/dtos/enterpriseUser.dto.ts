@@ -119,7 +119,7 @@ export class ProfileImageEnterpriseOutputDto {
   statusCode: number;
 
   @ApiProperty({
-    example: '기업회원 프로필 이미지 등록 성공',
+    example: '이미지 등록 성공',
     description: '설명',
   })
   message: string;

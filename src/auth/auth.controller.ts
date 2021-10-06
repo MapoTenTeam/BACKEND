@@ -290,7 +290,7 @@ export class AuthController {
 
   //개인 회원가입 API
   @Post('/personal/signup')
-  @ApiOperation({ summary: '개인 회원 가입 API(완료)*' })
+  @ApiOperation({ summary: '개인 회원 가입 API(수정예정)*' })
   @ApiBody({
     description: '유저 정보',
     type: AuthCredentialsPersonalDto,
@@ -317,7 +317,7 @@ export class AuthController {
 
   // 기업 회원가입 API
   @Post('/enterprise/signup')
-  @ApiOperation({ summary: '기업 회원 가입 API(완료)*' })
+  @ApiOperation({ summary: '기업 회원 가입 API(수정예정)*' })
   @ApiBody({ description: '유저 정보', type: AuthCredentialsEnterpriseDto })
   @ApiResponse({
     status: 201,
@@ -343,7 +343,7 @@ export class AuthController {
 
   // 로그인 API
   @Post('/signin')
-  @ApiOperation({ summary: '로그인 API(완료)*' })
+  @ApiOperation({ summary: '로그인 API(수정예정)*' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
   @ApiResponse({
     status: 201,
@@ -461,7 +461,7 @@ export class AuthController {
 
   //기업 회원 프로필 이미지 등록 or 수정
   @Post('/enterprise/upload/profile/image')
-  @ApiOperation({ summary: '기업 회원 프로필 이미지 등록 or 수정 API(완료)*' })
+  @ApiOperation({ summary: '기업 로고 이미지 등록 or 수정 API(완료)*' })
   @ApiResponse({
     status: 201,
     description: '기업 회원 프로필 이미지 등록 성공',
@@ -489,15 +489,17 @@ export class AuthController {
     description: '인증 오류',
   })
   @ApiResponse({
+    status: 404,
+    description: '이미지 등록 실패',
+  })
+  @ApiResponse({
     status: 413,
     description: '파일크기 제한',
   })
-  @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
+  @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   async enterpriseProfileImage(@Req() req, @UploadedFiles() files: string) {
-    console.log('user', req.user);
-    console.log('files', files);
     return await this.authService.enterpriseProfileImage(req.user, files);
   }
 
