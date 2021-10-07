@@ -8,6 +8,7 @@ import { COMTNGNRLMBER } from './auth/entities/user-personal.entity';
 import { COMTNENTRPRSMBER } from './auth/entities/user-enterprise.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { ManagerModule } from './manager/manager.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     AuthModule,
     BoardsModule,
     BookmarksModule,
+    ManagerModule,
   ],
 })
 export class AppModule {}

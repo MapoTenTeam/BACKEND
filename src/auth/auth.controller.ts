@@ -290,7 +290,7 @@ export class AuthController {
 
   //개인 회원가입 API
   @Post('/personal/signup')
-  @ApiOperation({ summary: '개인 회원 가입 API(수정예정)*' })
+  @ApiOperation({ summary: '개인 회원 가입 API(완료)*' })
   @ApiBody({
     description: '유저 정보',
     type: AuthCredentialsPersonalDto,
@@ -317,7 +317,7 @@ export class AuthController {
 
   // 기업 회원가입 API
   @Post('/enterprise/signup')
-  @ApiOperation({ summary: '기업 회원 가입 API(수정예정)*' })
+  @ApiOperation({ summary: '기업 회원 가입 API(완료)*' })
   @ApiBody({ description: '유저 정보', type: AuthCredentialsEnterpriseDto })
   @ApiResponse({
     status: 201,
@@ -343,7 +343,7 @@ export class AuthController {
 
   // 로그인 API
   @Post('/signin')
-  @ApiOperation({ summary: '로그인 API(수정예정)*' })
+  @ApiOperation({ summary: '로그인 API(완료)*' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
   @ApiResponse({
     status: 201,
@@ -358,6 +358,24 @@ export class AuthController {
     @Body(ValidationPipe) loginInputDto: LoginInputDto,
   ): Promise<{ accessToken: string }> {
     return await this.authService.signIn(loginInputDto);
+  }
+
+  @Post('/signin/test')
+  @ApiOperation({ summary: '로그인(예전꺼) API(완료)*' })
+  @ApiBody({ description: '유저 정보', type: LoginInputDto })
+  @ApiResponse({
+    status: 201,
+    description: '로그인 성공',
+    type: LoginOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인 실패',
+  })
+  async siginInApp(
+    @Body(ValidationPipe) loginInputDto: LoginInputDto,
+  ): Promise<{ accessToken: string }> {
+    return await this.authService.siginInApp(loginInputDto);
   }
 
   //개인 회원 프로필 조회

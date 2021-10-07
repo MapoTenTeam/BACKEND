@@ -87,6 +87,10 @@ export class AuthCredentialsEnterpriseDto {
   @ApiProperty({ description: '이용약관 체크여부' })
   @IsNotEmpty()
   TERMS: boolean;
+
+  @ApiProperty({ description: '사업자등록번호 확인 여부' })
+  @IsNotEmpty()
+  BIZRNOAVAILABLE: boolean;
 }
 
 //로그인 InputDto

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, MaxLength } from 'class-validator';
 
 export class JobEnterpriseRegisterInputDto {
   @ApiProperty({
@@ -71,10 +71,12 @@ export class JobEnterpriseRegisterInputDto {
 
   @ApiProperty({ example: '식사제공(코드값)' })
   @IsNotEmpty()
+  @MaxLength(5)
   MEAL_COD: string;
 
   @ApiProperty({ example: '1주당근로시간' })
   @IsNotEmpty()
+  @MaxLength(5)
   WORKINGHOURS: string;
 
   @ApiProperty({ example: '퇴직금형태(코드값)' })
@@ -337,6 +339,12 @@ export class JobEnterpriseRegisterOutputDto {
     description: '설명',
   })
   message: string;
+
+  @ApiProperty({
+    example: '1',
+    description: '설명',
+  })
+  jobid: number;
 }
 
 export class JobEnterpriseJudgeOutputDto {

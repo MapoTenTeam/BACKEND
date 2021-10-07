@@ -408,9 +408,13 @@ export class BoardsService {
         JOB_TYPE,
       ];
       await conn.query(sql, params);
+      const [jobid] = await conn.query(
+        `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' ORDER BY CREATE_AT DESC LIMIT 1`,
+      );
       return Object.assign({
         statusCode: 201,
         message: '채용공고 등록 성공',
+        jobid: jobid.JOBID,
       });
     } else {
       return Object.assign({

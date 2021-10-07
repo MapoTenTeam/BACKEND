@@ -142,15 +142,15 @@ export class AuthService {
         });
         const password = String(number);
 
-        await conn.query(
-          `UPDATE COMTNGNRLMBER SET PASSWORD='${password}' WHERE MBER_ID='${USER_ID}'`,
-        );
-        // const salt = await bcrypt.genSalt();
-        // const hashedPassword = await bcrypt.hash(password, salt);
-
         // await conn.query(
-        //   `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
+        //   `UPDATE COMTNGNRLMBER SET PASSWORD='${password}' WHERE MBER_ID='${USER_ID}'`,
         // );
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await conn.query(
+          `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
+        );
 
         return Object.assign({
           statusCode: 201,
@@ -267,11 +267,40 @@ export class AuthService {
       `SELECT USER_ID, PASSWORD, USER_SE FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
     );
 
-    // if (user && bcrypt.compare(PASSWORD, user.PASSWORD)) {
+    if (user && (await bcrypt.compare(PASSWORD, user.PASSWORD))) {
+      // if (user && user.PASSWORD == PASSWORD) {
+      //유저 토큰 생성(Secret + Payload)
+      const payload = { USER_ID };
+      const accessToken = await this.jwtService.sign(payload);
+      console.log('로그인 성공');
+      return Object.assign({
+        statusCode: 201,
+        message: '로그인 성공',
+        accessToken: accessToken,
+        user_se: user.USER_SE,
+      });
+    } else {
+      throw new UnauthorizedException('로그인 실패');
+    }
+  }
+
+  async siginInApp(loginInputDto: LoginInputDto): Promise<{
+    statusCode: number;
+    message: string;
+    accessToken: string;
+  }> {
+    const { USER_ID, PASSWORD } = loginInputDto;
+
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT USER_ID, PASSWORD, USER_SE FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
+    );
+
     if (user && user.PASSWORD == PASSWORD) {
       //유저 토큰 생성(Secret + Payload)
       const payload = { USER_ID };
       const accessToken = await this.jwtService.sign(payload);
+      console.log('로그인 성공');
       return Object.assign({
         statusCode: 201,
         message: '로그인 성공',
@@ -360,7 +389,7 @@ export class AuthService {
   async enterpriseBusinessApproval(@Req() req) {
     const conn = getConnection();
     await conn.query(
-      `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL_CODE='20' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL_CODE='20', REQUEST_DATE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
     return Object.assign({
@@ -454,19 +483,35 @@ export class AuthService {
     const { PASSWORD } = passwordConfirmInputDto;
 
     const conn = getConnection();
+
     const [found] = await conn.query(
-      `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${req.USER_ID}' AND PASSWORD='${PASSWORD}'`,
+      `SELECT USER_ID, PASSWORD FROM COMVNUSERMASTER WHERE USER_ID='${req.USER_ID}'`,
     );
 
-    return found
-      ? Object.assign({
-          statusCode: 201,
-          message: '유저 비밀번호 조회 성공',
-        })
-      : Object.assign({
-          statusCode: 400,
-          message: '유저 비밀번호 조회 실패',
-        });
+    if (found && (await bcrypt.compare(PASSWORD, found.PASSWORD))) {
+      return Object.assign({
+        statusCode: 201,
+        message: '유저 비밀번호 조회 성공',
+      });
+    } else {
+      return Object.assign({
+        statusCode: 400,
+        message: '유저 비밀번호 조회 실패',
+      });
+    }
+    // const [found] = await conn.query(
+    //   `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${req.USER_ID}' AND PASSWORD='${PASSWORD}'`,
+    // );
+
+    // return found
+    //   ? Object.assign({
+    //       statusCode: 201,
+    //       message: '유저 비밀번호 조회 성공',
+    //     })
+    //   : Object.assign({
+    //       statusCode: 400,
+    //       message: '유저 비밀번호 조회 실패',
+    //     });
   }
 
   async personalPasswordChange(
@@ -475,6 +520,11 @@ export class AuthService {
   ) {
     const { PASSWORD } = passwordChangeInputDto;
 
+    console.log('PASSWORD', PASSWORD);
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(PASSWORD, salt);
+    console.log('hashedPassword', hashedPassword);
+
     const conn = getConnection();
     const [found] = await conn.query(
       `SELECT MBER_ID FROM COMTNGNRLMBER WHERE MBER_ID='${req.USER_ID}'`,
@@ -482,8 +532,11 @@ export class AuthService {
 
     if (found) {
       await conn.query(
-        `UPDATE COMTNGNRLMBER SET PASSWORD='${PASSWORD}' WHERE MBER_ID='${req.USER_ID}'`,
+        `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${req.USER_ID}'`,
       );
+      // await conn.query(
+      //   `UPDATE COMTNGNRLMBER SET PASSWORD='${PASSWORD}' WHERE MBER_ID='${req.USER_ID}'`,
+      // );
       return Object.assign({
         statusCode: 200,
         message: '비밀 번호 변경 성공',
@@ -501,6 +554,11 @@ export class AuthService {
   ) {
     const { PASSWORD } = passwordChangeInputDto;
 
+    console.log('PASSWORD', PASSWORD);
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(PASSWORD, salt);
+    console.log('hashedPassword', hashedPassword);
+
     const conn = getConnection();
     const [found] = await conn.query(
       `SELECT ENTRPRS_MBER_ID FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
@@ -508,8 +566,11 @@ export class AuthService {
 
     if (found) {
       await conn.query(
-        `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${PASSWORD}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+        `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${hashedPassword}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
       );
+      // await conn.query(
+      //   `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${PASSWORD}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      // );
       return Object.assign({
         statusCode: 200,
         message: '비밀 번호 변경 성공',
