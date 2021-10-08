@@ -68,6 +68,7 @@ import {
   PasswordConfirmInputDto,
   PasswordConfirmOutputFailDto,
   PasswordConfirmOutputSuccessDto,
+  PasswordInputDto,
   TermsOutputDto,
 } from './dtos/auth-credential.dto';
 import {
@@ -360,6 +361,7 @@ export class AuthController {
     return await this.authService.signIn(loginInputDto);
   }
 
+  // 로그인 API(예전꺼)
   @Post('/signin/test')
   @ApiOperation({ summary: '로그인(예전꺼) API(완료)*' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
@@ -376,6 +378,36 @@ export class AuthController {
     @Body(ValidationPipe) loginInputDto: LoginInputDto,
   ): Promise<{ accessToken: string }> {
     return await this.authService.siginInApp(loginInputDto);
+  }
+
+  // 비밀번호 1차 암호화(스웨거용)
+  @Post('/password/first')
+  @ApiOperation({ summary: '비밀번호 1차 암호화(스웨거용)*' })
+  @ApiBody({ description: '평문 비밀번호 입력', type: PasswordInputDto })
+  async passwordFirst(@Body() passwordInputDto: PasswordInputDto) {
+    return await this.authService.passwordFirst(passwordInputDto);
+  }
+
+  // 비밀번호 2차 암호화(스웨거용)
+  @Post('/password/second')
+  @ApiOperation({ summary: '비밀번호 2차 암호화(스웨거용)*' })
+  @ApiBody({
+    description: '1차 암호화된 비밀번호 입력',
+    type: PasswordInputDto,
+  })
+  async passwordSecond(@Body() passwordInputDto: PasswordInputDto) {
+    return await this.authService.passwordSecond(passwordInputDto);
+  }
+
+  // 비밀번호 1,2차 통합 암호화(스웨거용)
+  @Post('/password/integrat')
+  @ApiOperation({ summary: '비밀번호 1,2차 통합 암호화(스웨거용)*' })
+  @ApiBody({
+    description: '평문 비밀번호 입력',
+    type: PasswordInputDto,
+  })
+  async passwordIntegrat(@Body() passwordInputDto: PasswordInputDto) {
+    return await this.authService.passwordIntegrat(passwordInputDto);
   }
 
   //개인 회원 프로필 조회

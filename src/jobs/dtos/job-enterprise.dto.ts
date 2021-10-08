@@ -91,7 +91,7 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   CLOSING_TYPE: string;
 
-  @ApiProperty({ example: '접수마감일' })
+  @ApiProperty({ example: '접수마감일', required: false })
   ENDRECEPTION: string;
 
   @ApiProperty({ example: '접수방법(코드값)' })
@@ -99,7 +99,6 @@ export class JobEnterpriseRegisterInputDto {
   APPLY_METHOD: string;
 
   @ApiProperty({ example: '접수방법 상세' })
-  @IsNotEmpty()
   APPLY_METHOD_ETC: string;
 
   @ApiProperty({ example: '전형방법(코드값)' })
@@ -107,7 +106,6 @@ export class JobEnterpriseRegisterInputDto {
   TEST_METHOD: string;
 
   @ApiProperty({ example: '전형방법 상세' })
-  @IsNotEmpty()
   TEST_METHOD_DTC: string;
 
   @ApiProperty({ example: '제출서류(코드값)' })
@@ -192,11 +190,11 @@ export class JobDetailOutputDto {
   SOCIAL_INSURANCE: string;
   @ApiProperty({ example: '접수마감일구분' })
   CLOSING_TYPE: string;
-  @ApiProperty({ example: '접수방법' })
+  @ApiProperty({ example: ['접수방법'] })
   APPLY_METHOD: string;
   @ApiProperty({ example: '접수방법 상세' })
   APPLY_METHOD_ETC: string;
-  @ApiProperty({ example: '전형방법' })
+  @ApiProperty({ example: ['전형방법'] })
   TEST_METHOD: string;
   @ApiProperty({ example: '전형방법 상세' })
   TEST_METHOD_DTC: string;
@@ -246,6 +244,10 @@ export class JobEnterpriseDetailOutputDto {
   INDUTY: string;
   @ApiProperty({ example: '사원수' })
   NMBR_WRKRS: string;
+  @ApiProperty({ example: '로고이미지' })
+  CMPNY_IM: string;
+  @ApiProperty({ example: '일자리이미지' })
+  JOB_IM: string;
   @ApiProperty({ example: '채용제목' })
   TITLE: string;
   @ApiProperty({ example: '모집직종' })
@@ -290,11 +292,11 @@ export class JobEnterpriseDetailOutputDto {
   STARTRECEPTION: string;
   @ApiProperty({ example: '접수마감일' })
   ENDRECEPTION: string;
-  @ApiProperty({ example: '접수방법' })
+  @ApiProperty({ example: ['접수방법'] })
   APPLY_METHOD: string;
   @ApiProperty({ example: '접수방법 상세' })
   APPLY_METHOD_ETC: string;
-  @ApiProperty({ example: '전형방법' })
+  @ApiProperty({ example: ['전형방법'] })
   TEST_METHOD: string;
   @ApiProperty({ example: '전형방법 상세' })
   TEST_METHOD_DTC: string;

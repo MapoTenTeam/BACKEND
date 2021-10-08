@@ -135,6 +135,14 @@ export class LoginOutputDto {
   accessToken: string;
 }
 
+//비밀번호 암호화
+export class PasswordInputDto {
+  @ApiProperty({ example: '비밀번호' })
+  @IsString()
+  @IsNotEmpty()
+  PASSWORD: string;
+}
+
 //이용약관 조회 성공했을때
 export class TermsOutputDto {
   @ApiProperty({

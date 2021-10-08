@@ -107,8 +107,8 @@ export class BoardsService {
       const [clstyp] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
       );
-      const [apytyp] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
+      const apytyp = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE IN(${found.APPLY_METHOD})`,
       );
       const doccd = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
@@ -119,8 +119,8 @@ export class BoardsService {
       const socins = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
       );
-      const [testmt] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
+      const testmt = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE IN(${found.TEST_METHOD})`,
       );
 
       if (
@@ -176,9 +176,9 @@ export class BoardsService {
             SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
             SOCIAL_INSURANCE: socins,
             CLOSING_TYPE: clstyp.CODE_NM,
-            APPLY_METHOD: apytyp.CODE_NM,
+            APPLY_METHOD: apytyp,
             APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
-            TEST_METHOD: testmt.CODE_NM,
+            TEST_METHOD: testmt,
             TEST_METHOD_DTC: found.TEST_METHOD_DTC,
             APPLY_DOCUMENT: doccd,
             CONTACT_NAME: found.CONTACT_NAME,
@@ -629,8 +629,8 @@ export class BoardsService {
       const [clstyp] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
       );
-      const [apytyp] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE='${found.APPLY_METHOD}'`,
+      const apytyp = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE IN(${found.APPLY_METHOD})`,
       );
       const doccd = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
@@ -641,10 +641,9 @@ export class BoardsService {
       const socins = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
       );
-      const [testmt] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE='${found.TEST_METHOD}'`,
+      const testmt = await conn.query(
+        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE IN(${found.TEST_METHOD})`,
       );
-
       if (
         educd &&
         career &&
@@ -699,9 +698,9 @@ export class BoardsService {
             SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
             SOCIAL_INSURANCE: socins,
             CLOSING_TYPE: clstyp.CODE_NM,
-            APPLY_METHOD: apytyp.CODE_NM,
+            APPLY_METHOD: apytyp,
             APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
-            TEST_METHOD: testmt.CODE_NM,
+            TEST_METHOD: testmt,
             TEST_METHOD_DTC: found.TEST_METHOD_DTC,
             APPLY_DOCUMENT: doccd,
             CONTACT_NAME: found.CONTACT_NAME,

@@ -13,6 +13,7 @@ import {
   LoginInputDto,
   PasswordChangeInputDto,
   PasswordConfirmInputDto,
+  PasswordInputDto,
 } from './dtos/auth-credential.dto';
 import { UserPersonalRepository } from './repository/user-personal-repository';
 import { UserEnterpriseRepository } from './repository/user-enterprise-repository';
@@ -23,6 +24,8 @@ import { GetUserByPasswordFindInputDto } from './dtos/response/getUserByPassword
 import { ProfilePersonalInputDto } from './dtos/personalUser.dto';
 import { ProfileEnterpriseInputDto } from './dtos/enterpriseUser.dto';
 import { createImageURL } from './multerOptions';
+import * as crypto from 'crypto';
+import * as pbkdf2 from 'pbkdf2-sha256';
 
 @Injectable()
 export class AuthService {
@@ -141,13 +144,16 @@ export class AuthService {
           html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
         });
         const password = String(number);
-
-        // await conn.query(
-        //   `UPDATE COMTNGNRLMBER SET PASSWORD='${password}' WHERE MBER_ID='${USER_ID}'`,
-        // );
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(password, salt);
-
+        const cryptoSalt = process.env.CRYPTOSALT;
+        const cryptoPassword = await pbkdf2(
+          password,
+          cryptoSalt,
+          parseInt(process.env.REPEAT_NUMBER),
+          parseInt(process.env.LENGTH),
+        );
+        const hashed = await cryptoPassword.toString(process.env.HASHED);
+        const bcryptSalt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(hashed, bcryptSalt);
         await conn.query(
           `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
         );
@@ -156,7 +162,12 @@ export class AuthService {
           statusCode: 201,
           message: '임시 비밀번호 생성 성공',
         });
-      } catch (err) {}
+      } catch (err) {
+        return Object.assign({
+          statusCode: 404,
+          message: '임시 비밀번호 생성 실패',
+        });
+      }
     } else {
       return Object.assign({
         statusCode: 400,
@@ -187,8 +198,16 @@ export class AuthService {
           html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
         });
         const password = String(number);
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const cryptoSalt = process.env.CRYPTOSALT;
+        const cryptoPassword = await pbkdf2(
+          password,
+          cryptoSalt,
+          parseInt(process.env.REPEAT_NUMBER),
+          parseInt(process.env.LENGTH),
+        );
+        const hashed = await cryptoPassword.toString(process.env.HASHED);
+        const bcryptSalt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(hashed, bcryptSalt);
 
         await conn.query(
           `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${hashedPassword}' WHERE ENTRPRS_MBER_ID='${USER_ID}'`,
@@ -310,6 +329,53 @@ export class AuthService {
     } else {
       throw new UnauthorizedException('로그인 실패');
     }
+  }
+
+  async passwordFirst(passwordInputDto: PasswordInputDto) {
+    const { PASSWORD } = passwordInputDto;
+
+    const cryptoSalt = process.env.CRYPTOSALT;
+    const cryptoPassword = await pbkdf2(
+      PASSWORD,
+      cryptoSalt,
+      parseInt(process.env.REPEAT_NUMBER),
+      parseInt(process.env.LENGTH),
+    );
+    const hashed = await cryptoPassword.toString(process.env.HASHED);
+
+    return {
+      password: hashed,
+    };
+  }
+
+  async passwordSecond(passwordInputDto: PasswordInputDto) {
+    const { PASSWORD } = passwordInputDto;
+
+    const bcryptSalt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(PASSWORD, bcryptSalt);
+
+    return {
+      password: hashedPassword,
+    };
+  }
+
+  async passwordIntegrat(passwordInputDto: PasswordInputDto) {
+    const { PASSWORD } = passwordInputDto;
+
+    const cryptoSalt = process.env.CRYPTOSALT;
+    const cryptoPassword = await pbkdf2(
+      PASSWORD,
+      cryptoSalt,
+      parseInt(process.env.REPEAT_NUMBER),
+      parseInt(process.env.LENGTH),
+    );
+    const hashed = await cryptoPassword.toString(process.env.HASHED);
+    const bcryptSalt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(hashed, bcryptSalt);
+
+    return {
+      password: hashedPassword,
+    };
   }
 
   async deletePersonalUser(@Req() req) {
