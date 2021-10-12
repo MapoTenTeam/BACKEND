@@ -175,9 +175,9 @@ export class AuthController {
     return await this.authService.getUserByIdFind(getUserByIdFindInputDto);
   }
 
-  //개인회원 패스워드 찾기(임시비밀번호 생성)
+  //회원 패스워드 찾기(임시비밀번호 생성)
   @ApiOperation({
-    summary: '개인회원 패스워드 찾기(임시비밀번호 생성) API(완료)*',
+    summary: '회원 패스워드 찾기(임시비밀번호 생성) API(완료)*',
   })
   @ApiBody({
     description: '유저 정보',
@@ -191,38 +191,12 @@ export class AuthController {
     status: 400,
     description: '회원정보가 없습니다.',
   })
-  @Post('/find/personal/password')
-  async getpersonalByPasswordFind(
+  @Post('/find/password')
+  async getByPasswordFind(
     @Body(ValidationPipe)
     getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
   ) {
-    return await this.authService.getpersonalByPasswordFind(
-      getUserByPasswordFindInputDto,
-    );
-  }
-
-  //기업회원 패스워드 찾기(임시비밀번호 생성)
-  @ApiOperation({
-    summary: '기업회원 패스워드 찾기(임시비밀번호 생성) API(완료)*',
-  })
-  @ApiBody({
-    description: '유저 정보',
-    type: GetUserByPasswordFindInputDto,
-  })
-  @ApiOkResponse({
-    description: '임시 비밀번호 생성 성공',
-    type: GetUserByPasswordFindOutputDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: '회원정보가 없습니다.',
-  })
-  @Post('/find/enterprise/password')
-  async getenterpriseByPasswordFind(
-    @Body(ValidationPipe)
-    getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
-  ) {
-    return await this.authService.getenterpriseByPasswordFind(
+    return await this.authService.getByPasswordFind(
       getUserByPasswordFindInputDto,
     );
   }
@@ -363,7 +337,7 @@ export class AuthController {
 
   // 로그인 API(예전꺼)
   @Post('/signin/test')
-  @ApiOperation({ summary: '로그인(예전꺼) API(완료)*' })
+  @ApiOperation({ summary: '로그인(예전꺼) API(삭제예정)*' })
   @ApiBody({ description: '유저 정보', type: LoginInputDto })
   @ApiResponse({
     status: 201,
@@ -410,12 +384,35 @@ export class AuthController {
     return await this.authService.passwordIntegrat(passwordInputDto);
   }
 
+  // 로그인 API(스웨거용)
+  @Post('/signin/swagger')
+  @ApiOperation({ summary: '로그인 API(스웨거용)*' })
+  @ApiBody({ description: '유저 정보(평문 비밀번호)', type: LoginInputDto })
+  @ApiResponse({
+    status: 201,
+    description: '로그인 성공',
+    type: LoginOutputDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인 실패',
+  })
+  async siginInSwagger(
+    @Body(ValidationPipe) loginInputDto: LoginInputDto,
+  ): Promise<{ accessToken: string }> {
+    return await this.authService.siginInSwagger(loginInputDto);
+  }
+
   //개인 회원 프로필 조회
   @Get('/personal/profile')
   @ApiOperation({ summary: '개인 회원 프로필 조회 API(완료)*' })
   @ApiOkResponse({
     description: '개인 회원 프로필 조회 성공',
     type: SelectProfilePersonalOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '개인 회원 프로필 조회 실패',
   })
   @ApiResponse({
     status: 401,
@@ -433,6 +430,10 @@ export class AuthController {
   @ApiOkResponse({
     description: '기업 회원 프로필 조회 성공',
     type: SelectProfileEnterpriseOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '기업 회원 프로필 조회 실패',
   })
   @ApiResponse({
     status: 401,

@@ -158,10 +158,15 @@ export class ProfileDetailEnterpriseOutputDto {
   @ApiProperty({ description: '프로필 등록여부' })
   PROFILE_STTUS: boolean;
   @ApiProperty({
-    example: '승인 요청 필요',
-    description: '사업자 승인 요청여부',
+    example: '10',
+    description: '사업자 승인 요청 코드값',
   })
-  BSNNM_APRVL: string;
+  BSNNM_APRVL_CODE: string;
+  @ApiProperty({
+    example: '승인 요청 필요',
+    description: '사업자 승인 요청 이름',
+  })
+  BSNNM_APRVL_NAME: string;
 }
 
 //기업 회원 프로필 조회

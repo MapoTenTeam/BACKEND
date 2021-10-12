@@ -61,6 +61,22 @@ export class ManagerController {
     return await this.managerService.updateBizrnoApproval(req.user, param);
   }
 
+  //사업자 승인 거절
+  @Patch('/bizrno/approval/refuse/:userid')
+  @ApiOperation({
+    summary: '사업자 승인 거절(1차완료)',
+  })
+  @ApiParam({
+    name: 'userid',
+    example: 'hee123',
+    description: '유저Id',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async updateBizrnoRefuse(@Req() req, @Param() param: { userid: string }) {
+    return await this.managerService.updateBizrnoRefuse(req.user, param);
+  }
+
   //채용공고 승인 신청자 조회
   @Get('/job/approval')
   @ApiOperation({
@@ -94,6 +110,28 @@ export class ManagerController {
     updateBizrnoApprovalInputDto: UpdateBizrnoApprovalInputDto,
   ) {
     return await this.managerService.updateJobApproval(
+      req.user,
+      updateBizrnoApprovalInputDto,
+    );
+  }
+
+  //채용공고 승인 거절
+  @Patch('/job/approval/refuse/:userid')
+  @ApiOperation({
+    summary: '채용공고 승인 거절(1차완료)',
+  })
+  @ApiBody({
+    description: '코멘트 정보',
+    type: UpdateBizrnoApprovalInputDto,
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
+  async updateJobRefuse(
+    @Req() req,
+    @Body(ValidationPipe)
+    updateBizrnoApprovalInputDto: UpdateBizrnoApprovalInputDto,
+  ) {
+    return await this.managerService.updateJobRefuse(
       req.user,
       updateBizrnoApprovalInputDto,
     );

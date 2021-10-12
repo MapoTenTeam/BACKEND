@@ -14,7 +14,11 @@ export class BoardsService {
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     const page = await conn.query(
-      `SELECT  B.JOBID, A.CMPNY_NM, B.JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
+      `SELECT  B.JOBID, A.CMPNY_NM, 
+      IFNULL(B.JOB_IM,'') AS JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, 
+      IFNULL(B.STARTRECEPTION,'') AS STARTRECEPTION,  
+      IFNULL(B.ENDRECEPTION, '') AS ENDRECEPTION, 
+      IFNULL(B.APPROVAL_DATE,'') AS APPROVAL_DATE
       FROM COMTNENTRPRSMBER A 
       INNER JOIN jobInformation B ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       INNER JOIN COMTCCMMNDETAILCODE C ON (B.CAREER = C.CODE)
@@ -45,7 +49,11 @@ export class BoardsService {
       `SELECT JOBID FROM jobInformation WHERE JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
     const page = await conn.query(
-      `SELECT  B.JOBID, A.CMPNY_NM, B.JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, B.STARTRECEPTION, B.ENDRECEPTION, B.APPROVAL_DATE
+      `SELECT  B.JOBID, A.CMPNY_NM, 
+      IFNULL(B.JOB_IM,'') AS JOB_IM, B.TITLE, B.JOB_TYPE_DESC, B.WORK_ADDRESS, C.CODE_NM AS CAREER, B.JOB_DESC, 
+      IFNULL(B.STARTRECEPTION,'') AS STARTRECEPTION,  
+      IFNULL(B.ENDRECEPTION, '') AS ENDRECEPTION, 
+      IFNULL(B.APPROVAL_DATE,'') AS APPROVAL_DATE
       FROM COMTNENTRPRSMBER A 
       INNER JOIN jobInformation B ON (A.ENTRPRS_MBER_ID = B.ENTRPRS_MBER_ID)
       INNER JOIN COMTCCMMNDETAILCODE C ON (B.CAREER = C.CODE)
@@ -74,10 +82,17 @@ export class BoardsService {
     const [found] = await conn.query(
       `SELECT * FROM jobInformation WHERE JOBID='${param.jobid}' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
+    const [job_im] = await conn.query(
+      `SELECT IFNULL(JOB_IM, '') AS JOB_IM FROM jobInformation WHERE JOBID='${param.jobid}' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
+    const [endreception] = await conn.query(
+      `SELECT IFNULL(ENDRECEPTION, '') AS ENDRECEPTION FROM jobInformation WHERE JOBID='${param.jobid}' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
+    );
 
     if (found) {
       const [user] = await conn.query(
-        `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${found.ENTRPRS_MBER_ID}' AND ENTRPRS_MBER_STTUS='P'`,
+        `SELECT CMPNY_NM, BIZRNO, CEO, ADRES, DETAIL_ADRES, INDUTY, NMBR_WRKRS,
+        IFNULL(CMPNY_IM, '') AS CMPNY_IM FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${found.ENTRPRS_MBER_ID}' AND ENTRPRS_MBER_STTUS='P'`,
       );
 
       const [educd] = await conn.query(
@@ -153,7 +168,7 @@ export class BoardsService {
             INDUTY: user.INDUTY,
             NMBR_WRKRS: user.NMBR_WRKRS,
             CMPNY_IM: user.CMPNY_IM,
-            JOB_IM: found.JOB_IM,
+            JOB_IM: job_im.JOB_IM,
 
             TITLE: found.TITLE,
             JOB_TYPE_DESC: found.JOB_TYPE_DESC,
@@ -166,7 +181,7 @@ export class BoardsService {
             EMPLOYTYPE_DET: empdet,
             PAYCD: paycd.CODE_NM,
             WORK_TIME_TYPE: timecd.CODE_NM,
-            ENDRECEPTION: found.ENDRECEPTION,
+            ENDRECEPTION: endreception.ENDRECEPTION,
             CAREER_PERIOD: found.CAREER_PERIOD,
             WORK_ADDRESS: found.WORK_ADDRESS,
             WORK_AREA_DESC: found.WORK_AREA_DESC,
@@ -308,7 +323,7 @@ export class BoardsService {
       generatedFiles.push(createImageURL(file));
       // http://주소:포트번호/upload/파일이름 형식으로 저장이 됩니다.
     }
-    const {
+    var {
       TITLE,
       JOB_TYPE_DESC,
       REQUIRE_COUNT,
@@ -340,6 +355,12 @@ export class BoardsService {
       CONTACT_PHONE,
       CONTACT_EMAIL,
     } = jobEnterpriseRegisterInputDto;
+
+    var ENDRECEPTION = ENDRECEPTION;
+    if (ENDRECEPTION == '') {
+      ENDRECEPTION = null;
+    }
+
     const conn = getConnection();
     const [found] = await conn.query(
       `SELECT ENTRPRS_MBER_ID FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND BSNNM_APRVL_CODE='30'`,
@@ -436,7 +457,7 @@ export class BoardsService {
       generatedFiles.push(createImageURL(file));
       // http://주소:포트번호/upload/파일이름 형식으로 저장이 됩니다.
     }
-    const {
+    var {
       TITLE,
       JOB_TYPE_DESC,
       REQUIRE_COUNT,
@@ -468,6 +489,11 @@ export class BoardsService {
       CONTACT_PHONE,
       CONTACT_EMAIL,
     } = jobEnterpriseRegisterInputDto;
+
+    var ENDRECEPTION = ENDRECEPTION;
+    if (ENDRECEPTION == '') {
+      ENDRECEPTION = null;
+    }
 
     const conn = getConnection();
 
@@ -567,7 +593,11 @@ export class BoardsService {
 
     if (jobfound) {
       const found = await conn.query(
-        `SELECT  B.JOBID, B.TITLE, B.CREATE_AT, B.REQUEST_DATE, B.COMENTS, A.CODE_NM AS JOB_STAT
+        `SELECT  B.JOBID, B.TITLE, B.CREATE_AT, 
+        IFNULL(B.REQUEST_DATE, '') AS REQUEST_DATE, 
+        IFNULL(B.COMENTS, '') AS COMENTS,
+        B.JOB_STAT AS JOB_STAT_CODE,
+        A.CODE_NM AS JOB_STAT_NAME
         FROM COMTCCMMNDETAILCODE A INNER JOIN jobInformation B ON (A.CODE = B.JOB_STAT)
         WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y' AND CODE_ID='jstat' ORDER BY CREATE_AT DESC LIMIT 12 OFFSET ${pagecount}`,
       );
@@ -598,9 +628,20 @@ export class BoardsService {
       `SELECT * FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
     );
 
+    const [job_im] = await conn.query(
+      `SELECT IFNULL(JOB_IM, '') AS JOB_IM FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
+    );
+
+    const [endreception] = await conn.query(
+      `SELECT IFNULL(ENDRECEPTION, '') AS ENDRECEPTION FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}' AND JOB_STTUS='Y'`,
+    );
+
     if (found) {
       const [user] = await conn.query(
         `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      );
+      const [cmpny_im] = await conn.query(
+        `SELECT IFNULL(CMPNY_IM, '') AS CMPNY_IM FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
       );
       const [educd] = await conn.query(
         `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
@@ -673,8 +714,8 @@ export class BoardsService {
             DETAIL_ADRES: user.DETAIL_ADRES,
             INDUTY: user.INDUTY,
             NMBR_WRKRS: user.NMBR_WRKRS,
-            CMPNY_IM: user.CMPNY_IM,
-            JOB_IM: found.JOB_IM,
+            CMPNY_IM: cmpny_im.CMPNY_IM,
+            JOB_IM: job_im.JOB_IM,
 
             TITLE: found.TITLE,
             JOB_TYPE_DESC: found.JOB_TYPE_DESC,
@@ -688,7 +729,7 @@ export class BoardsService {
             PAYCD: paycd.CODE_NM,
             WORK_TIME_TYPE: timecd.CODE_NM,
             STARTRECEPTION: found.STARTRECEPTION,
-            ENDRECEPTION: found.ENDRECEPTION,
+            ENDRECEPTION: endreception.ENDRECEPTION,
             CAREER_PERIOD: found.CAREER_PERIOD,
             WORK_ADDRESS: found.WORK_ADDRESS,
             WORK_AREA_DESC: found.WORK_AREA_DESC,

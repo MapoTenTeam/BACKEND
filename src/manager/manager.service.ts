@@ -61,6 +61,26 @@ export class ManagerService {
     }
   }
 
+  async updateBizrnoRefuse(@Req() req, param: { userid: string }) {
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT EMPLYR_ID FROM COMTNEMPLYRINFO WHERE EMPLYR_STTUS_CODE='P' AND EMPLYR_ID='${req.USER_ID}'`,
+    );
+
+    if (user) {
+      await conn.query(
+        `UPDATE COMTNENTRPRSMBER SET BSNNM_APRVL_CODE='40' WHERE ENTRPRS_MBER_ID='${param.userid}'`,
+      );
+
+      return Object.assign({
+        statusCode: 200,
+        message: '사업자 승인 거절 성공',
+      });
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+
   async getJobApproval(@Req() req, query) {
     var pagecount = (query.page - 1) * 12;
     const conn = getConnection();
@@ -110,13 +130,38 @@ export class ManagerService {
 
     if (user) {
       await conn.query(
-        `UPDATE jobInformation SET APPROVAL_YN='Y', APPROVAL_DATE=NOW(), APPROVAL_USER='${req.USER_ID}', JOB_STAT='APPRV', COMENTS='${COMMENT}' 
+        `UPDATE jobInformation SET APPROVAL_DATE=NOW(), APPROVAL_USER='${req.USER_ID}', JOB_STAT='APPRV', COMENTS='${COMMENT}' 
         WHERE JOBID='${JOBID}'`,
       );
 
       return Object.assign({
         statusCode: 200,
         message: '사업자 승인 성공',
+      });
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+
+  async updateJobRefuse(
+    @Req() req,
+    updateBizrnoApprovalInputDto: UpdateBizrnoApprovalInputDto,
+  ) {
+    const { JOBID, COMMENT } = updateBizrnoApprovalInputDto;
+    const conn = getConnection();
+    const [user] = await conn.query(
+      `SELECT EMPLYR_ID FROM COMTNEMPLYRINFO WHERE EMPLYR_STTUS_CODE='P' AND EMPLYR_ID='${req.USER_ID}'`,
+    );
+
+    if (user) {
+      await conn.query(
+        `UPDATE jobInformation SET JOB_STAT='DENI', COMENTS='${COMMENT}' 
+        WHERE JOBID='${JOBID}'`,
+      );
+
+      return Object.assign({
+        statusCode: 200,
+        message: '사업자 승인 거절 성공',
       });
     } else {
       throw new UnauthorizedException();

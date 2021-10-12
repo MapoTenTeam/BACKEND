@@ -379,8 +379,11 @@ export class JobEnterpriseOutputDto {
   @ApiProperty({ example: '비고란' })
   COMENTS: string;
 
-  @ApiProperty({ example: '승인상태' })
-  JOB_STAT: string;
+  @ApiProperty({ example: '승인상태 코드값' })
+  JOB_STAT_CODE: string;
+
+  @ApiProperty({ example: '승인상태 이름' })
+  JOB_STAT_NAME: string;
 }
 
 export class SelectJobEnterpriseOutputDto {
