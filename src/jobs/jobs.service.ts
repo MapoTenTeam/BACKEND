@@ -91,51 +91,56 @@ export class BoardsService {
 
     if (found) {
       const [user] = await conn.query(
-        `SELECT CMPNY_NM, BIZRNO, CEO, ADRES, DETAIL_ADRES, INDUTY, NMBR_WRKRS,
+        `SELECT CMPNY_NM, BIZRNO, 
+        IFNULL(CEO, '') AS CEO,
+        IFNULL(ADRES, '') AS ADRES,
+        IFNULL(DETAIL_ADRES, '') AS DETAIL_ADRES,
+        IFNULL(INDUTY, '') AS INDUTY,
+        IFNULL(NMBR_WRKRS, '') AS NMBR_WRKRS,
         IFNULL(CMPNY_IM, '') AS CMPNY_IM FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${found.ENTRPRS_MBER_ID}' AND ENTRPRS_MBER_STTUS='P'`,
       );
 
       const [educd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
       );
       const [career] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
       );
       const [areacd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
       );
       const [timecd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
       );
       const [empcd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
       );
       const empdet = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE IN(${found.EMPLOYTYPE_DET})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE IN(${found.EMPLOYTYPE_DET})`,
       );
       const [paycd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
       );
       const [sevpay] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
       );
       const [clstyp] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
       );
       const apytyp = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE IN(${found.APPLY_METHOD})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE IN(${found.APPLY_METHOD})`,
       );
       const doccd = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
       );
       const [mealcd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
       );
       const socins = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
       );
       const testmt = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE IN(${found.TEST_METHOD})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE IN(${found.TEST_METHOD})`,
       );
 
       if (
@@ -174,23 +179,23 @@ export class BoardsService {
             JOB_TYPE_DESC: found.JOB_TYPE_DESC,
             REQUIRE_COUNT: found.REQUIRE_COUNT,
             JOB_DESC: found.JOB_DESC,
-            DEUCATION: educd.CODE_NM,
-            CAREER: career.CODE_NM,
-            WORK_AREA: areacd.CODE_NM,
-            EMPLOYTYPE: empcd.CODE_NM,
+            DEUCATION: educd,
+            CAREER: career,
+            WORK_AREA: areacd,
+            EMPLOYTYPE: empcd,
             EMPLOYTYPE_DET: empdet,
-            PAYCD: paycd.CODE_NM,
-            WORK_TIME_TYPE: timecd.CODE_NM,
+            PAYCD: paycd,
+            WORK_TIME_TYPE: timecd,
             ENDRECEPTION: endreception.ENDRECEPTION,
             CAREER_PERIOD: found.CAREER_PERIOD,
             WORK_ADDRESS: found.WORK_ADDRESS,
             WORK_AREA_DESC: found.WORK_AREA_DESC,
             PAY_AMOUNT: found.PAY_AMOUNT,
-            MEAL_COD: mealcd.CODE_NM,
+            MEAL_COD: mealcd,
             WORKINGHOURS: found.WORKINGHOURS,
-            SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+            SEVERANCE_PAY_TYPE: sevpay,
             SOCIAL_INSURANCE: socins,
-            CLOSING_TYPE: clstyp.CODE_NM,
+            CLOSING_TYPE: clstyp,
             APPLY_METHOD: apytyp,
             APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
             TEST_METHOD: testmt,
@@ -638,52 +643,55 @@ export class BoardsService {
 
     if (found) {
       const [user] = await conn.query(
-        `SELECT * FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
-      );
-      const [cmpny_im] = await conn.query(
-        `SELECT IFNULL(CMPNY_IM, '') AS CMPNY_IM FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+        `SELECT CMPNY_NM, BIZRNO, 
+        IFNULL(CEO, '') AS CEO,
+        IFNULL(ADRES, '') AS ADRES,
+        IFNULL(DETAIL_ADRES, '') AS DETAIL_ADRES,
+        IFNULL(INDUTY, '') AS INDUTY,
+        IFNULL(NMBR_WRKRS, '') AS NMBR_WRKRS,
+        IFNULL(CMPNY_IM, '') AS CMPNY_IM FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
       );
       const [educd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='educd' AND CODE='${found.DEUCATION}'`,
       );
       const [career] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='career' AND CODE='${found.CAREER}'`,
       );
       const [areacd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='areacd' AND CODE='${found.WORK_AREA}'`,
       );
       const [timecd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='timecd' AND CODE='${found.WORK_TIME_TYPE}'`,
       );
       const [empcd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empcd' AND CODE='${found.EMPLOYTYPE}'`,
       );
       const empdet = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE IN(${found.EMPLOYTYPE_DET})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='empdet' AND CODE IN(${found.EMPLOYTYPE_DET})`,
       );
       const [paycd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='paycd' AND CODE='${found.PAYCD}'`,
       );
       const [sevpay] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='sevpay' AND CODE='${found.SEVERANCE_PAY_TYPE}'`,
       );
       const [clstyp] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='clstyp' AND CODE='${found.CLOSING_TYPE}'`,
       );
       const apytyp = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE IN(${found.APPLY_METHOD})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='apytyp' AND CODE IN(${found.APPLY_METHOD})`,
       );
       const doccd = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='doccd' AND CODE IN(${found.APPLY_DOCUMENT})`,
       );
       const [mealcd] = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='mealcd' AND CODE='${found.MEAL_COD}'`,
       );
       const socins = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='socins' AND CODE IN(${found.SOCIAL_INSURANCE})`,
       );
       const testmt = await conn.query(
-        `SELECT CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE IN(${found.TEST_METHOD})`,
+        `SELECT CODE, CODE_NM FROM COMTCCMMNDETAILCODE WHERE CODE_ID ='testmt' AND CODE IN(${found.TEST_METHOD})`,
       );
       if (
         educd &&
@@ -714,31 +722,31 @@ export class BoardsService {
             DETAIL_ADRES: user.DETAIL_ADRES,
             INDUTY: user.INDUTY,
             NMBR_WRKRS: user.NMBR_WRKRS,
-            CMPNY_IM: cmpny_im.CMPNY_IM,
+            CMPNY_IM: user.CMPNY_IM,
             JOB_IM: job_im.JOB_IM,
 
             TITLE: found.TITLE,
             JOB_TYPE_DESC: found.JOB_TYPE_DESC,
             REQUIRE_COUNT: found.REQUIRE_COUNT,
             JOB_DESC: found.JOB_DESC,
-            DEUCATION: educd.CODE_NM,
-            CAREER: career.CODE_NM,
-            WORK_AREA: areacd.CODE_NM,
-            EMPLOYTYPE: empcd.CODE_NM,
+            DEUCATION: educd,
+            CAREER: career,
+            WORK_AREA: areacd,
+            EMPLOYTYPE: empcd,
             EMPLOYTYPE_DET: empdet,
-            PAYCD: paycd.CODE_NM,
-            WORK_TIME_TYPE: timecd.CODE_NM,
+            PAYCD: paycd,
+            WORK_TIME_TYPE: timecd,
             STARTRECEPTION: found.STARTRECEPTION,
             ENDRECEPTION: endreception.ENDRECEPTION,
             CAREER_PERIOD: found.CAREER_PERIOD,
             WORK_ADDRESS: found.WORK_ADDRESS,
             WORK_AREA_DESC: found.WORK_AREA_DESC,
             PAY_AMOUNT: found.PAY_AMOUNT,
-            MEAL_COD: mealcd.CODE_NM,
+            MEAL_COD: mealcd,
             WORKINGHOURS: found.WORKINGHOURS,
-            SEVERANCE_PAY_TYPE: sevpay.CODE_NM,
+            SEVERANCE_PAY_TYPE: sevpay,
             SOCIAL_INSURANCE: socins,
-            CLOSING_TYPE: clstyp.CODE_NM,
+            CLOSING_TYPE: clstyp,
             APPLY_METHOD: apytyp,
             APPLY_METHOD_ETC: found.APPLY_METHOD_ETC,
             TEST_METHOD: testmt,
