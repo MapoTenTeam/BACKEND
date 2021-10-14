@@ -41,12 +41,10 @@ export class JobEnterpriseRegisterInputDto {
   @IsNotEmpty()
   WORK_AREA: string;
 
-  @ApiProperty({ example: '근무예정지 주소' })
-  @IsNotEmpty()
+  @ApiProperty({ example: '근무예정지 주소', required: false })
   WORK_ADDRESS: string;
 
-  @ApiProperty({ example: '근무예정지 산업단지' })
-  @IsNotEmpty()
+  @ApiProperty({ example: '근무예정지 산업단지', required: false })
   WORK_AREA_DESC: string;
 
   @ApiProperty({ example: '고용형태(코드값)' })
