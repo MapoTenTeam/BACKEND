@@ -5,7 +5,7 @@ import { ExtractJwt } from 'passport-jwt';
 import { getConnection } from 'typeorm';
 
 @Injectable()
-export class PersonalJwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       secretOrKey: `${process.env.JWT_SECRET}`,
@@ -20,10 +20,10 @@ export class PersonalJwtStrategy extends PassportStrategy(Strategy) {
     const [user] = await conn.query(
       `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
     );
-
     if (!user) {
       throw new UnauthorizedException();
     }
+
     return user;
   }
 }

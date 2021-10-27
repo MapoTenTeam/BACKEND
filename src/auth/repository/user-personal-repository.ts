@@ -5,10 +5,12 @@ import * as bcrypt from 'bcryptjs';
 import {
   ConflictException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 
 @EntityRepository(COMTNGNRLMBER)
 export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
+  private logger = new Logger('createPersonalUser');
   async createPersonalUser(
     authCredentialsPersonalDto: AuthCredentialsPersonalDto,
   ): Promise<void> {
@@ -17,10 +19,8 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
     const MBER_STTUS = 'P';
     const PROFILE_STTUS = false;
 
-    console.log('PASSWORD', PASSWORD);
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(PASSWORD, salt);
-    console.log('hashedPassword', hashedPassword);
 
     const conn = getConnection();
     var sql =
@@ -38,18 +38,21 @@ export class UserPersonalRepository extends Repository<COMTNGNRLMBER> {
     try {
       if (EMAIL_VRFCT && TERMS == true) {
         await conn.query(sql, params);
-        console.log('개인 회원가입 성공');
+        this.logger.log(`개인 회원가입 성공`);
         return Object.assign({
           statusCode: 201,
           message: '개인 회원가입 성공',
         });
       } else {
+        this.logger.warn(`이메일 인증 or 이용약관 동의 실패`);
         return Object.assign({
           statusCode: 406,
           message: '이메일 인증 or 이용약관 동의 실패',
         });
       }
     } catch (error) {
+      this.logger.error(`개인 회원가입 실패
+      Error: ${error}`);
       if (error.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('중복된 MBER_ID');
       } else {

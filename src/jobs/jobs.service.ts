@@ -1,5 +1,4 @@
 import { Injectable, Req } from '@nestjs/common';
-import { range } from 'rxjs';
 import { createImageURL } from 'src/auth/multerOptions';
 import { getConnection } from 'typeorm';
 import { JobEnterpriseRegisterInputDto } from './dtos/job-enterprise.dto';
@@ -230,72 +229,72 @@ export class BoardsService {
     const apytyp = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'apytyp' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'apytyp' AND A.USE_AT ='Y'`,
     );
     const educd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'educd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'educd' AND A.USE_AT ='Y'`,
     );
     const career = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'career' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'career' AND A.USE_AT ='Y'`,
     );
     const areacd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'areacd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'areacd' AND A.USE_AT ='Y'`,
     );
     const timecd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'timecd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'timecd' AND A.USE_AT ='Y'`,
     );
     const empcd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'empcd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'empcd' AND A.USE_AT ='Y'`,
     );
     const empdet = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'empdet' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'empdet' AND A.USE_AT ='Y'`,
     );
     const paycd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'paycd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'paycd' AND A.USE_AT ='Y'`,
     );
     const sevpay = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'sevpay' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'sevpay' AND A.USE_AT ='Y'`,
     );
     const clstyp = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'clstyp' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'clstyp' AND A.USE_AT ='Y'`,
     );
     const doccd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'doccd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'doccd' AND A.USE_AT ='Y'`,
     );
     const mealcd = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'mealcd' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'mealcd' AND A.USE_AT ='Y'`,
     );
     const socins = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'socins' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'socins' AND A.USE_AT ='Y'`,
     );
     const testmt = await conn.query(
       `SELECT  A.CODE_ID_NM,  B.CODE, B.CODE_NM
       FROM    COMTCCMMNCODE A INNER JOIN COMTCCMMNDETAILCODE  B  ON (A.CODE_ID = B.CODE_ID)
-      WHERE   A.CODE_ID = 'testmt' AND USE_AT ='Y'`,
+      WHERE   A.CODE_ID = 'testmt' AND A.USE_AT ='Y'`,
     );
 
     return Object.assign({

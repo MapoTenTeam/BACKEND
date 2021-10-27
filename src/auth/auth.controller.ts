@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -66,7 +67,6 @@ import {
   PasswordChangeInputDto,
   PasswordChangeOutputDto,
   PasswordConfirmInputDto,
-  PasswordConfirmOutputFailDto,
   PasswordConfirmOutputSuccessDto,
   PasswordInputDto,
   TermsOutputDto,
@@ -80,6 +80,7 @@ import { multerOptions } from './multerOptions';
 @ApiTags('유저 API')
 @Controller('user')
 export class AuthController {
+  private logger = new Logger('AuthController');
   constructor(private authService: AuthService) {}
 
   //유저ID 중복체크 API
@@ -102,6 +103,8 @@ export class AuthController {
   async getUserById(
     @Param() param: { userid: string },
   ): Promise<GetUserByIdNotDto> {
+    this.logger.verbose(`유저ID 중복체크
+    Payload: ${param.userid}`);
     return await this.authService.getUserById(param);
   }
 
@@ -121,11 +124,9 @@ export class AuthController {
     description: '이메일이 있는경우',
     type: GetUserByEmailDto,
   })
-  // @ApiResponse({
-  //   status: 400,
-  //   description: '이메일 형태가 아닙니다.',
-  // })
   async getUserByEmail(@Param() param: { email: string }) {
+    this.logger.verbose(`유저 이메일 중복체크 
+    Payload: ${param.email}`);
     return await this.authService.getUserByEmail(param);
   }
 
@@ -149,6 +150,8 @@ export class AuthController {
   async getUserBybizrno(
     @Param() param: { bizrno: string },
   ): Promise<GetUserByBizrnoNotDto> {
+    this.logger.verbose(`사업장등록번호 중복체크
+    Payload: ${param.bizrno}`);
     return await this.authService.getUserBybizrno(param);
   }
 
@@ -172,6 +175,10 @@ export class AuthController {
     @Body(ValidationPipe)
     getUserByIdFindInputDto: GetUserByIdFindInputDto,
   ): Promise<GetUserByIdFindOutputDto> {
+    this.logger.verbose(
+      `유저 아이디 찾기 
+      Payload: ${JSON.stringify(getUserByIdFindInputDto)}`,
+    );
     return await this.authService.getUserByIdFind(getUserByIdFindInputDto);
   }
 
@@ -196,6 +203,10 @@ export class AuthController {
     @Body(ValidationPipe)
     getUserByPasswordFindInputDto: GetUserByPasswordFindInputDto,
   ) {
+    this.logger.verbose(
+      `임시 비밀번호 생성
+      Payload: ${JSON.stringify(getUserByPasswordFindInputDto)}`,
+    );
     return await this.authService.getByPasswordFind(
       getUserByPasswordFindInputDto,
     );
@@ -209,6 +220,7 @@ export class AuthController {
   })
   @Get('/terms')
   async getTerms() {
+    this.logger.log(`이용약관 조회`);
     return await this.authService.getTerms();
   }
 
@@ -226,6 +238,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async deletePersonalUser(@Req() req) {
+    this.logger.verbose(`개인회원 탈퇴
+    Payload: ${JSON.stringify(req.user)}`);
     return await this.authService.deletePersonalUser(req.user);
   }
 
@@ -243,6 +257,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async deleteEnterpriseUser(@Req() req) {
+    this.logger.verbose(`기업회원 탈퇴
+    Payload: ${JSON.stringify(req.user)}`);
     return await this.authService.deleteEnterpriseUser(req.user);
   }
 
@@ -260,6 +276,8 @@ export class AuthController {
     type: GetUserByEmailAuthDto,
   })
   async emailAuth(@Param() param: { email: string }) {
+    this.logger.verbose(`이메일 인증
+    Payload: ${JSON.stringify(param.email)}`);
     return await this.authService.emailAuth(param);
   }
 
@@ -287,6 +305,8 @@ export class AuthController {
     @Body(ValidationPipe)
     authCredentialsPersonalDto: AuthCredentialsPersonalDto,
   ): Promise<void> {
+    this.logger.verbose(`개인 회원가입
+    Payload: ${JSON.stringify(authCredentialsPersonalDto)}`);
     return await this.authService.personalSignUp(authCredentialsPersonalDto);
   }
 
@@ -311,6 +331,8 @@ export class AuthController {
     @Body(ValidationPipe)
     authCredentialsEnterpriseDto: AuthCredentialsEnterpriseDto,
   ): Promise<void> {
+    this.logger.verbose(`기업 회원가입
+    Payload: ${JSON.stringify(authCredentialsEnterpriseDto)}`);
     return await this.authService.enterpriseSignUp(
       authCredentialsEnterpriseDto,
     );
@@ -332,13 +354,18 @@ export class AuthController {
   async siginIn(
     @Body(ValidationPipe) loginInputDto: LoginInputDto,
   ): Promise<{ accessToken: string }> {
+    this.logger.verbose(`로그인
+    Payload: ${JSON.stringify(loginInputDto)}`);
     return await this.authService.signIn(loginInputDto);
   }
 
-  // 로그인 API(예전꺼)
+  // 로그인 API(스웨거용)
   @Post('/signin/test')
-  @ApiOperation({ summary: '로그인(예전꺼) API(삭제예정)*' })
-  @ApiBody({ description: '유저 정보', type: LoginInputDto })
+  @ApiOperation({ summary: '로그인 API(스웨거용)*' })
+  @ApiBody({
+    description: '유저 정보(DB에 저장된 비밀번호)',
+    type: LoginInputDto,
+  })
   @ApiResponse({
     status: 201,
     description: '로그인 성공',
@@ -351,37 +378,9 @@ export class AuthController {
   async siginInApp(
     @Body(ValidationPipe) loginInputDto: LoginInputDto,
   ): Promise<{ accessToken: string }> {
+    this.logger.verbose(`로그인(스웨거용)
+    Payload: ${JSON.stringify(loginInputDto)}`);
     return await this.authService.siginInApp(loginInputDto);
-  }
-
-  // 비밀번호 1차 암호화(스웨거용)
-  @Post('/password/first')
-  @ApiOperation({ summary: '비밀번호 1차 암호화(스웨거용)*' })
-  @ApiBody({ description: '평문 비밀번호 입력', type: PasswordInputDto })
-  async passwordFirst(@Body() passwordInputDto: PasswordInputDto) {
-    return await this.authService.passwordFirst(passwordInputDto);
-  }
-
-  // 비밀번호 2차 암호화(스웨거용)
-  @Post('/password/second')
-  @ApiOperation({ summary: '비밀번호 2차 암호화(스웨거용)*' })
-  @ApiBody({
-    description: '1차 암호화된 비밀번호 입력',
-    type: PasswordInputDto,
-  })
-  async passwordSecond(@Body() passwordInputDto: PasswordInputDto) {
-    return await this.authService.passwordSecond(passwordInputDto);
-  }
-
-  // 비밀번호 1,2차 통합 암호화(스웨거용)
-  @Post('/password/integrat')
-  @ApiOperation({ summary: '비밀번호 1,2차 통합 암호화(스웨거용)*' })
-  @ApiBody({
-    description: '평문 비밀번호 입력',
-    type: PasswordInputDto,
-  })
-  async passwordIntegrat(@Body() passwordInputDto: PasswordInputDto) {
-    return await this.authService.passwordIntegrat(passwordInputDto);
   }
 
   // 로그인 API(스웨거용)
@@ -400,7 +399,45 @@ export class AuthController {
   async siginInSwagger(
     @Body(ValidationPipe) loginInputDto: LoginInputDto,
   ): Promise<{ accessToken: string }> {
+    this.logger.verbose(`로그인(스웨거용)
+    Payload: ${JSON.stringify(loginInputDto)}`);
     return await this.authService.siginInSwagger(loginInputDto);
+  }
+
+  // 비밀번호 1차 암호화(스웨거용)
+  @Post('/password/first')
+  @ApiOperation({ summary: '비밀번호 1차 암호화(스웨거용)*' })
+  @ApiBody({ description: '평문 비밀번호 입력', type: PasswordInputDto })
+  async passwordFirst(@Body() passwordInputDto: PasswordInputDto) {
+    this.logger.verbose(`비밀번호 1차 암호화(스웨거용)
+    Payload: ${JSON.stringify(passwordInputDto)}`);
+    return await this.authService.passwordFirst(passwordInputDto);
+  }
+
+  // 비밀번호 2차 암호화(스웨거용)
+  @Post('/password/second')
+  @ApiOperation({ summary: '비밀번호 2차 암호화(스웨거용)*' })
+  @ApiBody({
+    description: '1차 암호화된 비밀번호 입력',
+    type: PasswordInputDto,
+  })
+  async passwordSecond(@Body() passwordInputDto: PasswordInputDto) {
+    this.logger.verbose(`비밀번호 2차 암호화(스웨거용)
+    Payload: ${JSON.stringify(passwordInputDto)}`);
+    return await this.authService.passwordSecond(passwordInputDto);
+  }
+
+  // 비밀번호 1,2차 통합 암호화(스웨거용)
+  @Post('/password/integrat')
+  @ApiOperation({ summary: '비밀번호 1,2차 통합 암호화(스웨거용)*' })
+  @ApiBody({
+    description: '평문 비밀번호 입력',
+    type: PasswordInputDto,
+  })
+  async passwordIntegrat(@Body() passwordInputDto: PasswordInputDto) {
+    this.logger.verbose(`비밀번호 1,2차 통합 암호화(스웨거용)
+    Payload: ${JSON.stringify(passwordInputDto)}`);
+    return await this.authService.passwordIntegrat(passwordInputDto);
   }
 
   //개인 회원 프로필 조회
@@ -421,6 +458,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async getPersonalProfile(@Req() req) {
+    this.logger.verbose(`개인 회원 프로필 조회
+    Payload: ${JSON.stringify(req.user)}`);
     return await this.authService.getPersonalProfile(req.user);
   }
 
@@ -442,6 +481,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async getEnterpriseProfile(@Req() req) {
+    this.logger.verbose(`기업 회원 프로필 조회
+    Payload: ${JSON.stringify(req.user)}`);
     return await this.authService.getEnterpriseProfile(req.user);
   }
 
@@ -453,6 +494,7 @@ export class AuthController {
     type: ProfileEnterpriseDivisionOutputDto,
   })
   async getEnterpriseDivision() {
+    this.logger.log(`기업회원 프로필 기업유형 조회`);
     return await this.authService.getEnterpriseDivision();
   }
 
@@ -477,6 +519,9 @@ export class AuthController {
     @Req() req,
     @Body(ValidationPipe) profilePersonalInputDto: ProfilePersonalInputDto,
   ) {
+    this.logger.verbose(`개인 회원 프로필 등록 or 수정
+    Payload: ${JSON.stringify(req.user)}
+    ${JSON.stringify(profilePersonalInputDto)}`);
     return await this.authService.personalUploadProfile(
       req.user,
       profilePersonalInputDto,
@@ -504,6 +549,9 @@ export class AuthController {
     @Req() req,
     @Body(ValidationPipe) profileEnterpriseInputDto: ProfileEnterpriseInputDto,
   ) {
+    this.logger.verbose(`기업 회원 프로필 등록 or 수정
+    Payload: ${JSON.stringify(req.user)}
+    ${JSON.stringify(profileEnterpriseInputDto)}`);
     return await this.authService.enterpriseProfile(
       req.user,
       profileEnterpriseInputDto,
@@ -551,6 +599,9 @@ export class AuthController {
   @UseGuards(AuthGuard())
   @UseInterceptors(FilesInterceptor('file', null, multerOptions))
   async enterpriseProfileImage(@Req() req, @UploadedFiles() files: string) {
+    this.logger.verbose(`기업 회원 프로필 이미지 등록 or 수정
+    Payload: ${JSON.stringify(req.user)}
+    ${JSON.stringify(files)}`);
     return await this.authService.enterpriseProfileImage(req.user, files);
   }
 
@@ -568,6 +619,8 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseBusinessApproval(@Req() req) {
+    this.logger.verbose(`기업 사업자 승인 요청
+    Payload: ${JSON.stringify(req.user)}`);
     return await this.authService.enterpriseBusinessApproval(req.user);
   }
 
@@ -597,6 +650,8 @@ export class AuthController {
     @Req() req,
     @Body(ValidationPipe) passwordConfirmInputDto: PasswordConfirmInputDto,
   ) {
+    this.logger.verbose(`회원 비밀번호 확인
+    Payload: ${JSON.stringify(req.user)}`);
     return await this.authService.getPasswordConfirm(
       req.user,
       passwordConfirmInputDto,
@@ -624,6 +679,9 @@ export class AuthController {
     @Req() req,
     @Body(ValidationPipe) passwordChangeInputDto: PasswordChangeInputDto,
   ) {
+    this.logger.verbose(`개인 회원 비밀번호 변경
+    Payload: ${JSON.stringify(req.user)}
+    ${JSON.stringify(passwordChangeInputDto)}`);
     return await this.authService.personalPasswordChange(
       req.user,
       passwordChangeInputDto,
@@ -651,6 +709,9 @@ export class AuthController {
     @Req() req,
     @Body(ValidationPipe) passwordChangeInputDto: PasswordChangeInputDto,
   ) {
+    this.logger.verbose(`기업 회원 비밀번호 변경
+    Payload: ${JSON.stringify(req.user)}
+    ${JSON.stringify(passwordChangeInputDto)}`);
     return await this.authService.enterprisePasswordChange(
       req.user,
       passwordChangeInputDto,

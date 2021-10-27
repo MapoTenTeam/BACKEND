@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   Req,
-  Request,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -26,7 +25,6 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { BoardsService } from './jobs.service';
 import { EnterpriseRegisterMenuDto } from './dtos/enterpriseRegisterMenu.dto';
@@ -45,9 +43,8 @@ import {
   GetUserBySearchInputDto,
   SelectJobPublicOutputDto,
 } from './dtos/job-public.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/auth/multerOptions';
-import { ProfileImageEnterpriseOutputDto } from 'src/auth/dtos/enterpriseUser.dto';
 
 @ApiTags('일자리 API')
 @Controller('job')

@@ -3,12 +3,14 @@ import { AuthCredentialsEnterpriseDto } from '../dtos/auth-credential.dto';
 import {
   ConflictException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { COMTNENTRPRSMBER } from '../entities/user-enterprise.entity';
 import * as bcrypt from 'bcryptjs';
 
 @EntityRepository(COMTNENTRPRSMBER)
 export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
+  private logger = new Logger('createEnterpriseUser');
   async createEnterpriseUser(
     authCredentialsEnterpriseDto: AuthCredentialsEnterpriseDto,
   ): Promise<void> {
@@ -27,10 +29,8 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
     const PROFILE_STTUS = false;
     const BSNNM_APRVL_CODE = '10';
 
-    console.log('PASSWORD', ENTRPRS_MBER_PASSWORD);
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(ENTRPRS_MBER_PASSWORD, salt);
-    console.log('hashedPassword', hashedPassword);
 
     const conn = getConnection();
     var sql =
@@ -52,7 +52,7 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
     try {
       if (EMAIL_VRFCT && TERMS == true && BIZRNOAVAILABLE == true) {
         await conn.query(sql, params);
-        console.log('기업 회원가입 성공');
+        this.logger.log(`기업 회원가입 성공`);
         return Object.assign({
           statusCode: 201,
           message: '기업 회원가입 성공',
@@ -64,6 +64,8 @@ export class UserEnterpriseRepository extends Repository<COMTNENTRPRSMBER> {
         });
       }
     } catch (error) {
+      this.logger.error(`기업 회원가입 실패
+      Error: ${error}`);
       if (error.code === 'ER_DUP_ENTRY') {
         throw new ConflictException('중복된 MBER_ID');
       } else {

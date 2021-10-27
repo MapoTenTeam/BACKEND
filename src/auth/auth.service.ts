@@ -1,4 +1,4 @@
-import { Injectable, Req, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, Req, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
@@ -24,16 +24,14 @@ import { GetUserByPasswordFindInputDto } from './dtos/response/getUserByPassword
 import { ProfilePersonalInputDto } from './dtos/personalUser.dto';
 import { ProfileEnterpriseInputDto } from './dtos/enterpriseUser.dto';
 import { createImageURL } from './multerOptions';
-import * as crypto from 'crypto';
 import * as pbkdf2 from 'pbkdf2-sha256';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger('AuthService');
   constructor(
     @InjectRepository(UserPersonalRepository)
     private userPersonalRepository: UserPersonalRepository,
-    // private userPersonalDetailRepository: UserPersonalDetailRepository,
-    // private userEnterpriseDetailRepository: UserEnterpriseDetailRepository,
     private jwtService: JwtService,
     private mailerService: MailerService,
 
@@ -159,11 +157,14 @@ export class AuthService {
           await conn.query(
             `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${USER_ID}'`,
           );
+          this.logger.log(`개인 회원: ${USER_ID} 임시비밀번호 생성 성공`);
         } else if (found.USER_SE == 'ENT') {
           await conn.query(
             `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${hashedPassword}' WHERE ENTRPRS_MBER_ID='${USER_ID}'`,
           );
+          this.logger.log(`기업 회원: ${USER_ID} 임시비밀번호 생성 성공`);
         } else {
+          this.logger.error(`회원: ${USER_ID} 임시비밀번호 생성 실패`);
           return Object.assign({
             statusCode: 404,
             message: '임시 비밀번호 생성 실패',
@@ -175,6 +176,8 @@ export class AuthService {
           message: '임시 비밀번호 생성 성공',
         });
       } catch (err) {
+        this.logger.error(`회원: ${USER_ID} 임시비밀번호 생성 실패
+        Error: ${err}`);
         return Object.assign({
           statusCode: 404,
           message: '임시 비밀번호 생성 실패',
@@ -210,13 +213,15 @@ export class AuthService {
         subject: '이메일 인증 요청 메일입니다.', // Subject line
         html: '6자리 인증 코드 : ' + `<b> ${number}</b>`, // HTML body content
       });
+      this.logger.log(`이메일 인증 번호 생성 성공`);
       return Object.assign({
         statusCode: 201,
         message: '이메일 인증 번호 생성 성공',
         code: number,
       });
     } catch (err) {
-      console.log(err);
+      this.logger.error(`이메일 인증 번호 생성 실패
+      Error: ${err}`);
     }
   }
 
@@ -242,7 +247,6 @@ export class AuthService {
     accessToken: string;
   }> {
     const { USER_ID, PASSWORD } = loginInputDto;
-    console.log('로그인 PASSWORD', PASSWORD);
     const conn = getConnection();
     const [user] = await conn.query(
       `SELECT USER_ID, PASSWORD, USER_SE FROM COMVNUSERMASTER WHERE USER_ID='${USER_ID}' AND USER_STTUS='P'`,
@@ -253,7 +257,8 @@ export class AuthService {
       //유저 토큰 생성(Secret + Payload)
       const payload = { USER_ID };
       const accessToken = await this.jwtService.sign(payload);
-      console.log('로그인 성공');
+      this.logger.log(`로그인 성공
+      User Id: ${USER_ID}`);
       return Object.assign({
         statusCode: 201,
         message: '로그인 성공',
@@ -261,6 +266,8 @@ export class AuthService {
         user_se: user.USER_SE,
       });
     } else {
+      this.logger.warn(`로그인 실패
+      User Id: ${USER_ID}`);
       throw new UnauthorizedException('로그인 실패');
     }
   }
@@ -281,7 +288,6 @@ export class AuthService {
       //유저 토큰 생성(Secret + Payload)
       const payload = { USER_ID };
       const accessToken = await this.jwtService.sign(payload);
-      console.log('로그인 성공');
       return Object.assign({
         statusCode: 201,
         message: '로그인 성공',
@@ -318,7 +324,6 @@ export class AuthService {
       //유저 토큰 생성(Secret + Payload)
       const payload = { USER_ID };
       const accessToken = await this.jwtService.sign(payload);
-      console.log('로그인 성공');
       return Object.assign({
         statusCode: 201,
         message: '로그인 성공',
@@ -414,16 +419,22 @@ export class AuthService {
       FROM COMTNGNRLMBER WHERE MBER_ID='${req.USER_ID}'`,
     );
 
-    return user
-      ? Object.assign({
-          statusCode: 200,
-          message: '개인 회원 프로필 조회 성공',
-          data: user,
-        })
-      : Object.assign({
-          statusCode: 400,
-          message: '개인 회원 프로필 조회 실패',
-        });
+    if (user) {
+      this.logger.log(`개인 회원 프로필 조회 성공
+      User Id: ${req.USER_ID}`);
+      return Object.assign({
+        statusCode: 200,
+        message: '개인 회원 프로필 조회 성공',
+        data: user,
+      });
+    } else {
+      this.logger.warn(`개인 회원 프로필 조회 실패
+      User Id: ${req.USER_ID}`);
+      return Object.assign({
+        statusCode: 400,
+        message: '개인 회원 프로필 조회 실패',
+      });
+    }
   }
 
   async getEnterpriseProfile(@Req() req) {
@@ -450,16 +461,22 @@ export class AuthService {
       WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
 
-    return user
-      ? Object.assign({
-          statusCode: 200,
-          message: '기업 회원 프로필 조회 성공',
-          data: user,
-        })
-      : Object.assign({
-          statusCode: 400,
-          message: '기업 회원 프로필 조회 실패',
-        });
+    if (user) {
+      this.logger.log(`기업 회원 프로필 조회 성공
+      User Id: ${req.USER_ID}`);
+      return Object.assign({
+        statusCode: 200,
+        message: '기업 회원 프로필 조회 성공',
+        data: user,
+      });
+    } else {
+      this.logger.warn(`기업 회원 프로필 조회 실패
+      User Id: ${req.USER_ID}`);
+      return Object.assign({
+        statusCode: 400,
+        message: '기업 회원 프로필 조회 실패',
+      });
+    }
   }
 
   async getEnterpriseDivision() {
@@ -500,6 +517,7 @@ export class AuthService {
       MBTLNUM='${MBTLNUM}', ADRES='${ADRES}', DETAIL_ADRES='${DETAIL_ADRES}', PROFILE_STTUS=true 
       WHERE MBER_ID='${req.USER_ID}'`,
     );
+    this.logger.log(`개인회원 ${req.USER_ID} 프로필 등록 or 수정 성공`);
     return Object.assign({
       statusCode: 200,
       message: '개인회원 프로필 등록 성공',
@@ -532,6 +550,7 @@ export class AuthService {
       DETAIL_ADRES='${DETAIL_ADRES}',INDUTY='${INDUTY}',NMBR_WRKRS='${NMBR_WRKRS}',WEB_ADRES='${WEB_ADRES}',
       CEO_EMAIL_ADRES='${CEO_EMAIL_ADRES}', PROFILE_STTUS=true WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
     );
+    this.logger.log(`기업회원 ${req.USER_ID} 프로필 등록 or 수정 성공`);
     return Object.assign({
       statusCode: 200,
       message: '기업회원 프로필 등록 성공',
@@ -549,14 +568,31 @@ export class AuthService {
     const conn = getConnection();
 
     if (generatedFiles[0]) {
-      await conn.query(
-        `UPDATE COMTNENTRPRSMBER SET CMPNY_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+      const [user] = await conn.query(
+        `SELECT ENTRPRS_MBER_ID FROM COMTNENTRPRSMBER WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND ENTRPRS_MBER_STTUS='P'`,
       );
-      return Object.assign({
-        statusCode: 201,
-        message: '이미지 등록 성공',
-      });
+
+      if (user) {
+        await conn.query(
+          `UPDATE COMTNENTRPRSMBER SET CMPNY_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
+        );
+        this.logger.log(`이미지 등록 성공
+        User Id: ${req.USER_ID}`);
+        return Object.assign({
+          statusCode: 201,
+          message: '이미지 등록 성공',
+        });
+      } else {
+        this.logger.warn(`이미지 등록 실패
+        User Id: ${req.USER_ID}`);
+        return Object.assign({
+          statusCode: 404,
+          message: '이미지 등록 실패',
+        });
+      }
     } else {
+      this.logger.warn(`이미지 등록 실패
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 404,
         message: '이미지 등록 실패',
@@ -577,29 +613,20 @@ export class AuthService {
     );
 
     if (found && (await bcrypt.compare(PASSWORD, found.PASSWORD))) {
+      this.logger.log(`유저 비밀번호 조회 성공
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 201,
         message: '유저 비밀번호 조회 성공',
       });
     } else {
+      this.logger.warn(`유저 비밀번호 조회 실패
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 400,
         message: '유저 비밀번호 조회 실패',
       });
     }
-    // const [found] = await conn.query(
-    //   `SELECT USER_ID FROM COMVNUSERMASTER WHERE USER_ID='${req.USER_ID}' AND PASSWORD='${PASSWORD}'`,
-    // );
-
-    // return found
-    //   ? Object.assign({
-    //       statusCode: 201,
-    //       message: '유저 비밀번호 조회 성공',
-    //     })
-    //   : Object.assign({
-    //       statusCode: 400,
-    //       message: '유저 비밀번호 조회 실패',
-    //     });
   }
 
   async personalPasswordChange(
@@ -608,10 +635,8 @@ export class AuthService {
   ) {
     const { PASSWORD } = passwordChangeInputDto;
 
-    console.log('PASSWORD', PASSWORD);
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(PASSWORD, salt);
-    console.log('hashedPassword', hashedPassword);
 
     const conn = getConnection();
     const [found] = await conn.query(
@@ -622,17 +647,16 @@ export class AuthService {
       await conn.query(
         `UPDATE COMTNGNRLMBER SET PASSWORD='${hashedPassword}' WHERE MBER_ID='${req.USER_ID}'`,
       );
-      // await conn.query(
-      //   `UPDATE COMTNGNRLMBER SET PASSWORD='${PASSWORD}' WHERE MBER_ID='${req.USER_ID}'`,
-      // );
+      this.logger.log(`비밀 번호 변경 성공
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 200,
-        message: '비밀 번호 변경 성공',
+        message: '개인 비밀 번호 변경 성공',
       });
     } else {
-      {
-        throw new UnauthorizedException();
-      }
+      this.logger.warn(`개인 비밀 번호 변경 실패
+      User Id: ${req.USER_ID}`);
+      throw new UnauthorizedException();
     }
   }
 
@@ -642,10 +666,8 @@ export class AuthService {
   ) {
     const { PASSWORD } = passwordChangeInputDto;
 
-    console.log('PASSWORD', PASSWORD);
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(PASSWORD, salt);
-    console.log('hashedPassword', hashedPassword);
 
     const conn = getConnection();
     const [found] = await conn.query(
@@ -656,17 +678,16 @@ export class AuthService {
       await conn.query(
         `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${hashedPassword}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
       );
-      // await conn.query(
-      //   `UPDATE COMTNENTRPRSMBER SET ENTRPRS_MBER_PASSWORD='${PASSWORD}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}'`,
-      // );
+      this.logger.log(`기업 비밀 번호 변경 성공
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 200,
         message: '비밀 번호 변경 성공',
       });
     } else {
-      {
-        throw new UnauthorizedException();
-      }
+      this.logger.warn(`기업 비밀 번호 변경 실패
+      User Id: ${req.USER_ID}`);
+      throw new UnauthorizedException();
     }
   }
 }
