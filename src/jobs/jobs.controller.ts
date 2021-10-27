@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -49,6 +50,7 @@ import { multerOptions } from 'src/auth/multerOptions';
 @ApiTags('일자리 API')
 @Controller('job')
 export class BoardsController {
+  private logger = new Logger('JobsController');
   constructor(private boardsService: BoardsService) {}
 
   //공공 일자리 목록 조회
@@ -78,6 +80,10 @@ export class BoardsController {
     getUserBySearchInputDto: GetUserBySearchInputDto,
     @Query() query,
   ) {
+    this.logger.verbose(`공공 일자리 목록 조회
+    Payload: ${JSON.stringify(query)} ${JSON.stringify(
+      getUserBySearchInputDto,
+    )}`);
     return await this.boardsService.getPublicJob(
       getUserBySearchInputDto,
       query,
@@ -111,6 +117,10 @@ export class BoardsController {
     getUserBySearchInputDto: GetUserBySearchInputDto,
     @Query() query,
   ) {
+    this.logger.verbose(`일반 일자리 목록 조회
+    Payload: ${JSON.stringify(query)} ${JSON.stringify(
+      getUserBySearchInputDto,
+    )}`);
     return await this.boardsService.getGeneralJob(
       getUserBySearchInputDto,
       query,
@@ -134,6 +144,8 @@ export class BoardsController {
     type: SelectJobDetailOutputDto,
   })
   async getDetailJob(@Param() param: { jobid: number }) {
+    this.logger.verbose(`일자리 상세 조회
+    Payload: ${JSON.stringify(param)}`);
     return await this.boardsService.getDetailJob(param);
   }
 
@@ -147,6 +159,7 @@ export class BoardsController {
     description: '채용공고 등록 메뉴',
   })
   async getEnterpriseRegisterJob() {
+    this.logger.verbose(`기업 채용공고 등록 메뉴 조회`);
     return await this.boardsService.getEnterpriseRegisterJob();
   }
 
@@ -192,6 +205,10 @@ export class BoardsController {
     @Body(ValidationPipe)
     jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
   ) {
+    this.logger.verbose(`기업 채용공고 등록
+    Payload: ${JSON.stringify(req.user)}
+    ${JSON.stringify(jobEnterpriseRegisterInputDto)}
+    ${JSON.stringify(files)}`);
     return await this.boardsService.enterpriseRegisterJob(
       req.user,
       jobEnterpriseRegisterInputDto,
@@ -222,6 +239,8 @@ export class BoardsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseJudgeJob(@Req() req, @Param() param: { jobid: number }) {
+    this.logger.verbose(`기업 채용공고 심사요청
+    Payload: ${JSON.stringify(req.user)} ${JSON.stringify(param)}`);
     return await this.boardsService.enterpriseJudgeJob(req.user, param);
   }
 
@@ -249,6 +268,8 @@ export class BoardsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseListJob(@Req() req, @Query() query) {
+    this.logger.verbose(`기업 채용공고 목록 조회
+    Payload: ${JSON.stringify(req.user)} ${JSON.stringify(query)}`);
     return await this.boardsService.enterpriseListJob(req.user, query);
   }
 
@@ -279,6 +300,8 @@ export class BoardsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseListDetailJob(@Req() req, @Param() param: { jobid: number }) {
+    this.logger.verbose(`기업 채용공고 상세 조회
+    Payload: ${JSON.stringify(req.user)} ${JSON.stringify(param)}`);
     return await this.boardsService.enterpriseListDetailJob(req.user, param);
   }
 
@@ -329,6 +352,10 @@ export class BoardsController {
     @Body(ValidationPipe)
     jobEnterpriseRegisterInputDto: JobEnterpriseRegisterInputDto,
   ) {
+    this.logger.verbose(`기업 채용공고 수정
+    Payload: ${JSON.stringify(req.user)} ${JSON.stringify(param)}
+    ${JSON.stringify(jobEnterpriseRegisterInputDto)}
+    ${JSON.stringify(files)}`);
     return await this.boardsService.enterpriseEditJob(
       req.user,
       param,
@@ -360,6 +387,8 @@ export class BoardsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseDeleteJob(@Req() req, @Param() param: { jobid: number }) {
+    this.logger.verbose(`기업 채용공고 삭제
+    Payload: ${JSON.stringify(req.user)} ${JSON.stringify(param)}`);
     return await this.boardsService.enterpriseDeleteJob(req.user, param);
   }
 }

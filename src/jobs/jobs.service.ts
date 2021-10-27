@@ -1,4 +1,4 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable, Logger, Req } from '@nestjs/common';
 import { createImageURL } from 'src/auth/multerOptions';
 import { getConnection } from 'typeorm';
 import { JobEnterpriseRegisterInputDto } from './dtos/job-enterprise.dto';
@@ -6,6 +6,7 @@ import { GetUserBySearchInputDto } from './dtos/job-public.dto';
 
 @Injectable()
 export class BoardsService {
+  private logger = new Logger('JobsService');
   async getPublicJob(getUserBySearchInputDto: GetUserBySearchInputDto, query) {
     const { SEARCH_NAME } = getUserBySearchInputDto;
     var pagecount = (query.page - 1) * 12;
@@ -29,17 +30,30 @@ export class BoardsService {
     const [count] = await conn.query(
       `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE TITLE LIKE '%${SEARCH_NAME}%' AND JOB_TYPE='PUB' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
-    return found
-      ? Object.assign({
+
+    if (found) {
+      if (page.length != 0) {
+        this.logger.log(`공공일자리 목록 조회 성공`);
+        return Object.assign({
           statusCode: 200,
           message: '공공일자리 목록 조회 성공',
           count: count.COUNT,
           data: page,
-        })
-      : Object.assign({
+        });
+      } else {
+        this.logger.warn(`공공일자리 목록 조회 실패`);
+        return Object.assign({
           statusCode: 400,
           message: '공공일자리 목록 조회 실패',
         });
+      }
+    } else {
+      this.logger.warn(`공공일자리 목록 조회 실패`);
+      return Object.assign({
+        statusCode: 400,
+        message: '공공일자리 목록 조회 실패',
+      });
+    }
   }
 
   async getGeneralJob(getUserBySearchInputDto: GetUserBySearchInputDto, query) {
@@ -65,17 +79,30 @@ export class BoardsService {
     const [count] = await conn.query(
       `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE TITLE LIKE '%${SEARCH_NAME}%' AND JOB_TYPE='GEN' AND JOB_STTUS='Y' AND JOB_STAT='APPRV'`,
     );
-    return found
-      ? Object.assign({
+
+    if (found) {
+      if (page.length != 0) {
+        this.logger.log(`일반일자리 목록 조회 성공`);
+        return Object.assign({
           statusCode: 200,
           message: '일반일자리 목록 조회 성공',
           count: count.COUNT,
           data: page,
-        })
-      : Object.assign({
+        });
+      } else {
+        this.logger.warn(`일반일자리 목록 조회 실패`);
+        return Object.assign({
           statusCode: 400,
           message: '일반일자리 목록 조회 실패',
         });
+      }
+    } else {
+      this.logger.warn(`일반일자리 목록 조회 실패`);
+      return Object.assign({
+        statusCode: 400,
+        message: '일반일자리 목록 조회 실패',
+      });
+    }
   }
 
   async getDetailJob(param: { jobid: number }) {
@@ -161,6 +188,7 @@ export class BoardsService {
         socins &&
         testmt
       ) {
+        this.logger.log(`일자리 상세 조회 성공`);
         return Object.assign({
           statusCode: 200,
           message: '일자리 상세 조회 성공',
@@ -210,12 +238,14 @@ export class BoardsService {
           },
         });
       } else {
+        this.logger.warn(`코드값 확인`);
         return Object.assign({
           statusCode: 404,
           message: '코드값 확인',
         });
       }
     } else {
+      this.logger.warn(`일자리 상세 조회 실패`);
       return Object.assign({
         statusCode: 400,
         message: '일자리 상세 조회 실패',
@@ -383,6 +413,8 @@ export class BoardsService {
       } else if (job_type.CODE == 30) {
         JOB_TYPE = 'PUB';
       } else {
+        this.logger.warn(`기업구분 오류
+        User Id: ${req.USER_ID}`);
         return Object.assign({
           statusCode: 404,
           message: '기업구분 오류',
@@ -439,12 +471,16 @@ export class BoardsService {
       const [jobid] = await conn.query(
         `SELECT JOBID FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' ORDER BY CREATE_AT DESC LIMIT 1`,
       );
+      this.logger.log(`채용공고 등록 성공
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 201,
         message: '채용공고 등록 성공',
         jobid: jobid.JOBID,
       });
     } else {
+      this.logger.warn(`사업자등록번호 승인 필요
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 402,
         message: '사업자등록번호 승인 필요',
@@ -550,17 +586,26 @@ export class BoardsService {
         await conn.query(
           `UPDATE jobInformation SET JOB_IM='${generatedFiles[0]}' WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
         );
+        this.logger.log(`채용공고 수정 성공
+        User Id: ${req.USER_ID}
+        Job Id: ${param.jobid}`);
         return Object.assign({
           statusCode: 200,
           message: '채용공고 수정 성공',
         });
       } else {
+        this.logger.warn(`채용공고 수정 실패
+        User Id: ${req.USER_ID}
+        Job Id: ${param.jobid}`);
         return Object.assign({
           statusCode: 400,
           message: '채용공고 수정 실패',
         });
       }
     } else {
+      this.logger.warn(`일자리 정보 error
+        User Id: ${req.USER_ID}
+        Job Id: ${param.jobid}`);
       return Object.assign({
         statusCode: 404,
         message: '일자리 정보 error',
@@ -579,11 +624,13 @@ export class BoardsService {
       await conn.query(
         `UPDATE jobInformation SET JOB_STAT='REQ', REQUEST_DATE=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
       );
+      this.logger.log(`채용공고 심사요청 성공`);
       return Object.assign({
         statusCode: 200,
         message: '채용공고 심사요청 성공',
       });
     } else {
+      this.logger.warn(`채용공고 심사요청 실패`);
       return Object.assign({
         statusCode: 400,
         message: '채용공고 심사요청 실패',
@@ -611,15 +658,25 @@ export class BoardsService {
       const [count] = await conn.query(
         `SELECT COUNT(JOBID) AS COUNT FROM jobInformation WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOB_STTUS='Y'`,
       );
-
-      return Object.assign({
-        statusCode: 200,
-        message: '채용공고 목록 조회 성공',
-        ok: true,
-        count: count.COUNT,
-        data: found,
-      });
+      if (found != 0) {
+        this.logger.log(`채용공고 목록 조회 성공`);
+        return Object.assign({
+          statusCode: 200,
+          message: '채용공고 목록 조회 성공',
+          ok: true,
+          count: count.COUNT,
+          data: found,
+        });
+      } else {
+        this.logger.warn(`채용공고 목록 조회 실패`);
+        return Object.assign({
+          statusCode: 200,
+          message: '채용공고 목록 조회 실패',
+          ok: false,
+        });
+      }
     } else {
+      this.logger.warn(`채용공고 등록 필요`);
       return Object.assign({
         statusCode: 200,
         message: '채용공고 등록 필요',
@@ -711,6 +768,7 @@ export class BoardsService {
         socins &&
         testmt
       ) {
+        this.logger.log(`채용공고 상세 조회 성공`);
         return Object.assign({
           statusCode: 200,
           message: '채용공고 상세 조회 성공',
@@ -761,12 +819,14 @@ export class BoardsService {
           },
         });
       } else {
+        this.logger.warn(`코드값 확인`);
         return Object.assign({
           statusCode: 404,
           message: '코드값 확인',
         });
       }
     } else {
+      this.logger.warn(`채용공고 상세 조회 실패`);
       return Object.assign({
         statusCode: 400,
         message: '채용공고 상세 조회 실패',
@@ -785,11 +845,13 @@ export class BoardsService {
       await conn.query(
         `UPDATE jobInformation SET JOB_STTUS='N', DELEETE_AT=NOW() WHERE ENTRPRS_MBER_ID='${req.USER_ID}' AND JOBID='${param.jobid}'`,
       );
+      this.logger.log(`채용공고 삭제 성공`);
       return Object.assign({
         statusCode: 200,
         message: '채용공고 삭제 성공',
       });
     } else {
+      this.logger.warn(`채용공고 삭제 실패`);
       return Object.assign({
         statusCode: 400,
         message: '채용공고 삭제 실패',
