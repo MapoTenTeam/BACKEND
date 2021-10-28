@@ -1,8 +1,9 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable, Logger, Req } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 
 @Injectable()
 export class BookmarksService {
+  private logger = new Logger('BookmarksService');
   async enterpriseRegisterJob(@Req() req, param: { jobid: number }) {
     const conn = getConnection();
 
@@ -15,11 +16,17 @@ export class BookmarksService {
         `INSERT INTO bookmark(MBER_ID, JOBID, CREATE_AT) 
               VAlUE('${req.USER_ID}', '${param.jobid}', NOW());`,
       );
+      this.logger.log(`북마크 등록 성공
+      User Id: ${req.USER_ID}
+      Job Id: ${param.jobid}`);
       return Object.assign({
         statusCode: 201,
         message: '북마크 등록 성공',
       });
     } else {
+      this.logger.warn(`북마크 등록 실패
+      User Id: ${req.USER_ID}
+      Job Id: ${param.jobid}`);
       return Object.assign({
         statusCode: 400,
         message: '북마크 등록 실패',
@@ -51,13 +58,27 @@ export class BookmarksService {
       const [count] = await conn.query(
         `SELECT COUNT(BOOKID) AS COUNT FROM bookmark WHERE MBER_ID='${req.USER_ID}' AND BOOKMARK='Y'`,
       );
-      return Object.assign({
-        statusCode: 200,
-        message: '북마크 조회 성공',
-        count: count.COUNT,
-        data: bookmark,
-      });
+
+      if (bookmark != 0) {
+        this.logger.log(`북마크 조회 성공
+        User Id: ${req.USER_ID}`);
+        return Object.assign({
+          statusCode: 200,
+          message: '북마크 조회 성공',
+          count: count.COUNT,
+          data: bookmark,
+        });
+      } else {
+        this.logger.warn(`북마크 조회 실패
+        User Id: ${req.USER_ID}`);
+        return Object.assign({
+          statusCode: 400,
+          message: '북마크 조회 실패',
+        });
+      }
     } else {
+      this.logger.warn(`북마크 조회 실패
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 400,
         message: '북마크 조회 실패',
@@ -76,11 +97,15 @@ export class BookmarksService {
       const update = await conn.query(
         `UPDATE bookmark SET BOOKMARK='N', UPDATE_AT=NOW() WHERE MBER_ID='${req.USER_ID}' AND BOOKID='${param.bookid}' AND BOOKMARK='Y'`,
       );
+      this.logger.log(`북마크 삭제 성공
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 200,
         message: '북마크 삭제 성공',
       });
     } else {
+      this.logger.warn(`북마크 삭제 실패
+      User Id: ${req.USER_ID}`);
       return Object.assign({
         statusCode: 400,
         message: '북마크 삭제 실패',

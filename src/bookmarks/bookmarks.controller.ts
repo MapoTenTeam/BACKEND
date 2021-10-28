@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -22,6 +23,7 @@ import { BookmarksService } from './bookmarks.service';
 @ApiTags('북마크 API')
 @Controller('bookmarks')
 export class BookmarksController {
+  private logger = new Logger('BookmarksController');
   constructor(private bookmarksService: BookmarksService) {}
   //북마크 등록
   @Post('/:jobid')
@@ -46,6 +48,8 @@ export class BookmarksController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseRegisterJob(@Req() req, @Param() param: { jobid: number }) {
+    this.logger.verbose(`북마크 등록
+    Payload: ${req.user} ${param}`);
     return await this.bookmarksService.enterpriseRegisterJob(req.user, param);
   }
 
@@ -72,10 +76,12 @@ export class BookmarksController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseListJob(@Req() req, @Query() query) {
+    this.logger.verbose(`북마크 목록 조회
+    Payload: ${req.user} ${query}`);
     return await this.bookmarksService.enterpriseListJob(req.user, query);
   }
 
-  //북마크 삭제
+  //북마크 취소
   @Patch('/:bookid')
   @ApiOperation({ summary: '북마크 취소 API(완료)*' })
   @ApiParam({
@@ -98,6 +104,8 @@ export class BookmarksController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard())
   async enterpriseEditJob(@Req() req, @Param() param: { bookid: number }) {
+    this.logger.verbose(`북마크 취소
+    Payload: ${req.user} ${param}`);
     return await this.bookmarksService.enterpriseEditJob(req.user, param);
   }
 }
