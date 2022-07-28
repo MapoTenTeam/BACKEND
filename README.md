@@ -1,73 +1,44 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# MapoTen App - 일자리 플랫폼 서비스
+마포고용복지지원센터가 클라이언트로 참여한 프로젝트 <일자리 플랫폼>입니다.
+<image src="https://user-images.githubusercontent.com/38373150/137691396-432e572e-975f-4e45-9599-60d4c1aa0fe7.gif" />
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 기획 의도
+1. 오프라인으로 진행 중인 구인, 구직 서비스를 온라인화.  
+  : 현재방식은 상담 기록, 이력서 작성, 교육 훈련등 모든 과정이 직접 서류 작성을 통한
+    아날로그 방식, 이를 모두 온라인화하여 사용자 및 관리자의 편리성을 고취시키는 것이 목표입니다.
+2. 정보 공유가 될 수 있는 통합 웹사이트의 필요성 대두.  
+: 고용복지 지원센터 내에 여러 부서가 있는데, 각 부서별 채용공고나 인력 정보를 개인정보보호의 이유로 
+	공유가 어려워 통합 관리가 이루어지고 있지 않음. 
+   따라서 일자리 플랫폼을 구축하여 각 부서의 정보가 공유될 수 있는 통합 웹사이트를 구축하고자 했습니다.
+   
+---
+### 개발 목표
+1. JetPack Navigation을 사용하여 Fragment 전환 및 데이터 전송 사용
+2. 데이터는 Retrofit2를 사용하여 관게형 데이터 베이스 연동
+3. SecretKeyFactory 클래스 PBKDF2withHmacSHA256 알고리즘 암호화를 이용한 네트워크 통신 시 스니핑 방지
+---
+### 주요 기능
+> 로그인, 회원 가입
+- 이메일 인증
+- 비밀번호 암호화
 
-## Installation
+> 채용공고 조회 및 등록
+- 공공 및 일반 일자리 조회
+- 게시물 북마크 기능
+- 검색기능
+- Naver map API 사용
 
-```bash
-$ npm install
-```
+> 사용자에따른(개인 or 기업) 동적 마이페이지
+- 기업 승인 여부, 채용공고 승인 여부 관리
+- 기업 프로필 등록 및 수정
+- 파일 및 이미지 업로드
+- 비밀번호 재설정
+- 로그아웃 
 
-## Running the app
+--- 
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+### 앱 다운로드
+[일자리플랫폼](https://drive.google.com/file/d/1A8wu7O69e_6yKgdE-SKEmTy4HR0w-kfp/view?usp=sharing)
