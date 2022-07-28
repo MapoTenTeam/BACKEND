@@ -39,6 +39,3 @@
 - 로그아웃 
 
 --- 
-
-### 앱 다운로드
-[일자리플랫폼](https://drive.google.com/file/d/1A8wu7O69e_6yKgdE-SKEmTy4HR0w-kfp/view?usp=sharing)
